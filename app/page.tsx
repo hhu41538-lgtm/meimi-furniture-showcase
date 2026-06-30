@@ -11,7 +11,7 @@ const categories = [
   {
     title: "Dining & Bedroom",
     description: "Dining Tables, Dining Chairs, Beds, Nightstands",
-    folder: "Dining & Bedroom",
+    folder: "Dining",
   },
   {
     title: "Custom Interiors",
@@ -21,10 +21,10 @@ const categories = [
 ];
 
 export default function Home() {
-  const heroImage = getRepresentativeImage("Hero", "/images/Other/观景01.jpg");
+  const heroImage = getRepresentativeImage("Hero", "/images/Other/fallback.jpg");
   const categoryCards = categories.map((category) => ({
     ...category,
-    image: getRepresentativeImage(category.folder, "/images/Other/观景01.jpg"),
+    image: getRepresentativeImage(category.folder, "/images/Other/fallback.jpg"),
   }));
 
   return (
