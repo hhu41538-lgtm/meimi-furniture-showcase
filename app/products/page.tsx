@@ -1,4 +1,4 @@
-﻿import { getFolderImagePaths } from "@/lib/imageAssets";
+import { getFolderImagePaths } from "@/lib/imageAssets";
 import ProductsClient from "./ProductsClient";
 
 const FALLBACK = "/images/Other/fallback.jpg";
@@ -26,10 +26,44 @@ const readyMadeProducts = [
 ];
 
 const customCategories = [
-  { title: "Wardrobes & Storage", description: "Tailored wardrobe systems, closets, and finished storage solutions." },
-  { title: "Kitchen Cabinetry", description: "Elegant turnkey cabinetry for contemporary kitchens and service spaces." },
-  { title: "Wall Panels & Doors", description: "Textured wall panels and statement doors crafted to suit your interiors." },
+  {
+    id: "wall-panels",
+    title: "Wall Panels, Doors & TV Cabinets",
+    description:
+      "Textured wall panels, statement doors and integrated TV cabinetry, crafted as a continuous surface for living and reception spaces.",
+    image: "",
+  },
+  {
+    id: "kitchen",
+    title: "Kitchen Cabinetry",
+    description:
+      "Turnkey kitchen systems combining precise millwork, stone worktops and integrated appliances for modern cooking and service areas.",
+    image: "",
+  },
+  {
+    id: "wardrobes",
+    title: "Wardrobes",
+    description:
+      "Full-height wardrobe and dressing systems tailored to bedrooms and walk-in closets, with configurable interiors.",
+    image: "",
+  },
 ];
+
+const otherSpacesCategory = {
+  id: "other-spaces",
+  title: "Other Spaces",
+  description:
+    "Ready-made furniture for tea rooms, home offices, entryways and other areas of the home. New collections are being added to this range.",
+  image: "",
+};
+
+const mattressCategory = {
+  id: "mattress",
+  title: "Handmade Mattress",
+  description:
+    "Hand-tufted, hand-stitched mattresses built layer by layer in our own workshop — a signature craft of the Meimi&H factory.",
+  image: "",
+};
 
 const folderMap: Record<string, string> = {
   "Living Room": "Living Room",
@@ -61,10 +95,31 @@ export default function ProductsPage() {
   const customImages = getFolderImagePaths("Custom Interiors");
   const customWithImages = customCategories.map((cat, i) => ({
     ...cat,
-    imageSrc: customImages.length > 0 ? customImages[i % customImages.length] : FALLBACK,
+    imageSrc:
+      cat.image || (customImages.length > 0 ? customImages[i % customImages.length] : FALLBACK),
   }));
 
+  const otherImages = getFolderImagePaths("Other");
+  const otherSpacesWithImage = {
+    ...otherSpacesCategory,
+    imageSrc:
+      otherSpacesCategory.image ||
+      (otherImages.length > 0 ? otherImages[0] : FALLBACK),
+  };
+
+  const mattressImages = getFolderImagePaths("Handmade mattress");
+  const mattressWithImage = {
+    ...mattressCategory,
+    imageSrc:
+      mattressCategory.image || (mattressImages.length > 0 ? mattressImages[0] : FALLBACK),
+  };
+
   return (
-    <ProductsClient products={productsWithImages} customCategories={customWithImages} />
+    <ProductsClient
+      products={productsWithImages}
+      customCategories={customWithImages}
+      otherSpaces={otherSpacesWithImage}
+      mattress={mattressWithImage}
+    />
   );
 }

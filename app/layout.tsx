@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Inter, Playfair_Display, Bodoni_Moda } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -16,6 +16,12 @@ const playfairDisplay = Playfair_Display({
   display: "swap",
 });
 
+const bodoniModa = Bodoni_Moda({
+  subsets: ["latin"],
+  variable: "--font-bodoni-moda",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Meimi Furniture",
   description: "Elegant furniture solutions crafted for modern living.",
@@ -27,7 +33,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfairDisplay.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${playfairDisplay.variable} ${bodoniModa.variable}`}
+    >
       <body className="min-h-screen bg-[#FCFBF7] text-stone-800 antialiased">
         <div className="flex min-h-screen flex-col">
           <Header />
