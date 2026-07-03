@@ -46,7 +46,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-8 lg:px-10">
         <Link
           href="/"
-          className="font-['var(--font-bodoni-moda)'] text-2xl font-semibold tracking-[0.15em] text-stone-900"
+          className="font-['var(--font-jost)'] text-2xl font-light tracking-[0.2em] text-stone-900"
         >
           Meimi&H
         </Link>

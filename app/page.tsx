@@ -57,7 +57,7 @@ export default function Home() {
             Where Beauty Dwells, The Heart Finds
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-stone-200 sm:text-xl">
-            Premium furniture, direct from our Foshan atelier. Established 2020.
+            Creating refinement, one piece at a time.
           </p>
           <a
             href="/products"
