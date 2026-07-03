@@ -32,6 +32,7 @@ const productsMenu: MenuColumn[] = [
 
 const otherNavItems = [
   { label: "Home", href: "/" },
+  { label: "Case Showcase", href: "/case-showcase" },
   { label: "About us", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
@@ -100,6 +101,9 @@ export default function Header() {
             )}
           </div>
 
+          <Link href="/case-showcase" className="transition hover:text-stone-950">
+            Case Showcase
+          </Link>
           <Link href="/about" className="transition hover:text-stone-950">
             About us
           </Link>
