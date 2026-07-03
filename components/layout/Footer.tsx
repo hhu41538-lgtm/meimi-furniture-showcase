@@ -11,7 +11,7 @@ export default function Footer() {
     <footer className="border-t border-stone-200 bg-[#FAF9F6]">
       <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-8 text-sm text-stone-600 sm:px-8 lg:flex-row lg:items-start lg:justify-between lg:px-10">
         <div>
-          <p className="font-['var(--font-playfair-display)'] text-xl font-semibold tracking-[0.12em] text-stone-900">
+          <p className="font-['var(--font-jost)'] text-xl font-light tracking-[0.18em] text-stone-900">
             Meimi&H
           </p>
           <p className="mt-2 text-base text-stone-700">
@@ -28,7 +28,7 @@ export default function Footer() {
                 href={link.href}
                 target="_blank"
                 rel="noreferrer"
-                className="font-medium text-stone-700 transition hover:text-stone-950"
+                className="font-medium text-stone-700 transition-colors duration-300 hover:text-[#6B2737]"
               >
                 {link.label}
               </a>
@@ -38,7 +38,7 @@ export default function Footer() {
             href="https://wa.me/8617796076275"
             target="_blank"
             rel="noreferrer"
-            className="font-medium text-stone-700 transition hover:text-stone-950"
+            className="font-medium text-stone-700 transition-colors duration-300 hover:text-[#6B2737]"
           >
             WhatsApp
           </Link>
