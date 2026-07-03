@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 type SubItem = { label: string; href: string };
@@ -38,9 +39,17 @@ const otherNavItems = [
 ];
 
 export default function Header() {
+  const pathname = usePathname();
   const [megaOpen, setMegaOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+
+  const navLinkClass = (href: string, exact = true) => {
+    const isActive = exact ? pathname === href : pathname.startsWith(href);
+    return `relative pb-1 transition hover:text-stone-950 after:absolute after:-bottom-0.5 after:left-0 after:h-px after:bg-[#6B2737] after:transition-all after:duration-300 ${
+      isActive ? "text-stone-950 after:w-full" : "after:w-0 hover:after:w-full"
+    }`;
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-stone-200/80 bg-[#FAF9F6] shadow-sm backdrop-blur">
@@ -54,7 +63,7 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-8 text-sm font-medium text-stone-700 md:flex">
-          <Link href="/" className="transition hover:text-stone-950">
+          <Link href="/" className={navLinkClass("/")}>
             Home
           </Link>
 
@@ -65,7 +74,7 @@ export default function Header() {
           >
             <Link
               href="/products"
-              className="inline-flex items-center gap-1 transition hover:text-stone-950"
+              className={`inline-flex items-center gap-1 ${navLinkClass("/products", false)}`}
             >
               Products
               <span aria-hidden className="text-xs">{"\u25BE"}</span>
@@ -85,7 +94,7 @@ export default function Header() {
                             <li key={item.href}>
                               <Link
                                 href={item.href}
-                                className="block text-sm text-stone-800 transition hover:text-stone-950"
+                                className="block text-sm text-stone-800 transition hover:text-[#6B2737]"
                                 onClick={() => setMegaOpen(false)}
                               >
                                 {item.label}
@@ -101,13 +110,13 @@ export default function Header() {
             )}
           </div>
 
-          <Link href="/case-showcase" className="transition hover:text-stone-950">
+          <Link href="/case-showcase" className={navLinkClass("/case-showcase")}>
             Case Showcase
           </Link>
-          <Link href="/about" className="transition hover:text-stone-950">
+          <Link href="/about" className={navLinkClass("/about")}>
             About us
           </Link>
-          <Link href="/contact" className="transition hover:text-stone-950">
+          <Link href="/contact" className={navLinkClass("/contact")}>
             Contact
           </Link>
         </nav>
@@ -131,7 +140,9 @@ export default function Header() {
               <li>
                 <Link
                   href="/"
-                  className="block rounded px-3 py-3 hover:bg-stone-100"
+                  className={`block rounded px-3 py-3 hover:bg-stone-100 ${
+                    pathname === "/" ? "bg-stone-100 text-[#6B2737]" : ""
+                  }`}
                   onClick={() => setMobileOpen(false)}
                 >
                   Home
@@ -182,7 +193,9 @@ export default function Header() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="block rounded px-3 py-3 hover:bg-stone-100"
+                      className={`block rounded px-3 py-3 hover:bg-stone-100 ${
+                        pathname === item.href ? "bg-stone-100 text-[#6B2737]" : ""
+                      }`}
                       onClick={() => setMobileOpen(false)}
                     >
                       {item.label}
