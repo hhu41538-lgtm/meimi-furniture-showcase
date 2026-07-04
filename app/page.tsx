@@ -2,33 +2,38 @@ import Image from "next/image";
 import { getFolderImagePaths, getRepresentativeImage } from "@/lib/imageAssets";
 import HeroCarousel from "./HeroCarousel";
 import FadeIn from "@/components/ui/FadeIn";
+
 const FALLBACK = "/images/Other/fallback.jpg";
+
 const categories = [
   {
     title: "Living Room",
-    description: "Sofas, Lounge Chairs, Coffee Tables",
+    description: "Sofas, lounge chairs, coffee tables",
     folder: "Living Room",
   },
   {
     title: "Dining & Bedroom",
-    description: "Dining Tables, Dining Chairs, Beds, Nightstands",
+    description: "Dining tables, chairs, beds, nightstands",
     folder: "Dining",
   },
   {
     title: "Custom Interiors",
-    description: "Wardrobes, Cabinetry, Wall Panels, Doors, TV Units",
+    description: "Wardrobes, cabinetry, wall panels, doors",
     folder: "Custom Interiors",
   },
 ];
+
 const newArrivalFolders = [
   { label: "New Arrival 01", folder: "Bedroom" },
   { label: "New Arrival 02", folder: "Dining" },
   { label: "New Arrival 03", folder: "Living Room" },
   { label: "New Arrival 04", folder: "Custom Interiors" },
 ];
+
 export default function Home() {
   const heroImages = getFolderImagePaths("Hero");
   const heroSlides = heroImages.length > 0 ? heroImages : [FALLBACK];
+  const ethosImage = getRepresentativeImage("Living Room", FALLBACK);
   const categoryCards = categories.map((category) => ({
     ...category,
     image: getRepresentativeImage(category.folder, FALLBACK),
@@ -38,64 +43,124 @@ export default function Home() {
     const image = list.length > 1 ? list[1] : list[0] ?? FALLBACK;
     return { ...item, image };
   });
+
   return (
     <main className="bg-[#FAF9F6] text-stone-800">
-      <section className="relative isolate overflow-hidden px-6 py-20 sm:px-8 lg:px-10">
+      {/* HERO */}
+      <section className="relative isolate overflow-hidden">
         <HeroCarousel images={heroSlides} />
-        <div className="relative z-10 mx-auto flex min-h-[90vh] max-w-6xl flex-col items-center justify-center text-center">
-          <p className="mb-4 text-sm font-semibold uppercase tracking-[0.35em] text-stone-200">
+        <div className="relative z-10 mx-auto flex min-h-[92vh] max-w-5xl flex-col items-center justify-center px-6 text-center">
+          <p className="hero-rise mb-8 text-xs font-medium uppercase tracking-[0.5em] text-white/70" style={{ animationDelay: "0.1s" }}>
             Meimi&H
           </p>
-          <div className="mb-6 h-px w-12 bg-[#C99A9A]" />
-          <h1 className="max-w-4xl font-['var(--font-playfair-display)'] text-5xl leading-tight text-white sm:text-6xl lg:text-7xl">
-            Where Beauty Dwells, The Heart Finds
+          <h1 className="hero-rise max-w-4xl text-[2.75rem] font-extralight leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[5rem]" style={{ animationDelay: "0.25s" }}>
+            Where beauty dwells,
+            <br className="hidden sm:block" /> the heart finds
           </h1>
-          <p className="mt-6 max-w-2xl text-lg text-stone-200 sm:text-xl">
-            Creating refinement, one piece at a time.
+          <p className="hero-rise mt-8 max-w-md text-base font-light leading-relaxed tracking-wide text-white/80" style={{ animationDelay: "0.45s" }}>
+            Refined furniture, made to feel like home.
           </p>
           <a
             href="/products"
-            className="mt-10 inline-flex items-center rounded-full border border-white bg-white px-7 py-3 text-sm font-semibold text-stone-900 transition-all duration-300 hover:border-[#6B2737] hover:bg-[#6B2737] hover:text-white"
+            className="hero-rise group mt-12 inline-flex items-center gap-2 border-b border-white/50 pb-1 text-sm font-medium tracking-[0.15em] text-white transition-colors duration-300 hover:border-white"
+            style={{ animationDelay: "0.65s" }}
           >
-            Explore Collections
+            EXPLORE COLLECTIONS
+            <span className="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
           </a>
         </div>
       </section>
-      <section className="px-6 pb-20 sm:px-8 lg:px-10">
-        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-3">
-          {categoryCards.map((category, index) => (
-            <FadeIn key={category.title} delay={index * 100}>
-              <article className="group flex min-h-[260px] flex-col justify-between rounded-[2rem] border border-stone-200 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
+
+      {/* BRAND ETHOS */}
+      <section className="px-6 py-28 sm:px-8 lg:px-10 lg:py-40">
+        <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2 lg:gap-20">
+          <FadeIn>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.4em] text-stone-400">
+                Our Philosophy
+              </p>
+              <h2 className="mt-6 text-4xl font-extralight leading-[1.15] tracking-tight text-stone-900 sm:text-5xl">
+                Furniture made to feel like home.
+              </h2>
+              <p className="mt-8 max-w-md text-base font-light leading-loose text-stone-500">
+                Every piece can be tailored to your space and built by hand in our
+                Foshan atelier &mdash; where twenty years of craft meet a quieter,
+                more considered idea of luxury.
+              </p>
+              <a
+                href="/about"
+                className="group mt-10 inline-flex items-center gap-2 text-sm font-medium tracking-[0.12em] text-[#6B2737] transition-colors duration-300 hover:text-stone-900"
+              >
+                OUR STORY
+                <span className="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
+              </a>
+            </div>
+          </FadeIn>
+          <FadeIn delay={150}>
+            <div className="relative aspect-[4/5] overflow-hidden rounded-sm">
+              <Image
+                src={ethosImage}
+                alt="Meimi&H interior"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* CATEGORIES - full-image magazine cards */}
+      <section className="px-6 pb-28 sm:px-8 lg:px-10 lg:pb-40">
+        <div className="mx-auto max-w-6xl">
+          <FadeIn>
+            <div className="mb-14 max-w-2xl">
+              <p className="text-xs font-medium uppercase tracking-[0.4em] text-stone-400">
+                Collections
+              </p>
+              <h2 className="mt-4 text-3xl font-extralight tracking-tight text-stone-900 sm:text-4xl">
+                Explore by space
+              </h2>
+            </div>
+          </FadeIn>
+          <div className="grid gap-6 md:grid-cols-3">
+            {categoryCards.map((category, index) => (
+              <FadeIn key={category.title} delay={index * 120}>
+                <a
+                  href="/products"
+                  className="group relative block aspect-[3/4] overflow-hidden rounded-sm"
+                >
                   <Image
                     src={category.image}
                     alt={`${category.title} showcase`}
                     fill
-                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                    className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-105"
                   />
-                </div>
-                <div className="mt-6">
-                  <h2 className="inline-block text-2xl font-semibold text-stone-900">
-                    {category.title}
-                    <span className="mt-1 block h-px w-0 bg-[#6B2737] transition-all duration-300 group-hover:w-full" />
-                  </h2>
-                  <p className="mt-3 text-base leading-7 text-stone-600">
-                    {category.description}
-                  </p>
-                </div>
-              </article>
-            </FadeIn>
-          ))}
+                  <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-stone-950/10 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 p-7">
+                    <h3 className="text-xl font-light tracking-tight text-white">
+                      {category.title}
+                    </h3>
+                    <p className="mt-1.5 max-w-[16rem] text-sm font-light leading-relaxed text-white/0 transition-all duration-500 group-hover:text-white/75">
+                      {category.description}
+                    </p>
+                    <span className="mt-3 block h-px w-8 bg-white/60 transition-all duration-500 group-hover:w-14" />
+                  </div>
+                </a>
+              </FadeIn>
+            ))}
+          </div>
         </div>
       </section>
-      <section className="border-t border-stone-200 px-6 py-20 sm:px-8 lg:px-10">
+
+      {/* NEW ARRIVALS */}
+      <section className="border-t border-stone-200/70 px-6 py-28 sm:px-8 lg:px-10 lg:py-36">
         <div className="mx-auto max-w-6xl">
           <FadeIn>
-            <div className="mb-10 flex flex-col items-center text-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.35em] text-stone-500">
+            <div className="mb-14 flex flex-col items-center text-center">
+              <p className="text-xs font-medium uppercase tracking-[0.4em] text-stone-400">
                 Just In
               </p>
-              <h2 className="mt-3 font-['var(--font-playfair-display)'] text-4xl text-stone-900 sm:text-5xl">
+              <h2 className="mt-4 text-4xl font-extralight tracking-tight text-stone-900 sm:text-5xl">
                 New Arrivals
               </h2>
             </div>
@@ -103,24 +168,23 @@ export default function Home() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {newArrivals.map((item, index) => (
               <FadeIn key={item.label} delay={index * 100}>
-                <article className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                  <div className="relative aspect-[3/4] overflow-hidden">
+                <article className="group">
+                  <div className="relative aspect-[3/4] overflow-hidden rounded-sm">
                     <Image
                       src={item.image}
                       alt={item.label}
                       fill
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                      className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-105"
                     />
-                    <span className="absolute left-4 top-4 rounded-full bg-[#6B2737] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+                    <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] text-stone-800 backdrop-blur">
                       New
                     </span>
                   </div>
-                  <div className="p-5">
-                    <h3 className="inline-block text-lg font-semibold text-stone-900">
+                  <div className="mt-5">
+                    <h3 className="text-base font-light tracking-tight text-stone-900">
                       {item.label}
-                      <span className="mt-1 block h-px w-0 bg-[#6B2737] transition-all duration-300 group-hover:w-full" />
                     </h3>
-                    <p className="mt-1 text-sm text-stone-500">Coming soon</p>
+                    <p className="mt-1 text-sm font-light text-stone-400">Coming soon</p>
                   </div>
                 </article>
               </FadeIn>
@@ -128,9 +192,11 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section className="border-t border-stone-200 bg-white/70 px-6 py-6 text-center sm:px-8 lg:px-10">
-        <p className="text-sm font-semibold uppercase tracking-[0.35em] text-stone-600">
-          Factory Direct · Premium Materials · Custom Orders Welcome · Est. 2020
+
+      {/* FOOTER STRIP */}
+      <section className="border-t border-stone-200/70 bg-white/60 px-6 py-10 text-center sm:px-8 lg:px-10">
+        <p className="text-xs font-medium uppercase tracking-[0.35em] text-stone-500">
+          Factory Direct &middot; Premium Materials &middot; Custom Orders Welcome &middot; Est. 2020
         </p>
       </section>
     </main>

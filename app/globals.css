@@ -3,25 +3,54 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #faf9f6;
+  --foreground: #1c1c1c;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-jost), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  .shadow-soft {
+    box-shadow: 0 1px 2px rgba(28, 28, 28, 0.04),
+      0 8px 24px rgba(28, 28, 28, 0.05);
+  }
+  .shadow-soft-hover {
+    box-shadow: 0 2px 4px rgba(28, 28, 28, 0.05),
+      0 18px 40px rgba(28, 28, 28, 0.08);
+  }
+}
+
+/* Hero entrance animation */
+@keyframes heroRise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-rise {
+  opacity: 0;
+  animation: heroRise 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-rise {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
