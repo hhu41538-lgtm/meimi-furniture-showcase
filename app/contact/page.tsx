@@ -1,63 +1,127 @@
+import type { Metadata } from "next";
 import FadeIn from "@/components/ui/FadeIn";
 
+export const metadata: Metadata = {
+  title: "Contact | Meimi&H",
+  description:
+    "Get in touch with Meimi&H — premium furniture handcrafted in Foshan, China. Chat with us on WhatsApp, we respond within 24 hours.",
+  alternates: { canonical: "/contact" },
+};
+
+const WHATSAPP = "https://wa.me/8617796076275";
+
 const socialLinks = [
-  { platform: "TikTok", handle: "@meimi_LincoIn / @meimi_furniture3 / @meimi_furniture" },
-  { platform: "Instagram", handle: "@Meimi&H Living India / @Meimi&H Living US" },
-  { platform: "Facebook", handle: "Meimi&H Living US / Meimi&H Living Global / Meimi&H Living India" },
+  {
+    platform: "TikTok",
+    handle: "@meimi_LincoIn · @meimi_furniture3 · @meimi_furniture",
+  },
+  {
+    platform: "Instagram",
+    handle: "Meimi&H Living India · Meimi&H Living US",
+  },
+  {
+    platform: "Facebook",
+    handle: "Meimi&H Living US · Global · India",
+  },
 ];
 
 export default function ContactPage() {
   return (
-    <main className="bg-[#FAF9F6] px-6 py-16 sm:px-8 lg:px-10">
-      <div className="mx-auto flex max-w-4xl flex-col gap-8">
+    <main className="bg-[#FAF9F6] text-stone-800">
+      {/* HEADER */}
+      <section className="px-6 pt-32 sm:px-8 lg:px-10 lg:pt-40">
         <FadeIn>
-          <section>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-stone-500">
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.4em] text-stone-400">
               Contact
             </p>
-            <h1 className="mt-3 text-4xl font-semibold text-stone-900 sm:text-5xl">
-              Get in Touch
+            <h1 className="mt-5 text-4xl font-extralight tracking-tight text-stone-900 sm:text-6xl">
+              Get in touch
             </h1>
-            <span className="mt-4 block h-0.5 w-16 bg-[#6B2737]" />
-          </section>
-        </FadeIn>
-
-        <FadeIn>
-          <a
-            href="https://wa.me/8617796076275"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center justify-center rounded-full bg-[#6B2737] px-6 py-4 text-center text-base font-semibold text-white transition-all duration-300 hover:bg-[#591F2C] sm:text-lg"
-          >
-            Chat on WhatsApp — We respond within 24 hours
-          </a>
-        </FadeIn>
-
-        <FadeIn delay={80}>
-          <div className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-xl">
-            <h2 className="text-2xl font-semibold text-stone-900">Meimi&H</h2>
-            <p className="mt-4 text-lg leading-8 text-stone-600">
-              佛山市美觅家居科技有限公司
-              <br />
-              Shunde District, Longjiang Town, Foshan, Guangdong, China
+            <p className="mx-auto mt-8 max-w-md text-base font-light leading-loose text-stone-500">
+              We&apos;d love to hear about your space. Reach out and a member of
+              our team will respond within 24 hours.
             </p>
+            <a
+              href={WHATSAPP}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-10 inline-flex items-center gap-2 bg-[#6B2737] px-8 py-3.5 text-sm font-medium tracking-[0.12em] text-white transition-colors duration-300 hover:bg-stone-900"
+            >
+              CHAT ON WHATSAPP
+              <span>&rarr;</span>
+            </a>
           </div>
         </FadeIn>
+      </section>
 
-        <FadeIn delay={160}>
-          <div className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-xl">
-            <h2 className="text-2xl font-semibold text-stone-900">Social</h2>
-            <div className="mt-4 space-y-3 text-stone-600">
-              {socialLinks.map((link) => (
-                <div key={link.platform}>
-                  <p className="font-semibold text-stone-900">{link.platform}</p>
-                  <p className="mt-1 text-base">{link.handle}</p>
-                </div>
-              ))}
+      {/* INFO */}
+      <section className="px-6 py-24 sm:px-8 lg:px-10 lg:py-32">
+        <div className="mx-auto grid max-w-5xl gap-16 lg:grid-cols-2 lg:gap-24">
+          <FadeIn>
+            <div className="border-t border-stone-200 pt-8">
+              <p className="text-xs font-medium uppercase tracking-[0.3em] text-stone-400">
+                Atelier
+              </p>
+              <h2 className="mt-6 text-2xl font-extralight tracking-tight text-stone-900">
+                Meimi&amp;H
+              </h2>
+              <p className="mt-5 text-base font-light leading-loose text-stone-500">
+                Shunde District, Longjiang Town
+                <br />
+                Foshan, Guangdong, China
+              </p>
+              <a
+                href={WHATSAPP}
+                target="_blank"
+                rel="noreferrer"
+                className="group mt-8 inline-flex items-center gap-2 text-sm font-medium tracking-[0.12em] text-[#6B2737] transition-colors duration-300 hover:text-stone-900"
+              >
+                +86 177 9607 6275
+                <span className="transition-transform duration-300 group-hover:translate-x-1">
+                  &rarr;
+                </span>
+              </a>
             </div>
-          </div>
-        </FadeIn>
-      </div>
+          </FadeIn>
+
+          <FadeIn delay={150}>
+            <div className="border-t border-stone-200 pt-8">
+              <p className="text-xs font-medium uppercase tracking-[0.3em] text-stone-400">
+                Social
+              </p>
+              <div className="mt-6 space-y-6">
+                {socialLinks.map((link) => (
+                  <div key={link.platform}>
+                    <p className="text-base font-light tracking-tight text-stone-900">
+                      {link.platform}
+                    </p>
+                    <p className="mt-1 text-sm font-light leading-relaxed text-stone-500">
+                      {link.handle}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      {/* CTA STRIP */}
+      <section className="border-t border-stone-200/70 bg-white/60 px-6 py-16 text-center sm:px-8 lg:px-10">
+        <h2 className="text-2xl font-extralight tracking-tight text-stone-900 sm:text-3xl">
+          Let&apos;s create something refined.
+        </h2>
+        <a
+          href={WHATSAPP}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-8 inline-flex items-center gap-2 border-b border-[#6B2737] pb-1 text-sm font-medium tracking-[0.12em] text-[#6B2737] transition-colors duration-300 hover:border-stone-900 hover:text-stone-900"
+        >
+          START A CONVERSATION
+          <span>&rarr;</span>
+        </a>
+      </section>
     </main>
   );
 }

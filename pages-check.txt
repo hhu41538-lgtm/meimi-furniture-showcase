@@ -1,0 +1,12 @@
+﻿===== 四个页面主文件 =====
+app\about\page.tsx
+app\case-showcase\page.tsx
+app\contact\page.tsx
+app\products\[slug]\page.tsx
+app\products\page.tsx
+app\products\ProductsClient.tsx
+
+===== components 下的相关子组件 =====
+components\layout\Footer.tsx
+components\layout\Header.tsx
+components\ui\FadeIn.tsx

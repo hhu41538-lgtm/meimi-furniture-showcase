@@ -1,5 +1,14 @@
+import type { Metadata } from "next";
+import Image from "next/image";
 import { getFolderImagePaths } from "@/lib/imageAssets";
 import FadeIn from "@/components/ui/FadeIn";
+
+export const metadata: Metadata = {
+  title: "About us | Meimi&H",
+  description:
+    "Meimi&H is a premium furniture atelier in Foshan, China — 20+ years of craftsmanship meeting a refined global aesthetic. The art of refined living.",
+  alternates: { canonical: "/about" },
+};
 
 const FALLBACK = "/images/Other/fallback.jpg";
 
@@ -31,116 +40,135 @@ export default function AboutPage() {
   const showroomImage = pick(2);
 
   return (
-    <main className="bg-[#FAF9F6] px-6 py-16 sm:px-8 lg:px-10">
-      <div className="mx-auto flex max-w-6xl flex-col gap-14">
+    <main className="bg-[#FAF9F6] text-stone-800">
+      {/* HEADER */}
+      <section className="px-6 pt-32 sm:px-8 lg:px-10 lg:pt-40">
         <FadeIn>
-          <section className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-stone-500">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.4em] text-stone-400">
               The Art of Refined Living
             </p>
-            <h1 className="mt-3 font-['var(--font-playfair-display)'] text-4xl font-semibold text-stone-900 sm:text-5xl">
-              Our Atelier &mdash; Foshan, China
+            <h1 className="mt-5 text-4xl font-extralight tracking-tight text-stone-900 sm:text-6xl">
+              Our atelier &mdash; Foshan, China
             </h1>
-            <span className="mt-4 block h-0.5 w-16 bg-[#6B2737]" />
-            <p className="mt-5 text-lg italic leading-8 text-stone-600 sm:text-xl">
+            <p className="mt-8 text-lg font-light italic leading-relaxed text-[#6B2737] sm:text-xl">
               Creating refinement, one piece at a time.
             </p>
-          </section>
+          </div>
         </FadeIn>
+      </section>
 
+      {/* WIDE IMAGE */}
+      <section className="px-6 pt-16 sm:px-8 lg:px-10">
         <FadeIn>
-          <section className="overflow-hidden rounded-3xl border border-stone-200 bg-stone-100 shadow-sm">
-            <div className="relative aspect-[16/9] w-full">
-              <img
-                src={atelierImage}
-                alt="Meimi&H atelier in Foshan"
-                className="h-full w-full object-cover"
-                loading="lazy"
+          <div className="relative mx-auto aspect-[16/9] max-w-6xl overflow-hidden rounded-sm">
+            <Image
+              src={atelierImage}
+              alt="Meimi&H atelier in Foshan"
+              fill
+              priority
+              className="object-cover"
+            />
+          </div>
+        </FadeIn>
+      </section>
+
+      {/* STORY */}
+      <section className="px-6 py-24 sm:px-8 lg:px-10 lg:py-32">
+        <FadeIn>
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-base font-light leading-loose text-stone-500 sm:text-lg">
+              Founded in 2020 in Shunde District, Longjiang Town, Foshan &mdash;
+              the world&apos;s furniture manufacturing heartland &mdash;
+              Meimi&amp;H was built on one belief: that beautiful furniture should
+              feel as considered as the finest European houses. We bring together
+              20+ years of local craftsmanship with a refined global aesthetic,
+              serving clients who believe their home deserves the extraordinary.
+            </p>
+          </div>
+        </FadeIn>
+      </section>
+
+      {/* SIGNATURE CRAFT */}
+      <section className="px-6 pb-24 sm:px-8 lg:px-10 lg:pb-32">
+        <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2 lg:gap-20">
+          <FadeIn>
+            <div className="group relative aspect-[4/3] overflow-hidden rounded-sm">
+              <Image
+                src={craftImage}
+                alt="Craft detail"
+                fill
+                className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-105"
               />
             </div>
-          </section>
-        </FadeIn>
-
-        <FadeIn>
-          <section className="rounded-3xl border border-stone-200 bg-white p-8 shadow-sm">
-            <p className="text-lg leading-8 text-stone-600">
-              Founded in 2020 in Shunde District, Longjiang Town, Foshan &mdash; the
-              world&apos;s furniture manufacturing heartland &mdash; Meimi&amp;H was
-              built on one belief: that beautiful furniture should feel as
-              considered as the finest European houses. We bring together 20+ years
-              of local craftsmanship with a refined global aesthetic, serving
-              clients who believe their home deserves the extraordinary.
-            </p>
-          </section>
-        </FadeIn>
-
-        <FadeIn>
-          <section className="grid gap-8 md:grid-cols-2">
-            <div className="group overflow-hidden rounded-3xl border border-stone-200 bg-stone-100 shadow-sm transition-all duration-300 hover:shadow-xl">
-              <div className="relative aspect-[4/3] w-full overflow-hidden">
-                <img
-                  src={craftImage}
-                  alt="Craft detail"
-                  className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-            </div>
-            <div className="flex flex-col justify-center">
-              <p className="text-sm font-semibold uppercase tracking-[0.3em] text-stone-500">
-                Signature craft
+          </FadeIn>
+          <FadeIn delay={150}>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.4em] text-stone-400">
+                Signature Craft
               </p>
-              <h2 className="mt-3 font-['var(--font-playfair-display)'] text-3xl font-semibold text-stone-900 sm:text-4xl">
+              <h2 className="mt-6 text-3xl font-extralight leading-[1.15] tracking-tight text-stone-900 sm:text-4xl">
                 Detail is our discipline.
               </h2>
-              <span className="mt-4 block h-0.5 w-12 bg-[#6B2737]" />
-              <p className="mt-5 text-base leading-8 text-stone-600 sm:text-lg">
+              <p className="mt-8 max-w-md text-base font-light leading-loose text-stone-500">
                 Every piece leaves our workshop only after passing through the
                 hands of makers who have spent a lifetime learning how wood, stone
                 and textile behave. The difference is in the millimetres you never
                 see.
               </p>
             </div>
-          </section>
-        </FadeIn>
+          </FadeIn>
+        </div>
+      </section>
 
-        <section className="grid gap-6 md:grid-cols-3">
-          {values.map((value, index) => (
-            <FadeIn key={value.title} delay={index * 100}>
-              <article className="group h-full rounded-3xl border border-stone-200 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                <h2 className="inline-block text-xl font-semibold text-stone-900">
-                  {value.title}
-                  <span className="mt-1 block h-px w-0 bg-[#6B2737] transition-all duration-300 group-hover:w-full" />
-                </h2>
-                <p className="mt-3 text-base leading-7 text-stone-600">
-                  {value.description}
-                </p>
-              </article>
-            </FadeIn>
-          ))}
-        </section>
+      {/* VALUES */}
+      <section className="border-t border-stone-200/70 px-6 py-24 sm:px-8 lg:px-10 lg:py-32">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-12 md:grid-cols-3 md:gap-8">
+            {values.map((value, index) => (
+              <FadeIn key={value.title} delay={index * 100}>
+                <div>
+                  <span className="block h-px w-8 bg-[#6B2737]" />
+                  <h3 className="mt-6 text-xl font-light tracking-tight text-stone-900">
+                    {value.title}
+                  </h3>
+                  <p className="mt-3 text-base font-light leading-loose text-stone-500">
+                    {value.description}
+                  </p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
 
+      {/* SHOWROOM WIDE IMAGE */}
+      <section className="px-6 pb-24 sm:px-8 lg:px-10 lg:pb-32">
         <FadeIn>
-          <section className="overflow-hidden rounded-3xl border border-stone-200 bg-stone-100 shadow-sm">
-            <div className="relative aspect-[21/9] w-full">
-              <img
-                src={showroomImage}
-                alt="Meimi&H showroom"
-                className="h-full w-full object-cover"
-                loading="lazy"
-              />
-            </div>
-          </section>
+          <div className="relative mx-auto aspect-[21/9] max-w-6xl overflow-hidden rounded-sm">
+            <Image
+              src={showroomImage}
+              alt="Meimi&H showroom"
+              fill
+              className="object-cover"
+            />
+          </div>
         </FadeIn>
+      </section>
 
+      {/* QUOTE */}
+      <section className="border-t border-stone-200/70 bg-white/60 px-6 py-24 text-center sm:px-8 lg:px-10">
         <FadeIn>
-          <blockquote className="rounded-3xl border-l-4 border-[#6B2737] bg-stone-900 px-8 py-10 text-white shadow-sm">
-            <p className="text-xl leading-8 sm:text-2xl">
-              &quot;Where beauty dwells, the heart finds.&quot; &mdash; Meimi&amp;H
+          <blockquote className="mx-auto max-w-3xl">
+            <p className="text-2xl font-extralight leading-relaxed tracking-tight text-stone-900 sm:text-3xl">
+              &ldquo;Where beauty dwells, the heart finds.&rdquo;
             </p>
+            <footer className="mt-6 text-xs font-medium uppercase tracking-[0.3em] text-stone-400">
+              Meimi&amp;H
+            </footer>
           </blockquote>
         </FadeIn>
-      </div>
+      </section>
     </main>
   );
 }
