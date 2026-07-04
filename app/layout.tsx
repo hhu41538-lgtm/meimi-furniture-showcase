@@ -4,18 +4,78 @@ import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { siteConfig } from "@/lib/seo-config";
+
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const playfairDisplay = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair-display", display: "swap" });
 const bodoniModa = Bodoni_Moda({ subsets: ["latin"], variable: "--font-bodoni-moda", display: "swap" });
 const jost = Jost({ subsets: ["latin"], variable: "--font-jost", display: "swap" });
+
 export const metadata: Metadata = {
-  title: "Meimi&H - Premium Furniture from Foshan",
-  description: "High-end furniture direct from our Foshan atelier. Sofas, custom interiors, beds, dining and more. Est. 2020.",
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.title,
+    template: "%s | Meimi&H",
+  },
+  description: siteConfig.description,
+  keywords: siteConfig.keywords,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.title,
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  verification: {
+    google: "2tC8uAIByQggv6N-iHMRdCVREsQtG2uxrHKP_flhFoU",
+  },
 };
+
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: siteConfig.name,
+  url: siteConfig.url,
+  logo: `${siteConfig.url}/favicon.ico`,
+  description: siteConfig.description,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Foshan",
+    addressRegion: "Guangdong",
+    addressCountry: "CN",
+  },
+};
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${inter.variable} ${playfairDisplay.variable} ${bodoniModa.variable} ${jost.variable}`}>
       <body className="min-h-screen bg-[#FCFBF7] text-stone-800 antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         <noscript>
           <img height="1" width="1" style={{ display: "none" }}
             src="https://www.facebook.com/tr?id=3027824810758006&ev=PageView&noscript=1" alt="" />
