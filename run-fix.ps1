@@ -1,90 +1,79 @@
-# ---- about/page.tsx ----
-$p1 = "app\about\page.tsx"
-$c1 = Get-Content -Path $p1 -Raw
-$c1 = 'import type { Metadata } from "next";' + "`r`n" + $c1
-$anchor1 = 'import FadeIn from "@/components/ui/FadeIn";'
-$block1 = @'
-import FadeIn from "@/components/ui/FadeIn";
+# ===== public/robots.txt =====
+$robots = @"
+User-agent: *
+Allow: /
 
-export const metadata: Metadata = {
-  title: "About Us",
-  description:
-    "Discover the story behind Meimi&H - premium materials and master craftsmanship from our Foshan furniture atelier, creating refined living spaces since 2020.",
-};
-'@
-$c1 = $c1.Replace($anchor1, $block1)
-[System.IO.File]::WriteAllText($p1, $c1, (New-Object System.Text.UTF8Encoding $false))
-if ($c1 -match "export const metadata") { Write-Host "about/page.tsx OK" -ForegroundColor Green } else { Write-Host "about/page.tsx FAILED" -ForegroundColor Red }
+Sitemap: https://meimi-furniture-showcase.vercel.app/sitemap.xml
+"@
+[System.IO.File]::WriteAllText("public\robots.txt", $robots, (New-Object System.Text.UTF8Encoding $false))
+Write-Host "public/robots.txt written" -ForegroundColor Green
 
-# ---- case-showcase/page.tsx ----
-$p2 = "app\case-showcase\page.tsx"
-$c2 = Get-Content -Path $p2 -Raw
-$c2 = 'import type { Metadata } from "next";' + "`r`n" + $c2
-$anchor2 = 'import FadeIn from "@/components/ui/FadeIn";'
-$block2 = @'
-import FadeIn from "@/components/ui/FadeIn";
+# ===== public/sitemap.xml =====
+$today = Get-Date -Format "yyyy-MM-dd"
+$sitemap = @"
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://meimi-furniture-showcase.vercel.app/</loc>
+    <lastmod>$today</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://meimi-furniture-showcase.vercel.app/about</loc>
+    <lastmod>$today</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://meimi-furniture-showcase.vercel.app/case-showcase</loc>
+    <lastmod>$today</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://meimi-furniture-showcase.vercel.app/contact</loc>
+    <lastmod>$today</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://meimi-furniture-showcase.vercel.app/products</loc>
+    <lastmod>$today</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://meimi-furniture-showcase.vercel.app/privacy</loc>
+    <lastmod>$today</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>
+"@
+[System.IO.File]::WriteAllText("public\sitemap.xml", $sitemap, (New-Object System.Text.UTF8Encoding $false))
+Write-Host "public/sitemap.xml written" -ForegroundColor Green
 
-export const metadata: Metadata = {
-  title: "Case Studies",
-  description:
-    "Explore real-world interior projects and custom furniture case studies from Meimi&H, a premium furniture manufacturer based in Foshan, China.",
-};
-'@
-$c2 = $c2.Replace($anchor2, $block2)
-[System.IO.File]::WriteAllText($p2, $c2, (New-Object System.Text.UTF8Encoding $false))
-if ($c2 -match "export const metadata") { Write-Host "case-showcase/page.tsx OK" -ForegroundColor Green } else { Write-Host "case-showcase/page.tsx FAILED" -ForegroundColor Red }
+# ===== public/manifest.webmanifest =====
+$manifest = @"
+{
+  "name": "Meimi&H",
+  "short_name": "Meimi&H",
+  "description": "High-end furniture direct from our Foshan atelier. Sofas, custom interiors, beds, dining and more. Est. 2020.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FCFBF7",
+  "theme_color": "#6B2737",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+}
+"@
+[System.IO.File]::WriteAllText("public\manifest.webmanifest", $manifest, (New-Object System.Text.UTF8Encoding $false))
+Write-Host "public/manifest.webmanifest written" -ForegroundColor Green
 
-# ---- contact/page.tsx ----
-$p3 = "app\contact\page.tsx"
-$c3 = Get-Content -Path $p3 -Raw
-$c3 = 'import type { Metadata } from "next";' + "`r`n" + $c3
-$anchor3 = 'import FadeIn from "@/components/ui/FadeIn";'
-$block3 = @'
-import FadeIn from "@/components/ui/FadeIn";
-
-export const metadata: Metadata = {
-  title: "Contact Us",
-  description:
-    "Get in touch with Meimi&H via WhatsApp, TikTok, Instagram or Facebook. Foshan-based premium furniture manufacturer ready to help with your project.",
-};
-'@
-$c3 = $c3.Replace($anchor3, $block3)
-[System.IO.File]::WriteAllText($p3, $c3, (New-Object System.Text.UTF8Encoding $false))
-if ($c3 -match "export const metadata") { Write-Host "contact/page.tsx OK" -ForegroundColor Green } else { Write-Host "contact/page.tsx FAILED" -ForegroundColor Red }
-
-# ---- privacy/page.tsx (没有import行，直接在文件最前面插入) ----
-$p4 = "app\privacy\page.tsx"
-$c4 = Get-Content -Path $p4 -Raw
-$prefix4 = @'
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description:
-    "Read Meimi&H's privacy policy covering how we collect, use and protect your information as a Foshan-based furniture manufacturer.",
-};
-
-'@
-$c4 = $prefix4 + $c4
-[System.IO.File]::WriteAllText($p4, $c4, (New-Object System.Text.UTF8Encoding $false))
-if ($c4 -match "export const metadata") { Write-Host "privacy/page.tsx OK" -ForegroundColor Green } else { Write-Host "privacy/page.tsx FAILED" -ForegroundColor Red }
-
-# ---- products/page.tsx ----
-$p5 = "app\products\page.tsx"
-$c5 = Get-Content -Path $p5 -Raw
-$c5 = 'import type { Metadata } from "next";' + "`r`n" + $c5
-$anchor5 = 'import ProductsClient from "./ProductsClient";'
-$block5 = @'
-import ProductsClient from "./ProductsClient";
-
-export const metadata: Metadata = {
-  title: "Products",
-  description:
-    "Browse Meimi&H's Ready-Made Collections, Custom Interiors and Handmade Mattresses - premium furniture crafted in our Foshan atelier.",
-};
-'@
-$c5 = $c5.Replace($anchor5, $block5)
-[System.IO.File]::WriteAllText($p5, $c5, (New-Object System.Text.UTF8Encoding $false))
-if ($c5 -match "export const metadata") { Write-Host "products/page.tsx OK" -ForegroundColor Green } else { Write-Host "products/page.tsx FAILED" -ForegroundColor Red }
-
-Write-Host "`n全部5个页面处理完毕，请运行 npm.cmd run build 验证" -ForegroundColor Cyan
+Write-Host "`n三个静态文件已写入 public 目录，请运行 npm.cmd run build 验证" -ForegroundColor Cyan

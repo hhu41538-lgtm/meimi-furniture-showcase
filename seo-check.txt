@@ -1,84 +1,8 @@
-===== about =====
-import { getFolderImagePaths } from "@/lib/imageAssets";
-import FadeIn from "@/components/ui/FadeIn";
+===== out Ŀ¼ =====
 
-const FALLBACK = "/images/Other/fallback.jpg";
 
-const values = [
-  {
-    title: "Premium Materials",
-    description:
-      "Hand-selected woods, luxe upholstery, and finishes chosen for durability and beauty.",
-  },
-  {
-    title: "Master Craftsmen",
-    description:
-      "Decades of furniture-making expertise, refined through generations of local craftsmanship.",
 
-===== case-showcase =====
-import Image from "next/image";
+===== public Ŀ¼ =====
 
-import { getFolderImagePaths } from "@/lib/imageAssets";
-import FadeIn from "@/components/ui/FadeIn";
 
-const FALLBACK = "/images/Other/fallback.jpg";
 
-const placeholderCases = [
-  { id: "case-01", title: "Case Study 01", location: "Coming soon" },
-  { id: "case-02", title: "Case Study 02", location: "Coming soon" },
-  { id: "case-03", title: "Case Study 03", location: "Coming soon" },
-  { id: "case-04", title: "Case Study 04", location: "Coming soon" },
-  { id: "case-05", title: "Case Study 05", location: "Coming soon" },
-  { id: "case-06", title: "Case Study 06", location: "Coming soon" },
-];
-
-===== contact =====
-import FadeIn from "@/components/ui/FadeIn";
-
-const socialLinks = [
-  { platform: "TikTok", handle: "@meimi_LincoIn / @meimi_furniture3 / @meimi_furniture" },
-  { platform: "Instagram", handle: "@Meimi&H Living India / @Meimi&H Living US" },
-  { platform: "Facebook", handle: "Meimi&H Living US / Meimi&H Living Global / Meimi&H Living India" },
-];
-
-export default function ContactPage() {
-  return (
-    <main className="bg-[#FAF9F6] px-6 py-16 sm:px-8 lg:px-10">
-      <div className="mx-auto flex max-w-4xl flex-col gap-8">
-        <FadeIn>
-          <section>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-stone-500">
-
-===== privacy =====
-export default function PrivacyPage() {
-  return (
-    <main className="bg-[#FAF9F6] px-6 py-16 sm:px-8 lg:px-10">
-      <div className="mx-auto max-w-3xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-stone-500">Legal</p>
-        <h1 className="mt-3 text-4xl font-semibold text-stone-900">Privacy Policy</h1>
-        <span className="mt-4 block h-0.5 w-16 bg-[#6B2737]" />
-        <p className="mt-4 text-sm text-stone-500">Last updated: July 2025</p>
-        <div className="mt-10 space-y-8 text-base leading-8 text-stone-700">
-          <section>
-            <h2 className="text-xl font-semibold text-stone-900">1. Who We Are</h2>
-            <p className="mt-3">This website is operated by <strong>Meimi&amp;H</strong>, a premium furniture manufacturer based in Shunde District, Longjiang Town, Foshan, Guangdong, China. Contact us via WhatsApp: <a href="https://wa.me/8617796076275" className="text-[#6B2737] hover:underline">+86 177 9607 6275</a>.</p>
-          </section>
-          <section>
-            <h2 className="text-xl font-semibold text-stone-900">2. Information We Collect</h2>
-
-===== products =====
-import { getFolderImagePaths } from "@/lib/imageAssets";
-import ProductsClient from "./ProductsClient";
-
-const FALLBACK = "/images/Other/fallback.jpg";
-
-const readyMadeProducts = [
-  { name: "Groundpiece", category: "Living Room", image: "" },
-  { name: "Vivienne", category: "Living Room", image: "" },
-  { name: "Lawrence", category: "Living Room", image: "" },
-  { name: "Perry", category: "Living Room", image: "" },
-  { name: "Camelot", category: "Living Room", image: "" },
-  { name: "Bessel", category: "Living Room", image: "" },
-  { name: "Vivienne Chair", category: "Living Room", image: "" },
-  { name: "Aston", category: "Living Room", image: "" },
-  { name: "Beverly", category: "Living Room", image: "" },

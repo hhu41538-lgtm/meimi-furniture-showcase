@@ -1,0 +1,10 @@
+﻿{
+  "name": "Meimi&H",
+  "short_name": "Meimi&H",
+  "description": "High-end furniture direct from our Foshan atelier. Sofas, custom interiors, beds, dining and more. Est. 2020.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FCFBF7",
+  "theme_color": "#6B2737",
+  "icons": [{ "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" }]
+}
