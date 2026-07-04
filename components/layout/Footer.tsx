@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 const socialLinks = [
-  { label: "TikTok", href: "https://www.tiktok.com" },
-  { label: "Instagram", href: "https://www.instagram.com" },
-  { label: "Facebook", href: "https://www.facebook.com" },
+  { label: "TikTok", href: "https://www.tiktok.com/@meimi_furniture" },
+  { label: "Instagram", href: "https://www.instagram.com/meimi_furniture_us" },
+  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61589995301371" },
 ];
 
 export default function Footer() {

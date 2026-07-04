@@ -11,18 +11,9 @@ export const metadata: Metadata = {
 const WHATSAPP = "https://wa.me/8617796076275";
 
 const socialLinks = [
-  {
-    platform: "TikTok",
-    handle: "@meimi_LincoIn · @meimi_furniture3 · @meimi_furniture",
-  },
-  {
-    platform: "Instagram",
-    handle: "Meimi&H Living India · Meimi&H Living US",
-  },
-  {
-    platform: "Facebook",
-    handle: "Meimi&H Living US · Global · India",
-  },
+  { platform: "TikTok", href: "https://www.tiktok.com/@meimi_furniture", handle: "@meimi_furniture" },
+  { platform: "Instagram", href: "https://www.instagram.com/meimi_furniture_us", handle: "@meimi_furniture_us" },
+  { platform: "Facebook", href: "https://www.facebook.com/profile.php?id=61589995301371", handle: "Meimi&H Living US" },
 ];
 
 export default function ContactPage() {
@@ -92,14 +83,20 @@ export default function ContactPage() {
               </p>
               <div className="mt-6 space-y-6">
                 {socialLinks.map((link) => (
-                  <div key={link.platform}>
-                    <p className="text-base font-light tracking-tight text-stone-900">
+                  <a
+                    key={link.platform}
+                    href={link.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group block"
+                  >
+                    <p className="text-base font-light tracking-tight text-stone-900 transition-colors duration-300 group-hover:text-[#6B2737]">
                       {link.platform}
                     </p>
                     <p className="mt-1 text-sm font-light leading-relaxed text-stone-500">
                       {link.handle}
                     </p>
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
