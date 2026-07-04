@@ -1,5 +1,7 @@
 import Image from "next/image";
+import Link from "next/link";
 import { getFolderImagePaths, getRepresentativeImage } from "@/lib/imageAssets";
+import { getProducts } from "@/lib/products";
 import HeroCarousel from "./HeroCarousel";
 import FadeIn from "@/components/ui/FadeIn";
 
@@ -23,13 +25,6 @@ const categories = [
   },
 ];
 
-const newArrivalFolders = [
-  { label: "New Arrival 01", folder: "Bedroom" },
-  { label: "New Arrival 02", folder: "Dining" },
-  { label: "New Arrival 03", folder: "Living Room" },
-  { label: "New Arrival 04", folder: "Custom Interiors" },
-];
-
 export default function Home() {
   const heroImages = getFolderImagePaths("Hero");
   const heroSlides = heroImages.length > 0 ? heroImages : [FALLBACK];
@@ -38,11 +33,7 @@ export default function Home() {
     ...category,
     image: getRepresentativeImage(category.folder, FALLBACK),
   }));
-  const newArrivals = newArrivalFolders.map((item) => {
-    const list = getFolderImagePaths(item.folder);
-    const image = list.length > 1 ? list[1] : list[0] ?? FALLBACK;
-    return { ...item, image };
-  });
+  const newArrivals = getProducts();
 
   return (
     <main className="bg-[#FAF9F6] text-stone-800">
@@ -153,7 +144,7 @@ export default function Home() {
       </section>
 
       {/* NEW ARRIVALS */}
-      <section className="border-t border-stone-200/70 px-6 py-28 sm:px-8 lg:px-10 lg:py-36">
+      <section id="new-arrivals" className="scroll-mt-24 border-t border-stone-200/70 px-6 py-28 sm:px-8 lg:px-10 lg:py-36">
         <div className="mx-auto max-w-6xl">
           <FadeIn>
             <div className="mb-14 flex flex-col items-center text-center">
@@ -166,13 +157,13 @@ export default function Home() {
             </div>
           </FadeIn>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {newArrivals.map((item, index) => (
-              <FadeIn key={item.label} delay={index * 100}>
-                <article className="group">
+            {newArrivals.map((product, index) => (
+              <FadeIn key={product.slug} delay={index * 100}>
+                <Link href={`/products/${product.slug}`} className="group block">
                   <div className="relative aspect-[3/4] overflow-hidden rounded-sm">
                     <Image
-                      src={item.image}
-                      alt={item.label}
+                      src={product.mainImage}
+                      alt={product.name}
                       fill
                       className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-105"
                     />
@@ -181,12 +172,14 @@ export default function Home() {
                     </span>
                   </div>
                   <div className="mt-5">
-                    <h3 className="text-base font-light tracking-tight text-stone-900">
-                      {item.label}
+                    <h3 className="text-base font-light tracking-tight text-stone-900 transition-colors duration-300 group-hover:text-[#6B2737]">
+                      {product.name}
                     </h3>
-                    <p className="mt-1 text-sm font-light text-stone-400">Coming soon</p>
+                    <p className="mt-1 text-sm font-light text-stone-400">
+                      {product.tagline}
+                    </p>
                   </div>
-                </article>
+                </Link>
               </FadeIn>
             ))}
           </div>

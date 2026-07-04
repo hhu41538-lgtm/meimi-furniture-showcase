@@ -35,5 +35,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# 图片压缩备份，不提交
+
 public/images/Hero_backup/
+
+image-backups/
+run-fix.ps1
+run-compress.ps1
+compress-images.js
+compress-report.txt
+img-check.txt
+seo-check.txt
