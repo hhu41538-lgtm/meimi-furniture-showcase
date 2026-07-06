@@ -33,6 +33,7 @@ const productsMenu: MenuColumn[] = [
 
 const otherNavItems = [
   { label: "Home", href: "/" },
+  { label: "Custom Furniture", href: "/custom" },
   { label: "Case Showcase", href: "/case-showcase" },
   { label: "About us", href: "/about" },
   { label: "Contact", href: "/contact" },
@@ -56,7 +57,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-8 lg:px-10">
         <Link
           href="/"
-          className="font-['var(--font-jost)'] text-2xl font-medium tracking-[0.12em] text-stone-900"
+          className="font-[family-name:var(--font-jost)] text-2xl font-medium tracking-[0.12em] text-stone-900"
         >
           Meimi&H
         </Link>
@@ -82,8 +83,8 @@ export default function Header() {
 
             {megaOpen && (
               <div className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-4">
-                <div className="w-[720px] rounded-2xl border border-stone-200 bg-white p-8 shadow-lg">
-                  <div className="grid grid-cols-3 gap-8">
+                <div className="w-[720px] overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-lg">
+                  <div className="grid grid-cols-3 gap-8 p-8">
                     {productsMenu.map((col) => (
                       <div key={col.title}>
                         <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
@@ -105,11 +106,31 @@ export default function Header() {
                       </div>
                     ))}
                   </div>
+                  <Link
+                    href="/custom"
+                    onClick={() => setMegaOpen(false)}
+                    className="group flex items-center justify-between border-t border-stone-100 bg-[#FAF9F6] px-8 py-5 transition-colors hover:bg-stone-100"
+                  >
+                    <span>
+                      <span className="block text-sm font-semibold tracking-tight text-stone-900">
+                        Custom Furniture
+                      </span>
+                      <span className="mt-0.5 block text-xs font-light text-stone-500">
+                        Bespoke pieces &amp; whole-home interiors, made to order
+                      </span>
+                    </span>
+                    <span className="text-sm text-[#6B2737] transition-transform duration-300 group-hover:translate-x-1">
+                      &rarr;
+                    </span>
+                  </Link>
                 </div>
               </div>
             )}
           </div>
 
+          <Link href="/custom" className={navLinkClass("/custom")}>
+            Custom Furniture
+          </Link>
           <Link href="/case-showcase" className={navLinkClass("/case-showcase")}>
             Case Showcase
           </Link>
@@ -175,7 +196,7 @@ export default function Header() {
                                 onClick={() => {
                                   setMobileOpen(false);
                                   setMobileProductsOpen(false);
-                                }}
+                              }}
                               >
                                 {item.label}
                               </Link>
