@@ -35,6 +35,7 @@ const otherNavItems = [
   { label: "Home", href: "/" },
   { label: "Custom Furniture", href: "/custom" },
   { label: "Case Showcase", href: "/case-showcase" },
+  { label: "Blog", href: "/blog" },
   { label: "About us", href: "/about" },
   { label: "Contact", href: "/contact" },
 ];
@@ -63,7 +64,7 @@ export default function Header() {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-8 text-sm font-medium text-stone-700 md:flex">
+        <nav className="hidden items-center gap-7 text-sm font-medium text-stone-700 lg:flex">
           <Link href="/" className={navLinkClass("/")}>
             Home
           </Link>
@@ -96,15 +97,15 @@ export default function Header() {
                               <Link
                                 href={item.href}
                                 className="block text-sm text-stone-800 transition hover:text-[#6B2737]"
-                                onClick={() => setMegaOpen(false)}
-                              >
-                                {item.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
+                              onClick={() => setMegaOpen(false)}
+                            >
+                              {item.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
                   </div>
                   <Link
                     href="/custom"
@@ -134,6 +135,9 @@ export default function Header() {
           <Link href="/case-showcase" className={navLinkClass("/case-showcase")}>
             Case Showcase
           </Link>
+          <Link href="/blog" className={navLinkClass("/blog", false)}>
+            Blog
+          </Link>
           <Link href="/about" className={navLinkClass("/about")}>
             About us
           </Link>
@@ -146,7 +150,7 @@ export default function Header() {
         <button
           type="button"
           aria-label="Toggle menu"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-stone-300 text-stone-700 md:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-stone-300 text-stone-700 lg:hidden"
           onClick={() => setMobileOpen((v) => !v)}
         >
           <span className="text-lg">{mobileOpen ? "\u2715" : "\u2630"}</span>
@@ -155,7 +159,7 @@ export default function Header() {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="border-t border-stone-200 bg-[#FAF9F6] md:hidden">
+        <div className="border-t border-stone-200 bg-[#FAF9F6] lg:hidden">
           <div className="mx-auto max-w-7xl px-6 py-4 sm:px-8">
             <ul className="space-y-1 text-sm font-medium text-stone-800">
               <li>
@@ -196,7 +200,7 @@ export default function Header() {
                                 onClick={() => {
                                   setMobileOpen(false);
                                   setMobileProductsOpen(false);
-                              }}
+                                }}
                               >
                                 {item.label}
                               </Link>
