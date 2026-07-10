@@ -45,11 +45,11 @@ export default function Home() {
             Meimi&H
           </p>
           <h1 className="hero-rise max-w-4xl text-[2.75rem] font-extralight leading-[1.08] tracking-tight text-white sm:text-6xl lg:text-[5rem]" style={{ animationDelay: "0.25s" }}>
-            Where beauty dwells,
-            <br className="hidden sm:block" /> the heart finds
+            Refined Living
+            <br className="hidden sm:block" /> Crafted For You
           </h1>
-          <p className="hero-rise mt-8 max-w-md text-base font-light leading-relaxed tracking-wide text-white/80" style={{ animationDelay: "0.45s" }}>
-            Refined furniture, made to feel like home.
+          <p className="hero-rise mt-8 max-w-lg text-base font-light leading-relaxed tracking-wide text-white/80" style={{ animationDelay: "0.45s" }}>
+            Bespoke furniture, made to order in our Foshan atelier.
           </p>
           <a
             href="/products"
