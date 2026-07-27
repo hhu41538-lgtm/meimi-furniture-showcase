@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "Meimi&H",
-  url: "https://meimi-furniture-showcase.vercel.app",
+  url: "https://www.meimifurniture.com",
   title: "Meimi&H - Premium Furniture from Foshan",
   description:
     "High-end furniture direct from our Foshan atelier. Sofas, custom interiors, beds, dining and more. Est. 2020.",

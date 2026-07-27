@@ -1,4 +1,4 @@
 ﻿User-agent: *
 Allow: /
 
-Sitemap: https://meimi-furniture-showcase.vercel.app/sitemap.xml
+Sitemap: https://www.meimifurniture.com/sitemap.xml
