@@ -52,18 +52,23 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     `Hi Meimi&H, I'd like to know more about the ${product.name}.`
   )}`;
 
+  const isMattress = product.category === "mattress";
+  const backHref = isMattress ? "/mattresses" : "/#new-arrivals";
+  const backLabel = isMattress ? "Mattress Collection" : "Collections";
+  const eyebrow = isMattress ? "Mattress Collection" : "New Arrival";
+
   return (
     <main className="bg-[#FAF9F6] text-stone-800">
       {/* BREADCRUMB */}
       <div className="mx-auto max-w-6xl px-6 pt-28 sm:px-8 lg:px-10 lg:pt-32">
         <Link
-          href="/#new-arrivals"
+          href={backHref}
           className="group inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.25em] text-stone-400 transition-colors hover:text-stone-700"
         >
           <span className="transition-transform duration-300 group-hover:-translate-x-1">
             &larr;
           </span>
-          Collections
+          {backLabel}
         </Link>
       </div>
 
@@ -88,7 +93,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
           <FadeIn>
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.4em] text-stone-400">
-                New Arrival
+                {eyebrow}
               </p>
               <h1 className="mt-5 text-4xl font-extralight tracking-tight text-stone-900 sm:text-5xl">
                 {product.name}

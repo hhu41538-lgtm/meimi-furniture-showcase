@@ -27,7 +27,10 @@ const productsMenu: MenuColumn[] = [
   },
   {
     title: "Signature Craft",
-    items: [{ label: "Handmade Mattress", href: "/products#mattress" }],
+    items: [
+      { label: "Mattress Collection", href: "/mattresses" },
+      { label: "Handmade Mattress", href: "/products#mattress" },
+    ],
   },
 ];
 

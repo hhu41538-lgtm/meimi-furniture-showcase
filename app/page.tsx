@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getFolderImagePaths, getRepresentativeImage } from "@/lib/imageAssets";
-import { getProducts } from "@/lib/products";
+import { getProductsByCategory } from "@/lib/products";
 import HeroCarousel from "./HeroCarousel";
 import FadeIn from "@/components/ui/FadeIn";
 import HeroTitle from "@/components/ui/HeroTitle";
@@ -36,7 +36,7 @@ export default function Home() {
     ...category,
     image: getRepresentativeImage(category.folder, FALLBACK),
   }));
-  const newArrivals = getProducts();
+  const newArrivals = getProductsByCategory("sofa");
 
   return (
     <main className="bg-[#FAF9F6] text-stone-800">

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import FadeIn from "@/components/ui/FadeIn";
 
 type Product = { name: string; category: string; imageSrc: string };
@@ -214,15 +215,12 @@ export default function ProductsClient(props: {
                 <p className="mt-6 max-w-md text-base font-light leading-loose text-stone-500">
                   {mattress.description}
                 </p>
-                <a
-                  href={WHATSAPP}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={inquireLink}
-                >
-                  Request the mattress catalogue
-                  <span>&rarr;</span>
-                </a>
+                <Link href="/mattresses" className={inquireLink}>
+                  View the Mattress Collection
+                  <span className="transition-transform duration-300 group-hover/cta:translate-x-1">
+                    &rarr;
+                  </span>
+                </Link>
               </div>
             </div>
           </FadeIn>

@@ -71,18 +71,15 @@ export function getProductImages(subfolder: string, fallbackPath = FALLBACK): Pr
     )
     .map((entry) => entry.name);
 
-  const mainName = files.find((name) => /new arrivals/i.test(name));
-  const detailNames = files
-    .filter((name) => !/new arrivals/i.test(name))
-    .sort((a, b) => leadingNumber(a) - leadingNumber(b));
+  const sorted = [...files].sort((a, b) => leadingNumber(a) - leadingNumber(b));
+  // Main image: a file marked "new arrivals" (sofas) or, failing that, the
+  // lowest-numbered file (mattresses use "01-hero.jpg" etc.).
+  const mainName = files.find((name) => /new arrivals/i.test(name)) ?? sorted[0];
+  const detailNames = sorted.filter((name) => name !== mainName);
 
   const toPath = (name: string) => toPublicPath(path.join(folderPath, name));
 
-  const mainImage = mainName
-    ? toPath(mainName)
-    : detailNames[0]
-    ? toPath(detailNames[0])
-    : fallbackPath;
+  const mainImage = mainName ? toPath(mainName) : fallbackPath;
 
   return {
     mainImage,
