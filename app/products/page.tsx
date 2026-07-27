@@ -3,7 +3,7 @@ import { getFolderImagePaths } from "@/lib/imageAssets";
 import ProductsClient from "./ProductsClient";
 
 export const metadata: Metadata = {
-  title: "Products | Meimi&H",
+  title: "Products",
   description:
     "Explore Meimi&H collections — ready-made living, dining and bedroom furniture, custom interiors, and our signature handmade mattresses. Factory-direct from Foshan.",
   alternates: { canonical: "/products" },

@@ -5,7 +5,7 @@ import FadeIn from "@/components/ui/FadeIn";
 import { getPosts } from "@/lib/blog";
 
 export const metadata: Metadata = {
-  title: "Journal | Meimi&H",
+  title: "Journal",
   description:
     "Guides and insights on custom furniture, bespoke interiors and factory-direct manufacturing from Meimi&H, a Foshan-based atelier serving clients worldwide.",
   alternates: { canonical: "/blog" },

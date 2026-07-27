@@ -8,7 +8,7 @@ const WHATSAPP = "https://wa.me/8617796076275";
 const HERO = "/images/Mattress Collection/01-hero.jpg";
 
 export const metadata: Metadata = {
-  title: "Mattress Collection | Meimi&H",
+  title: "Mattress Collection",
   description:
     "The Meimi&H mattress collection — hand-tufted, hand-stitched mattresses built layer by layer in our own workshop. Elizabeth, Isabel, Margaret, Stina and the Contemporary Edit. Factory-direct from Foshan.",
   alternates: { canonical: "/mattresses" },

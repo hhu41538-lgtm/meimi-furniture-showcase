@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import FadeIn from "@/components/ui/FadeIn";
 
 export const metadata: Metadata = {
-  title: "Contact | Meimi&H",
+  title: "Contact",
   description:
     "Get in touch with Meimi&H — premium furniture handcrafted in Foshan, China. Chat with us on WhatsApp, we respond within 24 hours.",
   alternates: { canonical: "/contact" },

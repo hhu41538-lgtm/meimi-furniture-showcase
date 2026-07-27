@@ -21,11 +21,11 @@ export function generateMetadata({
 }): Metadata {
   const post = getPostBySlug(params.slug);
   if (!post) {
-    return { title: "Article not found | Meimi&H" };
+    return { title: "Article not found" };
   }
   const ogImage = encodeURI(post.heroImage);
   return {
-    title: `${post.title} | Meimi&H`,
+    title: post.title,
     description: post.description,
     keywords: post.keywords,
     alternates: { canonical: `/blog/${post.slug}` },

@@ -4,7 +4,7 @@ import Link from "next/link";
 import FadeIn from "@/components/ui/FadeIn";
 
 export const metadata: Metadata = {
-  title: "Custom Furniture Manufacturer | Bespoke, Made to Order | Meimi&H",
+  title: "Custom Furniture Manufacturer | Bespoke, Made to Order",
   description:
     "Bespoke furniture made to order in our Foshan atelier. Two decades of craftsmanship, factory-direct: custom sofas, dining, bedroom, wardrobes, cabinetry and whole-home interiors, shipped worldwide.",
   alternates: { canonical: "/custom" },
@@ -100,6 +100,55 @@ const steps = [
   },
 ];
 
+const residences = [
+  {
+    eyebrow: "Residence 01",
+    title: "Warm Contemporary",
+    tagline: "Soft geometry. Clear presence.",
+    description:
+      "A calm living landscape shaped by continuous storage, warm tones and soft architectural light.",
+    hero: "/images/Residences/warm-contemporary/01-hero.jpg",
+    gallery: [
+      "/images/Residences/warm-contemporary/02-view.jpg",
+      "/images/Residences/warm-contemporary/03-view.jpg",
+      "/images/Residences/warm-contemporary/04-view.jpg",
+    ],
+  },
+  {
+    eyebrow: "Residence 02",
+    title: "Soft Minimal",
+    tagline: "Light, rhythm and reflection.",
+    description:
+      "Repeated lines, framed views and a restrained palette establish a calm, continuous architectural language.",
+    hero: "/images/Residences/soft-minimal/01-hero.jpg",
+    gallery: [
+      "/images/Residences/soft-minimal/02-view.jpg",
+      "/images/Residences/soft-minimal/03-view.jpg",
+    ],
+  },
+  {
+    eyebrow: "Residence 03",
+    title: "Dark Tonal",
+    tagline: "Structure with warmth.",
+    description:
+      "Clean geometry softened through material contrast and carefully paced detail — a darker, enveloping interior language.",
+    hero: "/images/Residences/dark-tonal/01-hero.jpg",
+    gallery: [
+      "/images/Residences/dark-tonal/02-view.jpg",
+      "/images/Residences/dark-tonal/03-view.jpg",
+    ],
+  },
+  {
+    eyebrow: "Modern French",
+    title: "Framed Cabinetry",
+    tagline: "Classical rhythm. Contemporary restraint.",
+    description:
+      "Framed fronts, measured symmetry and discreet detailing reinterpret a familiar European language for present-day interiors.",
+    hero: "/images/Residences/modern-french/01-hero.jpg",
+    gallery: ["/images/Residences/modern-french/02-view.jpg"],
+  },
+];
+
 export default function CustomPage() {
   return (
     <main className="bg-[#FAF9F6] text-stone-800">
@@ -180,6 +229,80 @@ export default function CustomPage() {
                 </div>
               </FadeIn>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* SELECTED RESIDENCES */}
+      <section className="border-t border-stone-200/70 px-6 py-24 sm:px-8 lg:px-10 lg:py-32">
+        <div className="mx-auto max-w-6xl">
+          <FadeIn>
+            <div className="mb-16 max-w-2xl">
+              <p className="text-xs font-medium uppercase tracking-[0.4em] text-stone-400">
+                Selected Residences
+              </p>
+              <h2 className="mt-4 text-3xl font-extralight tracking-tight text-stone-900 sm:text-4xl">
+                Interiors, considered as architecture
+              </h2>
+              <p className="mt-6 max-w-xl text-base font-light leading-loose text-stone-500">
+                A selection of whole-home projects — fitted storage, kitchens and
+                wall systems treated as part of the space around them.
+              </p>
+            </div>
+          </FadeIn>
+          <div className="space-y-24 lg:space-y-28">
+            {residences.map((r, index) => {
+              const reversed = index % 2 === 1;
+              return (
+                <FadeIn key={r.title} delay={80}>
+                  <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
+                    <div
+                      className={`relative aspect-[4/3] overflow-hidden rounded-sm lg:col-span-7 ${
+                        reversed ? "lg:order-2" : ""
+                      }`}
+                    >
+                      <Image
+                        src={r.hero}
+                        alt={`${r.title} residence`}
+                        fill
+                        className="object-cover transition-transform duration-[1200ms] [transition-timing-function:var(--ease-lux)] hover:scale-[1.04]"
+                      />
+                    </div>
+                    <div className={`lg:col-span-5 ${reversed ? "lg:order-1" : ""}`}>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.3em] text-[#6B2737]">
+                        {r.eyebrow}
+                      </p>
+                      <h3 className="mt-4 text-2xl font-extralight tracking-tight text-stone-900 sm:text-3xl">
+                        {r.title}
+                      </h3>
+                      <p className="mt-3 text-lg font-light italic text-stone-500">
+                        {r.tagline}
+                      </p>
+                      <p className="mt-5 max-w-md text-base font-light leading-loose text-stone-500">
+                        {r.description}
+                      </p>
+                    </div>
+                  </div>
+                  {r.gallery.length > 1 && (
+                    <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                      {r.gallery.map((src, i) => (
+                        <div
+                          key={src}
+                          className="relative aspect-[4/3] overflow-hidden rounded-sm"
+                        >
+                          <Image
+                            src={src}
+                            alt={`${r.title} detail ${i + 1}`}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </FadeIn>
+              );
+            })}
           </div>
         </div>
       </section>

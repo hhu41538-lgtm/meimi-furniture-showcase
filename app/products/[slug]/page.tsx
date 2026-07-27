@@ -20,7 +20,8 @@ export function generateMetadata({
   if (!product) {
     return { title: "Product not found | Meimi&H" };
   }
-  const title = `${product.name} | Meimi&H`;
+  const title = product.name;
+  const ogTitle = `${product.name} | Meimi&H`;
   const description = product.description;
   const ogImage = encodeURI(product.mainImage);
   return {
@@ -28,14 +29,14 @@ export function generateMetadata({
     description,
     alternates: { canonical: `/products/${product.slug}` },
     openGraph: {
-      title,
+      title: ogTitle,
       description,
       type: "website",
       images: [{ url: ogImage }],
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: ogTitle,
       description,
       images: [ogImage],
     },

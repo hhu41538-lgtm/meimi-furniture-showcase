@@ -4,7 +4,7 @@ import { getFolderImagePaths } from "@/lib/imageAssets";
 import FadeIn from "@/components/ui/FadeIn";
 
 export const metadata: Metadata = {
-  title: "Case Showcase | Meimi&H",
+  title: "Case Showcase",
   description:
     "Real visits, real spaces — a look inside how Meimi&H welcomes clients worldwide, from factory visits to finished interiors. Full case studies coming soon.",
   alternates: { canonical: "/case-showcase" },

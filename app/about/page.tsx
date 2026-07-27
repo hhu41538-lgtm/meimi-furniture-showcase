@@ -4,7 +4,7 @@ import { getFolderImagePaths } from "@/lib/imageAssets";
 import FadeIn from "@/components/ui/FadeIn";
 
 export const metadata: Metadata = {
-  title: "About us | Meimi&H",
+  title: "About us",
   description:
     "Meimi&H is a premium furniture atelier in Foshan, China — 20+ years of craftsmanship meeting a refined global aesthetic. The art of refined living.",
   alternates: { canonical: "/about" },
