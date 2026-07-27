@@ -42,9 +42,14 @@ export default function FadeIn({ children, className = "", delay = 0 }: FadeInPr
   return (
     <div
       ref={ref}
-      style={{ transitionDelay: visible ? `${delay}ms` : "0ms" }}
-      className={`transition-all duration-700 ease-out ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+      style={{
+        transitionDelay: visible ? `${delay}ms` : "0ms",
+        transitionTimingFunction: "var(--ease-lux)",
+        transitionDuration: "900ms",
+        transform: visible ? "translateY(0)" : "translateY(24px)",
+      }}
+      className={`transition-all ${
+        visible ? "opacity-100" : "opacity-0"
       } ${className}`}
     >
       {children}

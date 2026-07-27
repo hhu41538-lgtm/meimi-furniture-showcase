@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import PageTransition from "@/components/ui/PageTransition";
 import { siteConfig } from "@/lib/seo-config";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -95,7 +96,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </noscript>
         <div className="flex min-h-screen flex-col">
           <Header />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1">
+            <PageTransition>{children}</PageTransition>
+          </main>
           <Footer />
         </div>
         <a href="https://wa.me/8617796076275" target="_blank" rel="noreferrer" aria-label="Contact us on WhatsApp"

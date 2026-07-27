@@ -5,6 +5,8 @@
 :root {
   --background: #faf9f6;
   --foreground: #1c1c1c;
+  /* Luxurious easing curve used site-wide for reveals & transitions */
+  --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 body {
@@ -44,7 +46,7 @@ body {
 
 .hero-rise {
   opacity: 0;
-  animation: heroRise 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: heroRise 1s var(--ease-lux) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
