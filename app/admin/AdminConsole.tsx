@@ -3674,7 +3674,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
       </>
       ) : null}
 
-      {activeModule !== "home" && !(activeModule === "quote" && quoteWorkspaceView === "archive") ? (
+      {activeModule !== "home" && activeModule !== "customers" && !(activeModule === "quote" && quoteWorkspaceView === "archive") ? (
       <div className={`admin-workspace admin-workspace-${activeModule}${activeModule === "quote" ? ` admin-workspace-quote-${quoteWorkflowStage}` : ""}`}>
         <section id="product-warehouse" className="admin-library" aria-label="产品资料库">
           <div className="admin-section-heading">
