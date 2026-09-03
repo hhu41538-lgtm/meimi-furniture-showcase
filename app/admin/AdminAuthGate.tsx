@@ -17,6 +17,12 @@ import {
 type AuthMode = "admin" | "sales";
 type SalesAction = "login" | "register";
 
+type CloudAccount = Omit<StaffAccount, "loginKey"> & { loginKeyLast4: string };
+
+function cloudAccountToStaff(account: CloudAccount): StaffAccount {
+  return { ...account, loginKey: `••••${account.loginKeyLast4}` };
+}
+
 function adminSession(): AuthSession {
   return {
     accountId: "admin",
@@ -59,9 +65,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
       }
     } catch {
       setStatus("账号资料读取失败，请重新登录");
-    } finally {
-      setAuthReady(true);
-    }
+    } finally { setAuthReady(true); }
   }, []);
 
   function saveAccounts(nextAccounts: StaffAccount[]) {
@@ -83,20 +87,20 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
     enterSession(adminSession());
   }
 
-  function loginAsSales() {
-    const account = accounts.find((item) => item.loginKey === loginKey.trim());
-    if (!account) {
-      setStatus("没有找到这个销售密钥，请先注册或检查输入");
-      return;
-    }
-    if (!account.active) {
-      setStatus("这个销售账号已被管理员停用，请联系管理员");
-      return;
-    }
-    enterSession(accountToSession(account));
+  async function loginAsSales() {
+    setStatus("正在验证云端销售账号…");
+    try {
+      const response = await fetch("/api/staff-accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "login", loginKey: loginKey.trim() }) });
+      const payload = await response.json().catch(() => ({})) as { account?: CloudAccount; message?: string };
+      if (!response.ok || !payload.account) { setStatus(payload.message || "云端账号验证失败，请稍后重试"); return; }
+      const account = cloudAccountToStaff(payload.account);
+      if (!account.active) { setStatus("这个销售账号已被管理员停用，请联系管理员"); return; }
+      setAccounts((current) => current.some((item) => item.id === account.id) ? current.map((item) => item.id === account.id ? account : item) : [account, ...current]);
+      enterSession(accountToSession(account));
+    } catch { setStatus("云端账号服务暂时不可用，请检查数据库配置"); }
   }
 
-  function registerSales() {
+  async function registerSales() {
     const trimmedName = name.trim();
     const trimmedKey = loginKey.trim();
     if (trimmedName.length < 2) {
@@ -111,28 +115,33 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
       setStatus("两次输入的销售密钥不一致");
       return;
     }
-    if (accounts.some((account) => account.loginKey === trimmedKey)) {
-      setStatus("这个销售密钥已经被注册，请换一个");
-      return;
-    }
-    const account: StaffAccount = {
-      id: `sales:${Date.now()}`,
-      name: trimmedName,
-      loginKey: trimmedKey,
-      role: "sales",
-      permissions: [...DEFAULT_SALES_PERMISSIONS],
-      active: true,
-      createdAt: new Date().toISOString(),
-    };
-    saveAccounts([...accounts, account]);
-    enterSession(accountToSession(account));
+    setStatus("正在把销售账号保存到云端…");
+    try {
+      const response = await fetch("/api/staff-accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "register", name: trimmedName, loginKey: trimmedKey }) });
+      const payload = await response.json().catch(() => ({})) as { account?: CloudAccount; message?: string };
+      if (!response.ok || !payload.account) { setStatus(payload.message || "云端注册失败，请稍后重试"); return; }
+      const account = cloudAccountToStaff(payload.account);
+      saveAccounts([account, ...accounts.filter((item) => item.id !== account.id)]);
+      enterSession(accountToSession(account));
+    } catch { setStatus("云端账号服务暂时不可用，账号未注册"); }
   }
 
-  function submit(event: React.FormEvent<HTMLFormElement>) {
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (mode === "admin") loginAsAdmin();
-    else if (salesAction === "register") registerSales();
-    else loginAsSales();
+    if (mode === "admin") {
+      loginAsAdmin();
+      if (loginKey.trim() === ADMIN_LOGIN_KEY) {
+        try {
+          const response = await fetch("/api/staff-accounts", { headers: { "x-meimi-admin-key": ADMIN_LOGIN_KEY }, cache: "no-store" });
+          const payload = await response.json().catch(() => ({})) as { accounts?: CloudAccount[]; message?: string };
+          if (response.ok && Array.isArray(payload.accounts)) {
+            const next = payload.accounts.map(cloudAccountToStaff);
+            saveAccounts(next);
+          } else if (payload.message) setStatus(`管理员已进入，但账号云端列表读取失败：${payload.message}`);
+        } catch { setStatus("管理员已进入，云端账号列表暂时无法读取"); }
+      }
+    } else if (salesAction === "register") await registerSales();
+    else await loginAsSales();
   }
 
   function logout() {
@@ -143,17 +152,26 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
     setStatus("已退出当前账号");
   }
 
-  function updateSalesAccount(id: string, patch: Partial<Pick<StaffAccount, "permissions" | "active">>) {
+  async function updateSalesAccount(id: string, patch: Partial<Pick<StaffAccount, "permissions" | "active">>) {
     if (session?.role !== "admin") return;
-    const nextAccounts = accounts.map((account) => account.id === id ? { ...account, ...patch } : account);
-    saveAccounts(nextAccounts);
+    try {
+      const response = await fetch("/api/staff-accounts", { method: "PATCH", headers: { "content-type": "application/json", "x-meimi-admin-key": ADMIN_LOGIN_KEY }, body: JSON.stringify({ id, ...patch }) });
+      const payload = await response.json().catch(() => ({})) as { account?: CloudAccount; message?: string };
+      if (!response.ok || !payload.account) { setStatus(payload.message || "云端账号修改失败"); return; }
+      const account = cloudAccountToStaff(payload.account);
+      saveAccounts(accounts.map((item) => item.id === id ? account : item));
+    } catch { setStatus("云端账号服务暂时不可用"); }
   }
 
-  function deleteSalesAccount(id: string) {
+  async function deleteSalesAccount(id: string) {
     if (session?.role !== "admin") return;
     const account = accounts.find((item) => item.id === id);
     if (!account || !window.confirm(`确定删除销售账号“${account.name}”吗？`)) return;
-    saveAccounts(accounts.filter((item) => item.id !== id));
+    try {
+      const response = await fetch(`/api/staff-accounts?id=${encodeURIComponent(id)}`, { method: "DELETE", headers: { "x-meimi-admin-key": ADMIN_LOGIN_KEY } });
+      if (!response.ok) { const payload = await response.json().catch(() => ({})) as { message?: string }; setStatus(payload.message || "云端账号删除失败"); return; }
+      saveAccounts(accounts.filter((item) => item.id !== id));
+    } catch { setStatus("云端账号服务暂时不可用"); }
   }
 
   if (!authReady) {
@@ -214,7 +232,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
           <strong>{mode === "admin" ? "管理员可以做什么？" : "销售登录后可以做什么？"}</strong>
           <span>{mode === "admin" ? "添加 / 下架产品、删除旧产品、维护报价公式、统一销售端价格和分配销售权限。" : "客户归属、报价流程、产品浏览、产品搜索和汇率物流，具体权限由管理员分配。"}</span>
         </div>
-        <small className="auth-gate-local-note">当前版本账号和工作资料保存在本浏览器。部署到正式服务器时，建议接入统一账号和数据库。</small>
+        <small className="auth-gate-local-note">销售账号注册与登录以云端数据库为准；本浏览器仅缓存当前登录状态，换设备不会丢失账号。</small>
       </section>
     </main>
   );
