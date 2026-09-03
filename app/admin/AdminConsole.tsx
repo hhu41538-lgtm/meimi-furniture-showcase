@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { type ChangeEvent, type DragEvent, type ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { type ChangeEvent, type DragEvent, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   Archive,
@@ -32,8 +32,9 @@ import {
   X,
 } from "lucide-react";
 import { productCodePrefix } from "@/lib/productCodes";
-import { SALES_PERMISSION_OPTIONS, type AuthSession, type PermissionKey, type StaffAccount } from "./auth";
+import { ADMIN_LOGIN_KEY, SALES_PERMISSION_OPTIONS, type AuthSession, type PermissionKey, type StaffAccount } from "./auth";
 import { downloadQuotationTemplate } from "./quotationTemplate";
+import { fetchSharedWorkspaceState, publishSharedWorkspaceState, type CloudWorkspaceState } from "@/lib/workspaceSync";
 
 export type ManagedEntry = {
   id: string;
@@ -1403,6 +1404,9 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
   const [storageReady, setStorageReady] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState("");
   const [autoSaveStatus, setAutoSaveStatus] = useState("正在读取本地资料");
+  const [sharedSyncReady, setSharedSyncReady] = useState(false);
+  const [cloudSyncStatus, setCloudSyncStatus] = useState("正在连接云端资料");
+  const cloudVersionRef = useRef<number | null>(null);
   const [pdfDropActive, setPdfDropActive] = useState(false);
   const [pdfImportState, setPdfImportState] = useState<PdfImportState>({ phase: "idle", fileName: "", message: "等待导入产品图册", importedCount: 0 });
   const [status, setStatus] = useState(`已进入${session.role === "admin" ? "管理员" : "销售"}版：${session.name}`);
@@ -1531,8 +1535,64 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
     }
   }, [legacyQuoteStorageKey, quoteStorageKey, session.name, session.role, workflowPricingStorageKey, workflowStageStorageKey]);
 
+  const applySharedWorkspaceState = useCallback((state: CloudWorkspaceState) => {
+    cloudVersionRef.current = state.version;
+    if (!state.initialized) {
+      setCloudSyncStatus("云端已连接，等待管理员首次发布");
+      return;
+    }
+    const normalizedEntries = state.entries.map(normalizeEntry).filter((entry): entry is ManagedEntry => Boolean(entry));
+    const normalizedRules = state.pricingRules.filter(isPricingRule);
+    setEntries(normalizedEntries);
+    setPricingRules(normalizedRules);
+    if (state.workflowPricingRuleId && normalizedRules.some((rule) => rule.id === state.workflowPricingRuleId)) {
+      setWorkflowPricingRuleId(state.workflowPricingRuleId);
+    }
+    localStorage.setItem(CATALOGUE_STORAGE_KEY, JSON.stringify(normalizedEntries));
+    localStorage.setItem(PRICING_STORAGE_KEY, JSON.stringify(normalizedRules));
+    if (state.workflowPricingRuleId) localStorage.setItem(workflowPricingStorageKey, state.workflowPricingRuleId);
+    setSelectedEntryId((current) => normalizedEntries.some((entry) => entry.id === current) ? current : normalizedEntries[0]?.id ?? "");
+    setCloudSyncStatus(`已同步云端 V${state.version} · ${shortDateTime(state.updatedAt)}`);
+  }, [workflowPricingStorageKey]);
+
   useEffect(() => {
     if (!storageReady) return undefined;
+    let cancelled = false;
+    setCloudSyncStatus("正在读取云端产品与报价公式");
+    void fetchSharedWorkspaceState().then((result) => {
+      if (cancelled) return;
+      if (result.kind === "ready") applySharedWorkspaceState(result.state);
+      else {
+        cloudVersionRef.current = null;
+        setCloudSyncStatus(result.message);
+      }
+      setSharedSyncReady(true);
+    });
+    return () => { cancelled = true; };
+  }, [applySharedWorkspaceState, storageReady]);
+
+  const syncSharedWorkspaceState = useCallback(async () => {
+    if (!adminUnlocked || !sharedSyncReady || cloudVersionRef.current === null) return;
+    setCloudSyncStatus("正在发布产品与报价公式");
+    const result = await publishSharedWorkspaceState({
+      entries,
+      pricingRules,
+      workflowPricingRuleId,
+      version: cloudVersionRef.current,
+      updatedBy: session.name,
+      adminKey: ADMIN_LOGIN_KEY,
+    });
+    if (result.kind === "saved") {
+      applySharedWorkspaceState(result.state);
+      setStatus(`云端已同步 ${entries.length} 条资料和 ${pricingRules.length} 个报价公式`);
+    } else {
+      setCloudSyncStatus(result.message);
+      if (result.kind === "conflict") setStatus("云端已有其他管理员更新，请刷新后再保存");
+    }
+  }, [adminUnlocked, applySharedWorkspaceState, entries, pricingRules, session.name, sharedSyncReady, workflowPricingRuleId]);
+
+  useEffect(() => {
+    if (!storageReady || !sharedSyncReady) return undefined;
     setAutoSaveStatus("有修改，准备自动保存");
     const timer = window.setTimeout(() => {
       try {
@@ -1543,7 +1603,30 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
       }
     }, 650);
     return () => window.clearTimeout(timer);
-  }, [persistLocalData, storageReady]);
+  }, [persistLocalData, sharedSyncReady, storageReady]);
+
+  useEffect(() => {
+    if (!storageReady || !sharedSyncReady || !adminUnlocked || cloudVersionRef.current === null) return undefined;
+    const timer = window.setTimeout(() => { void syncSharedWorkspaceState(); }, 900);
+    return () => window.clearTimeout(timer);
+  }, [adminUnlocked, entries, pricingRules, sharedSyncReady, storageReady, syncSharedWorkspaceState, workflowPricingRuleId]);
+
+  useEffect(() => {
+    if (!storageReady || !sharedSyncReady || session.role !== "sales") return undefined;
+    const refresh = async () => {
+      const result = await fetchSharedWorkspaceState();
+      if (result.kind === "ready" && result.state.initialized && result.state.version > (cloudVersionRef.current ?? 0)) {
+        applySharedWorkspaceState(result.state);
+        setStatus("产品与报价公式已自动更新");
+      }
+    };
+    const timer = window.setInterval(() => { void refresh(); }, 30000);
+    window.addEventListener("focus", refresh);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [applySharedWorkspaceState, session.role, sharedSyncReady, storageReady]);
 
 
   const refreshExchangeRates = useCallback(async (signal?: AbortSignal) => {
@@ -2735,6 +2818,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
       const savedAt = persistLocalData();
       setAutoSaveStatus(`已手动保存 ${shortDateTime(savedAt)}`);
       setStatus(`已保存 ${entries.length} 条资料、${pricingRules.length} 个公式和 ${quote.lines.length} 条报价明细`);
+      void syncSharedWorkspaceState();
     } catch {
       setStatus("保存失败：请检查浏览器是否允许本地存储");
     }
@@ -2946,6 +3030,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
           <p className="admin-save-state">
             {autoSaveStatus}
             {lastSavedAt ? ` · 最近保存 ${shortDateTime(lastSavedAt)}` : ""}
+            {` · ${cloudSyncStatus}`}
           </p>
         </div>
         <div className="admin-header-actions">
@@ -2955,7 +3040,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
           </div>
           <button onClick={save}>
             <Save size={15} />
-            保存本地数据
+            保存并同步
           </button>
           <a className="admin-link" href="/app" target="_blank" rel="noreferrer">
             <ExternalLink size={15} />

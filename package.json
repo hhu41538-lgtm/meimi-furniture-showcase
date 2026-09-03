@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "preview:catalogue": "npx serve out",
+    "preview:catalogue": "next start",
     "audit:catalogue": "node scripts/audit-catalogue-assets.mjs",
     "audit:admin": "node scripts/audit-admin-data.mjs",
     "audit:export": "node scripts/audit-catalogue-export.mjs",
@@ -16,10 +16,11 @@
     "smoke:catalogue": "node scripts/smoke-catalogue.mjs",
     "check:catalogue": "npx tsc --noEmit && npm run lint && npm run audit:catalogue && npm run audit:admin && npm run audit:export && npm run audit:miniprogram && npm run audit:security && npm run smoke:catalogue",
     "build": "next build",
-    "start": "npx serve out",
+    "start": "next start",
     "lint": "eslint ."
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "exceljs": "^4.4.0",
     "framer-motion": "^12.42.2",
     "lucide-react": "^1.33.0",

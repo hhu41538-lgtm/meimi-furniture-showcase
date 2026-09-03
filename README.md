@@ -1,6 +1,6 @@
 # 美觅家居产品图册
 
-移动端优先的家具、定制与空间案例产品图册。当前以 Next.js 静态导出方式运行，入口为 `/app`。
+移动端优先的家具、定制与空间案例产品图册，入口为 `/app`；`/admin` 是内部员工报价工作台。
 
 运行环境要求 Node.js `18.18+`。
 
@@ -30,14 +30,14 @@ npm run build
 
 也可以直接运行 `npm run check:catalogue` 完成整套检查。
 
-## 预览静态产物
+## 本地生产预览
 
 ```bash
 npm run build
 npm run preview:catalogue
 ```
 
-静态文件输出在 `out/`，可部署到支持静态文件托管的服务器或 CDN。当前项目使用 `output: export`，`npm run start` 会直接预览 `out/` 静态产物。
+`next start` 会启动完整的 Next.js 生产服务。生产部署需要支持 Next.js 服务端接口，以便管理员和销售端共享云端产品、价格与报价公式。
 
 ## 主要入口
 
@@ -53,7 +53,15 @@ npm run preview:catalogue
 
 1. 执行 `npm run build`，将 `out/` 部署到 HTTPS 静态托管，并确认 `https://www.meimifurniture.com/app/` 可访问。
 2. 在微信公众平台把 `www.meimifurniture.com` 配置为业务域名，再导入 `miniprogram/` 提交审核。
-3. 当前 `/admin` 的账号、产品价格、公式、客户资源和报价留档保存在浏览器 `localStorage`，适合内部试运行与单浏览器验证；正式多设备上线前需要把登录、权限、产品和报价数据接入服务端数据库 / 身份服务。
+3. `/admin` 的客户资源、报价草稿和报价留档仍按员工保存在浏览器本地；产品、价格和报价公式通过 `/api/workspace-state` 同步到云端。首次部署前，需要在 Vercel Marketplace 绑定 Postgres，并配置 `DATABASE_URL` 与 `MEIMI_ADMIN_SYNC_KEY` 环境变量。
+
+### 开启产品与价格同步
+
+1. 在 Vercel 项目的 `Storage` 中从 Marketplace 绑定 Neon 或其他兼容 Postgres 的数据库，让项目获得 `DATABASE_URL`。
+2. 在 Vercel 项目的 `Settings > Environment Variables` 增加 `MEIMI_ADMIN_SYNC_KEY`，值填写管理员密钥 `2675982129`，至少勾选 Production。
+3. 重新部署一次。管理员登录后保存产品或报价公式，工作台顶部出现“已同步云端 V...”即表示发布成功；销售端打开、切回页面或等待约 30 秒会自动读取最新资料。
+
+接口会在第一次访问时自动创建 `meimi_workspace_state` 表。云端只保存产品资料、销售端统一价格和报价公式，不保存客户私有备注、报价草稿或报价留档。
 
 ## 素材约定
 
