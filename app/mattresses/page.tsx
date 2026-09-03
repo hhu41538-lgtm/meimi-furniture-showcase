@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import FadeIn from "@/components/ui/FadeIn";
 import { getProductsByCategory } from "@/lib/products";
 
-const WHATSAPP = "https://wa.me/8617796076275";
+const PHONE = "tel:15355787546";
 const HERO = "/images/Mattress Collection/01-hero.jpg";
 
 export const metadata: Metadata = {
@@ -24,9 +24,7 @@ export const metadata: Metadata = {
 export default function MattressesPage() {
   const mattresses = getProductsByCategory("mattress");
 
-  const enquiryHref = `${WHATSAPP}?text=${encodeURIComponent(
-    "Hi Meimi&H, I'd like to enquire about your mattress collection."
-  )}`;
+  const enquiryHref = PHONE;
 
   return (
     <main className="bg-[#FAF9F6] text-stone-800">
@@ -131,11 +129,9 @@ export default function MattressesPage() {
           </p>
           <a
             href={enquiryHref}
-            target="_blank"
-            rel="noopener noreferrer"
             className="mt-8 inline-flex items-center gap-2 bg-[#6B2737] px-7 py-3.5 text-sm font-medium tracking-[0.12em] text-white transition-colors duration-300 hover:bg-stone-900"
           >
-            ENQUIRE ON WHATSAPP
+            CALL 15355787546
             <span>&rarr;</span>
           </a>
         </FadeIn>

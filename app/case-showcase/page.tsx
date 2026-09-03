@@ -84,9 +84,7 @@ export default function CaseShowcasePage() {
           Visit us, or bring us your project.
         </h2>
         <a
-          href="https://wa.me/8617796076275"
-          target="_blank"
-          rel="noreferrer"
+          href="tel:15355787546"
           className="mt-8 inline-flex items-center gap-2 border-b border-[#6B2737] pb-1 text-sm font-medium tracking-[0.12em] text-[#6B2737] transition-colors duration-300 hover:border-stone-900 hover:text-stone-900"
         >
           START A CONVERSATION

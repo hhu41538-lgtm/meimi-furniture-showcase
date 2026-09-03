@@ -16,9 +16,7 @@ export const metadata: Metadata = {
   },
 };
 
-const WHATSAPP =
-  "https://wa.me/8617796076275?text=" +
-  encodeURIComponent("Hi Meimi&H, I'd like to discuss a custom furniture project.");
+const PHONE = "tel:15355787546";
 
 const HERO_IMAGE = encodeURI("/images/explore by space/Vivian sofa/New Arrivals.jpg");
 
@@ -76,7 +74,7 @@ const steps = [
   {
     n: "01",
     title: "Consultation",
-    description: "Share your space, references and requirements over WhatsApp. We discuss what's possible.",
+    description: "Share your space, references and requirements by phone. We discuss what's possible.",
   },
   {
     n: "02",
@@ -171,9 +169,7 @@ export default function CustomPage() {
             handcrafted in our atelier, and shipped worldwide.
           </p>
           <a
-            href={WHATSAPP}
-            target="_blank"
-            rel="noreferrer"
+            href={PHONE}
             className="mt-10 inline-flex items-center gap-2 bg-[#6B2737] px-8 py-3.5 text-sm font-medium tracking-[0.12em] text-white transition-colors duration-300 hover:bg-white hover:text-stone-900"
           >
             START YOUR PROJECT
@@ -401,12 +397,10 @@ export default function CustomPage() {
           factory-direct quote.
         </p>
         <a
-          href={WHATSAPP}
-          target="_blank"
-          rel="noreferrer"
+          href={PHONE}
           className="mt-8 inline-flex items-center gap-2 bg-[#6B2737] px-8 py-3.5 text-sm font-medium tracking-[0.12em] text-white transition-colors duration-300 hover:bg-stone-900"
         >
-          START ON WHATSAPP
+          CALL TO DISCUSS YOUR PROJECT
           <span>&rarr;</span>
         </a>
       </section>

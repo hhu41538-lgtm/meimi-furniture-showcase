@@ -31,14 +31,12 @@ export default function Footer() {
               </a>
             ))}
           </div>
-          <Link
-            href="https://wa.me/8617796076275"
-            target="_blank"
-            rel="noreferrer"
+          <a
+            href="tel:15355787546"
             className="font-medium text-stone-700 transition-colors duration-300 hover:text-[#6B2737]"
           >
-            WhatsApp
-          </Link>
+            Call 15355787546
+          </a>
           <Link
             href="/privacy"
             className="font-medium text-stone-500 transition-colors duration-300 hover:text-[#6B2737]"

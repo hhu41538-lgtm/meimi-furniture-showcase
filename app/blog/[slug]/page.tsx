@@ -6,9 +6,7 @@ import { notFound } from "next/navigation";
 import FadeIn from "@/components/ui/FadeIn";
 import { getPostSlugs, getPostBySlug } from "@/lib/blog";
 
-const WHATSAPP =
-  "https://wa.me/8617796076275?text=" +
-  encodeURIComponent("Hi Meimi&H, I read your guide and I'd like to discuss a custom project.");
+const PHONE_NUMBER = "15355787546";
 
 export function generateStaticParams() {
   return getPostSlugs().map((slug) => ({ slug }));
@@ -17,31 +15,33 @@ export function generateStaticParams() {
 export function generateMetadata({
   params,
 }: {
-  params: { slug: string };
-}): Metadata {
-  const post = getPostBySlug(params.slug);
-  if (!post) {
-    return { title: "Article not found" };
-  }
-  const ogImage = encodeURI(post.heroImage);
-  return {
-    title: post.title,
-    description: post.description,
-    keywords: post.keywords,
-    alternates: { canonical: `/blog/${post.slug}` },
-    openGraph: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  return params.then(({ slug }) => {
+    const post = getPostBySlug(slug);
+    if (!post) {
+      return { title: "Article not found" };
+    }
+    const ogImage = encodeURI(post.heroImage);
+    return {
       title: post.title,
       description: post.description,
-      type: "article",
-      images: [{ url: ogImage }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: post.title,
-      description: post.description,
-      images: [ogImage],
-    },
-  };
+      keywords: post.keywords,
+      alternates: { canonical: `/blog/${post.slug}` },
+      openGraph: {
+        title: post.title,
+        description: post.description,
+        type: "article",
+        images: [{ url: ogImage }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: post.title,
+        description: post.description,
+        images: [ogImage],
+      },
+    };
+  });
 }
 
 function renderInline(text: string): ReactNode[] {
@@ -64,8 +64,9 @@ function formatDate(iso: string) {
   });
 }
 
-export default function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = getPostBySlug(params.slug);
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
   if (!post) {
     notFound();
   }
@@ -174,12 +175,10 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
                 <span>&rarr;</span>
               </Link>
               <a
-                href={WHATSAPP}
-                target="_blank"
-                rel="noreferrer"
+                href={`tel:${PHONE_NUMBER}`}
                 className="inline-flex items-center gap-2 border-b border-stone-300 pb-1 text-sm font-medium tracking-[0.12em] text-stone-600 transition-colors duration-300 hover:border-stone-900 hover:text-stone-900"
               >
-                WHATSAPP
+                CALL MEIMI&H
                 <span>&rarr;</span>
               </a>
             </div>

@@ -89,7 +89,7 @@ const posts: Post[] = [
       {
         type: "ul",
         items: [
-          "**Consultation.** You share your space, reference images and requirements — usually over a messaging app like WhatsApp. The factory discusses what's possible and helps refine your idea.",
+          "**Consultation.** You share your space, reference images and requirements — usually by phone or a local messaging app. The factory discusses what's possible and helps refine your idea.",
           "**Design and quote.** The workshop prepares drawings, material options and a transparent, factory-direct quote so you know exactly what you're getting and what it costs.",
           "**Prototype and sampling.** Where appropriate, samples or a prototype are produced so you can approve materials and construction before committing to the full order.",
           "**Production.** Your pieces are handcrafted to order under the factory's own quality control. For a considered, made-to-order project, a conservative timeline is around two months, depending on scope and materials.",

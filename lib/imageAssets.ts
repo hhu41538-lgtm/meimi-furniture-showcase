@@ -75,7 +75,11 @@ export function getProductImages(subfolder: string, fallbackPath = FALLBACK): Pr
   // Main image: a file marked "new arrivals" (sofas) or, failing that, the
   // lowest-numbered file (mattresses use "01-hero.jpg" etc.).
   const mainName = files.find((name) => /new arrivals/i.test(name)) ?? sorted[0];
-  const detailNames = sorted.filter((name) => name !== mainName);
+  // Dedicated catalogue technical views are wired through product metadata,
+  // rather than appearing as lifestyle/detail-gallery images.
+  const detailNames = sorted.filter(
+    (name) => name !== mainName && !/-construction-|-(side|moss-chenille)-v\d+/i.test(name)
+  );
 
   const toPath = (name: string) => toPublicPath(path.join(folderPath, name));
 

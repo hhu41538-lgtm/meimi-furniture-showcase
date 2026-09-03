@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import FadeIn from "@/components/ui/FadeIn";
 
-type Product = { name: string; category: string; imageSrc: string };
+type Product = { slug: string; name: string; category: string; imageSrc: string };
 type CustomCategory = { id: string; title: string; description: string; imageSrc: string };
 type OtherSpaces = { id: string; title: string; description: string; imageSrc: string };
 type Mattress = { id: string; title: string; description: string; imageSrc: string };
@@ -12,10 +12,10 @@ type Mattress = { id: string; title: string; description: string; imageSrc: stri
 const readyMadeSubs = [
   { id: "living-room", title: "Living Room", category: "Living Room" },
   { id: "dining", title: "Dining", category: "Dining" },
-  { id: "bedroom", title: "Bedroom", category: "Bedroom" },
+  { id: "outdoor", title: "Outdoor", category: "Outdoor" },
 ];
 
-const WHATSAPP = "https://wa.me/8617796076275";
+const PHONE = "tel:15355787546";
 
 const inquireLink =
   "group/cta mt-4 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.15em] text-[#6B2737] transition-colors duration-300 hover:text-stone-900";
@@ -76,17 +76,15 @@ export default function ProductsClient(props: {
                           <h3 className="mt-2 text-lg font-light tracking-tight text-stone-900">
                             {product.name}
                           </h3>
-                          <a
-                            href={WHATSAPP}
-                            target="_blank"
-                            rel="noreferrer"
+                          <Link
+                            href={`/products/${product.slug}`}
                             className={inquireLink}
                           >
-                            Inquire on WhatsApp
+                            View product
                             <span className="transition-transform duration-300 group-hover/cta:translate-x-1">
                               &rarr;
                             </span>
-                          </a>
+                          </Link>
                         </div>
                       </article>
                     </FadeIn>
@@ -125,9 +123,7 @@ export default function ProductsClient(props: {
                       {otherSpaces.description}
                     </p>
                     <a
-                      href={WHATSAPP}
-                      target="_blank"
-                      rel="noreferrer"
+                      href={PHONE}
                       className={inquireLink}
                     >
                       Enquire about upcoming pieces
@@ -172,9 +168,7 @@ export default function ProductsClient(props: {
                       {category.description}
                     </p>
                     <a
-                      href={WHATSAPP}
-                      target="_blank"
-                      rel="noreferrer"
+                      href={PHONE}
                       className={inquireLink}
                     >
                       Discuss your project

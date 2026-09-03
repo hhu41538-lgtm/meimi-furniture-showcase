@@ -1,18 +1,19 @@
-import type { Metadata } from "next";
-import { Inter, Playfair_Display, Bodoni_Moda, Jost } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Jost } from "next/font/google";
 import Script from "next/script";
+import { Phone } from "lucide-react";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import PageTransition from "@/components/ui/PageTransition";
+import PwaRegistration from "@/components/PwaRegistration";
 import { siteConfig } from "@/lib/seo-config";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const playfairDisplay = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair-display", display: "swap" });
-const bodoniModa = Bodoni_Moda({ subsets: ["latin"], variable: "--font-bodoni-moda", display: "swap" });
 const jost = Jost({ subsets: ["latin"], variable: "--font-jost", display: "swap" });
 
 export const metadata: Metadata = {
+  manifest: "/manifest.webmanifest",
+  applicationName: "美觅家居产品图册",
   metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.title,
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
         alt: siteConfig.name,
       },
     ],
-    locale: "en_US",
+    locale: "zh_CN",
   },
   twitter: {
     card: "summary_large_image",
@@ -49,6 +50,18 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    icon: "/app-icon-192.png",
+    apple: "/app-icon-192.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "美觅家居",
+  },
+  formatDetection: {
+    telephone: false,
+  },
   verification: {
     google: [
       "2tC8uAIByQggv6N-iHMRdCVREsQtG2uxrHKP_flhFoU",
@@ -57,12 +70,19 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#6B2737",
+};
+
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: siteConfig.name,
   url: siteConfig.url,
-  logo: `${siteConfig.url}/favicon.ico`,
+  logo: `${siteConfig.url}/app-icon-512.png`,
   description: siteConfig.description,
   address: {
     "@type": "PostalAddress",
@@ -74,7 +94,7 @@ const organizationJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfairDisplay.variable} ${bodoniModa.variable} ${jost.variable}`}>
+    <html lang="zh-CN" className={jost.variable}>
       <body className="min-h-screen bg-[#FCFBF7] text-stone-800 antialiased">
         {/* Google Analytics 4 (gtag.js) */}
         <Script
@@ -94,23 +114,24 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
         <noscript>
+          {/* The Facebook fallback must remain a literal image for no-script clients. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img height="1" width="1" style={{ display: "none" }}
             src="https://www.facebook.com/tr?id=3027824810758006&ev=PageView&noscript=1" alt="" />
         </noscript>
         <div className="flex min-h-screen flex-col">
           <Header />
-          <main className="flex-1">
+          <div className="flex-1">
             <PageTransition>{children}</PageTransition>
-          </main>
+          </div>
           <Footer />
         </div>
-        <a href="https://wa.me/8617796076275" target="_blank" rel="noreferrer" aria-label="Contact us on WhatsApp"
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-emerald-900/20 transition hover:scale-105">
-          <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.166-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.149-.174.199-.297.298-.495.099-.198.049-.372-.025-.521-.074-.149-.669-1.611-.916-2.206-.241-.579-.486-.5-.669-.51-.173-.008-.372-.01-.57-.01-.198 0-.521.074-.793.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.49 1.694.627.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.287.173-1.413-.074-.126-.272-.198-.57-.347Z" />
-          </svg>
+        <a href="tel:15355787546" aria-label="拨打美觅家居电话 15355787546" title="拨打 15355787546"
+          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#6B2737] text-white shadow-lg shadow-stone-900/20 transition hover:scale-105">
+          <Phone className="h-7 w-7" strokeWidth={1.7} />
         </a>
         <Script src="/mp.js" strategy="afterInteractive" />
+        <PwaRegistration />
       </body>
     </html>
   );

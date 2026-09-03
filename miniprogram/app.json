@@ -1,0 +1,14 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "美觅家居",
+    "navigationBarBackgroundColor": "#FBFAF7",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FBFAF7",
+    "backgroundTextStyle": "light"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

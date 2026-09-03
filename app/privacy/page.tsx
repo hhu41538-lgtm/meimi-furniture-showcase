@@ -9,13 +9,13 @@ export default function PrivacyPage() {
         <div className="mt-10 space-y-8 text-base leading-8 text-stone-700">
           <section>
             <h2 className="text-xl font-semibold text-stone-900">1. Who We Are</h2>
-            <p className="mt-3">This website is operated by <strong>Meimi&amp;H</strong>, a premium furniture manufacturer based in Shunde District, Longjiang Town, Foshan, Guangdong, China. Contact us via WhatsApp: <a href="https://wa.me/8617796076275" className="text-[#6B2737] hover:underline">+86 177 9607 6275</a>.</p>
+            <p className="mt-3">This website is operated by <strong>Meimi&amp;H</strong>, a premium furniture manufacturer based in Shunde District, Longjiang Town, Foshan, Guangdong, China. Contact us by phone: <a href="tel:15355787546" className="text-[#6B2737] hover:underline">15355787546</a>.</p>
           </section>
           <section>
             <h2 className="text-xl font-semibold text-stone-900">2. Information We Collect</h2>
             <p className="mt-3">When you visit this website, we may automatically collect the following information through cookies and tracking technologies:</p>
             <ul className="mt-3 list-disc space-y-1 pl-6"><li>Pages you visit and time spent</li><li>Device type, browser, and approximate location</li><li>How you arrived at our website</li></ul>
-            <p className="mt-3">We do <strong>not</strong> collect your name, email, or other personal details unless you contact us directly via WhatsApp.</p>
+            <p className="mt-3">We do <strong>not</strong> collect your name, email, or other personal details unless you contact us directly by phone.</p>
           </section>
           <section>
             <h2 className="text-xl font-semibold text-stone-900">3. Meta Pixel</h2>
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
           </section>
           <section>
             <h2 className="text-xl font-semibold text-stone-900">6. Your Rights</h2>
-            <p className="mt-3">Depending on your location, you may have rights to access, correct, or delete your data. Contact us via WhatsApp to exercise these rights.</p>
+            <p className="mt-3">Depending on your location, you may have rights to access, correct, or delete your data. Contact us by phone to exercise these rights.</p>
           </section>
           <section>
             <h2 className="text-xl font-semibold text-stone-900">7. Changes to This Policy</h2>
@@ -40,7 +40,7 @@ export default function PrivacyPage() {
           </section>
           <section>
             <h2 className="text-xl font-semibold text-stone-900">8. Contact Us</h2>
-            <p className="mt-3"><strong>Meimi&amp;H</strong><br />Shunde District, Longjiang Town, Foshan, Guangdong, China<br />WhatsApp: <a href="https://wa.me/8617796076275" className="text-[#6B2737] hover:underline">+86 177 9607 6275</a></p>
+            <p className="mt-3"><strong>Meimi&amp;H</strong><br />Shunde District, Longjiang Town, Foshan, Guangdong, China<br />Phone: <a href="tel:15355787546" className="text-[#6B2737] hover:underline">15355787546</a></p>
           </section>
         </div>
       </div>

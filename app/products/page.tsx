@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getFolderImagePaths } from "@/lib/imageAssets";
+import { getProductsByCategory } from "@/lib/products";
 import ProductsClient from "./ProductsClient";
 
 export const metadata: Metadata = {
@@ -10,28 +11,6 @@ export const metadata: Metadata = {
 };
 
 const FALLBACK = "/images/Other/fallback.jpg";
-
-const readyMadeProducts = [
-  { name: "Groundpiece", category: "Living Room", image: "" },
-  { name: "Vivienne", category: "Living Room", image: "" },
-  { name: "Lawrence", category: "Living Room", image: "" },
-  { name: "Perry", category: "Living Room", image: "" },
-  { name: "Camelot", category: "Living Room", image: "" },
-  { name: "Bessel", category: "Living Room", image: "" },
-  { name: "Vivienne Chair", category: "Living Room", image: "" },
-  { name: "Aston", category: "Living Room", image: "" },
-  { name: "Beverly", category: "Living Room", image: "" },
-  { name: "Anrun", category: "Dining", image: "" },
-  { name: "Olivia", category: "Dining", image: "" },
-  { name: "Mashi", category: "Dining", image: "" },
-  { name: "Dragon Bone", category: "Dining", image: "" },
-  { name: "Senke Dining Table", category: "Dining", image: "" },
-  { name: "Travertine Dining Table", category: "Dining", image: "" },
-  { name: "Youqu", category: "Bedroom", image: "" },
-  { name: "Nianbi", category: "Bedroom", image: "" },
-  { name: "Aman", category: "Bedroom", image: "" },
-  { name: "Stone", category: "Bedroom", image: "" },
-];
 
 const customCategories = [
   {
@@ -73,32 +52,12 @@ const mattressCategory = {
   image: "",
 };
 
-const folderMap: Record<string, string> = {
-  "Living Room": "Living Room",
-  Dining: "Dining",
-  Bedroom: "Bedroom",
-};
-
 export default function ProductsPage() {
-  const imagesByFolder: Record<string, string[]> = {
-    "Living Room": getFolderImagePaths("Living Room"),
-    Dining: getFolderImagePaths("Dining"),
-    Bedroom: getFolderImagePaths("Bedroom"),
-  };
-
-  const counters: Record<string, number> = { "Living Room": 0, Dining: 0, Bedroom: 0 };
-
-  const productsWithImages = readyMadeProducts.map((product) => {
-    if (product.image) {
-      return { ...product, imageSrc: product.image };
-    }
-    const folder = folderMap[product.category] ?? "Living Room";
-    const list = imagesByFolder[folder] ?? [];
-    const idx = counters[folder] ?? 0;
-    counters[folder] = idx + 1;
-    const imageSrc = list.length > 0 ? list[idx % list.length] : FALLBACK;
-    return { ...product, imageSrc };
-  });
+  const productsWithImages = [
+    ...getProductsByCategory("sofa").map((product) => ({ slug: product.slug, name: product.name, category: "Living Room", imageSrc: product.mainImage || FALLBACK })),
+    ...getProductsByCategory("dining").map((product) => ({ slug: product.slug, name: product.name, category: "Dining", imageSrc: product.mainImage || FALLBACK })),
+    ...getProductsByCategory("outdoor").map((product) => ({ slug: product.slug, name: product.name, category: "Outdoor", imageSrc: product.mainImage || FALLBACK })),
+  ];
 
   const customImages = getFolderImagePaths("Custom Interiors");
   const customWithImages = customCategories.map((cat, i) => ({

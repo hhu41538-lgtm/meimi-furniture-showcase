@@ -2,15 +2,29 @@
   "name": "meimi-furniture-showcase",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "scripts": {
     "dev": "next dev",
+    "preview:catalogue": "npx serve out",
+    "audit:catalogue": "node scripts/audit-catalogue-assets.mjs",
+    "audit:admin": "node scripts/audit-admin-data.mjs",
+    "audit:export": "node scripts/audit-catalogue-export.mjs",
+    "audit:miniprogram": "node scripts/audit-miniprogram.mjs",
+    "audit:security": "npm audit --omit=dev --audit-level=high",
+    "smoke:catalogue": "node scripts/smoke-catalogue.mjs",
+    "check:catalogue": "npx tsc --noEmit && npm run lint && npm run audit:catalogue && npm run audit:admin && npm run audit:export && npm run audit:miniprogram && npm run audit:security && npm run smoke:catalogue",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "npx serve out",
+    "lint": "eslint ."
   },
   "dependencies": {
+    "exceljs": "^4.4.0",
     "framer-motion": "^12.42.2",
-    "next": "14.2.35",
+    "lucide-react": "^1.33.0",
+    "next": "^15.5.23",
+    "pdfjs-dist": "^4.10.38",
     "react": "^18",
     "react-dom": "^18"
   },
@@ -19,10 +33,15 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "14.2.35",
-    "postcss": "^8",
+    "eslint-config-next": "^15.5.23",
+    "postcss": "^8.5.26",
     "sharp": "^0.35.3",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
+  },
+  "overrides": {
+    "glob": "10.5.0",
+    "postcss": "$postcss",
+    "sharp": "$sharp"
   }
 }

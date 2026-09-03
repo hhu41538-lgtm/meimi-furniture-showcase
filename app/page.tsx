@@ -52,11 +52,11 @@ export default function Home() {
             Bespoke furniture, made to order in our Foshan atelier.
           </p>
           <a
-            href="/products"
+            href="/app"
             className="hero-rise group mt-12 inline-flex items-center gap-2 border-b border-white/50 pb-1 text-sm font-medium tracking-[0.15em] text-white transition-colors duration-300 hover:border-white"
             style={{ animationDelay: "1.3s" }}
           >
-            EXPLORE COLLECTIONS
+            OPEN CATALOGUE APP
             <span className="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
           </a>
         </div>
@@ -122,7 +122,7 @@ export default function Home() {
           <div className="grid gap-6 md:grid-cols-3">
             {categoryCards.map((category, index) => (
               <FadeIn key={category.title} delay={index * 120}>
-                <a
+                <Link
                   href="/products"
                   className="group relative block aspect-[3/4] overflow-hidden rounded-sm"
                 >
@@ -142,7 +142,7 @@ export default function Home() {
                     </p>
                     <span className="mt-3 block h-px w-8 bg-white/60 transition-all duration-500 [transition-timing-function:var(--ease-lux)] group-hover:w-16" />
                   </div>
-                </a>
+                </Link>
               </FadeIn>
             ))}
           </div>
@@ -162,13 +162,13 @@ export default function Home() {
                   New Arrivals
                 </h2>
               </div>
-              <a
+              <Link
                 href="/products"
                 className="group hidden items-center gap-2 pb-2 text-xs font-medium uppercase tracking-[0.25em] text-stone-500 transition-colors duration-300 hover:text-[#6B2737] sm:inline-flex"
               >
                 All Products
                 <span className="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
-              </a>
+              </Link>
             </div>
           </FadeIn>
           <div className="space-y-24 lg:space-y-28">

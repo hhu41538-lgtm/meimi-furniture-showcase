@@ -4,11 +4,11 @@ import FadeIn from "@/components/ui/FadeIn";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Get in touch with Meimi&H — premium furniture handcrafted in Foshan, China. Chat with us on WhatsApp, we respond within 24 hours.",
+    "Get in touch with Meimi&H — premium furniture handcrafted in Foshan, China. Call us on 15355787546, we respond within 24 hours.",
   alternates: { canonical: "/contact" },
 };
 
-const WHATSAPP = "https://wa.me/8617796076275";
+const PHONE = "tel:15355787546";
 
 const socialLinks = [
   { platform: "TikTok", href: "https://www.tiktok.com/@meimi_furniture", handle: "@meimi_furniture" },
@@ -34,12 +34,10 @@ export default function ContactPage() {
               our team will respond within 24 hours.
             </p>
             <a
-              href={WHATSAPP}
-              target="_blank"
-              rel="noreferrer"
+              href={PHONE}
               className="mt-10 inline-flex items-center gap-2 bg-[#6B2737] px-8 py-3.5 text-sm font-medium tracking-[0.12em] text-white transition-colors duration-300 hover:bg-stone-900"
             >
-              CHAT ON WHATSAPP
+              CALL 15355787546
               <span>&rarr;</span>
             </a>
           </div>
@@ -63,12 +61,10 @@ export default function ContactPage() {
                 Foshan, Guangdong, China
               </p>
               <a
-                href={WHATSAPP}
-                target="_blank"
-                rel="noreferrer"
+                href={PHONE}
                 className="group mt-8 inline-flex items-center gap-2 text-sm font-medium tracking-[0.12em] text-[#6B2737] transition-colors duration-300 hover:text-stone-900"
               >
-                +86 177 9607 6275
+                15355787546
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   &rarr;
                 </span>
@@ -110,9 +106,7 @@ export default function ContactPage() {
           Let&apos;s create something refined.
         </h2>
         <a
-          href={WHATSAPP}
-          target="_blank"
-          rel="noreferrer"
+          href={PHONE}
           className="mt-8 inline-flex items-center gap-2 border-b border-[#6B2737] pb-1 text-sm font-medium tracking-[0.12em] text-[#6B2737] transition-colors duration-300 hover:border-stone-900 hover:text-stone-900"
         >
           START A CONVERSATION
