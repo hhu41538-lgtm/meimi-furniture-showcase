@@ -218,7 +218,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
         <div className="auth-gate-heading">
           <h1 id="auth-title">进入内部报价工作台</h1>
           <p>选择工作版本后，用对应密钥进入客户、产品和报价工具。</p>
-          <p className="auth-gate-storage-note" role="status">{isOnline ? "云端账号服务在线 · 工作资料会同时保存到本机" : "当前离线 · 本机工作资料仍可读取，登录账号需联网验证"}</p>
+          <p className="auth-gate-storage-note" role="status">{isOnline ? "当前网络可用 · 登录时会验证云端账号，工作资料同时保存到本机" : "当前离线 · 本机工作资料仍可读取，登录账号需联网验证"}</p>
         </div>
         <div className="auth-gate-mode-tabs" role="tablist" aria-label="工作版本">
           <button className={mode === "sales" ? "is-active" : ""} type="button" role="tab" aria-selected={mode === "sales"} onClick={() => { setMode("sales"); setStatus(""); }}>
