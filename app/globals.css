@@ -4480,6 +4480,16 @@ body:has(.admin-shell) {
   min-width: 42px;
   border: 0;
   color: var(--auth-cobalt);
+  cursor: pointer;
+  padding: 0;
+}
+
+.auth-gate-password-toggle:hover {
+  background: #f1f5fb;
+}
+
+.auth-gate-password-toggle[aria-pressed="true"] {
+  background: #e8eef8;
 }
 
 .auth-gate-action-tabs {
