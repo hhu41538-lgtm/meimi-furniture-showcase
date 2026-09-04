@@ -3078,7 +3078,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       const savedAt = persistLocalData();
       setAutoSaveStatus(`已手动保存 ${shortDateTime(savedAt)}`);
       setStatus(adminUnlocked && isOnline
-        ? `已保存 ${entries.length} 条资料、${pricingRules.length} 个公式和 ${quote.lines.length} 条报价明细，并已提交云端同步`
+        ? cloudSyncConflict
+          ? "已保存到本机，但云端存在新版本；请先刷新云端版本后再同步"
+          : `已保存 ${entries.length} 条资料、${pricingRules.length} 个公式和 ${quote.lines.length} 条报价明细，并已提交云端同步`
         : adminUnlocked
           ? "已保存到本机，联网后会自动同步云端"
           : "已保存到本机；产品目录和报价公式由云端统一更新");
