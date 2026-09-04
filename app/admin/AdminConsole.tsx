@@ -1666,9 +1666,11 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
     };
     const timer = window.setInterval(() => { void refresh(); }, 30000);
     window.addEventListener("focus", refresh);
+    window.addEventListener("online", refresh);
     return () => {
       window.clearInterval(timer);
       window.removeEventListener("focus", refresh);
+      window.removeEventListener("online", refresh);
     };
   }, [applySharedWorkspaceState, session.role, sharedSyncReady, storageReady]);
 
