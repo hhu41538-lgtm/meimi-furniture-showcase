@@ -1429,6 +1429,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [customerTierFilter, setCustomerTierFilter] = useState<"all" | CustomerTier>("all");
   const [customerFollowFilter, setCustomerFollowFilter] = useState<"all" | "due">("all");
   const [customerStatusFilter, setCustomerStatusFilter] = useState<"all" | CustomerFollowStatus>("all");
+  const [customerLeadSourceFilter, setCustomerLeadSourceFilter] = useState<"all" | CustomerLeadSource>("all");
   const [newCustomerTier, setNewCustomerTier] = useState<CustomerTier>("B");
   const [newCustomerLeadSource, setNewCustomerLeadSource] = useState<CustomerLeadSource>("manual");
   const [expandedCustomerId, setExpandedCustomerId] = useState("");
@@ -1931,8 +1932,11 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     const tierMatches = customerTierFilter === "all"
       ? statusMatches
       : statusMatches.filter((record) => record.tier === customerTierFilter);
+    const sourceMatches = customerLeadSourceFilter === "all"
+      ? tierMatches
+      : tierMatches.filter((record) => record.leadSource === customerLeadSourceFilter);
     const matches = normalized
-      ? tierMatches.filter((record) =>
+      ? sourceMatches.filter((record) =>
           [
             record.country,
             record.phone,
@@ -1945,6 +1949,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             record.ownerContact,
             record.tier,
             customerFollowStatusLabels[record.followStatus],
+            customerLeadSourceLabels[record.leadSource],
             record.note,
             record.privateNote,
             record.lastQuoteNo,
@@ -1955,7 +1960,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             .toLowerCase()
             .includes(normalized),
         )
-      : tierMatches;
+      : sourceMatches;
     return [...matches]
       .sort(
         (left, right) =>
@@ -1963,7 +1968,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
           followUpTimestamp(left) - followUpTimestamp(right) ||
           customerRecordTimestamp(right) - customerRecordTimestamp(left),
       );
-  }, [customerFollowFilter, customerStatusFilter, customerTierFilter, ownerSearchQuery, visibleCustomerOwners]);
+  }, [customerFollowFilter, customerLeadSourceFilter, customerStatusFilter, customerTierFilter, ownerSearchQuery, visibleCustomerOwners]);
   const displayedCustomerOwners = useMemo(
     () => showAllCustomers ? filteredCustomerOwners : filteredCustomerOwners.slice(0, 8),
     [filteredCustomerOwners, showAllCustomers],
@@ -3576,7 +3581,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               <button className="customer-owner-search-clear" type="button" onClick={() => { setOwnerSearchQuery(""); setStatus("已清空客户搜索"); }} disabled={!ownerSearchQuery} aria-label="清空客户搜索" title="清空搜索"><X size={14} /></button>
             </label>
             <div className="customer-tier-summary" role="group" aria-label="客户资源筛选">
-              <button className={customerTierFilter === "all" && customerFollowFilter === "all" && customerStatusFilter === "all" ? "active" : ""} aria-pressed={customerTierFilter === "all" && customerFollowFilter === "all" && customerStatusFilter === "all"} onClick={() => { setCustomerTierFilter("all"); setCustomerFollowFilter("all"); setCustomerStatusFilter("all"); setStatus("已显示全部客户"); }}>全部 {visibleCustomerOwners.length}</button>
+              <button className={customerTierFilter === "all" && customerFollowFilter === "all" && customerStatusFilter === "all" && customerLeadSourceFilter === "all" ? "active" : ""} aria-pressed={customerTierFilter === "all" && customerFollowFilter === "all" && customerStatusFilter === "all" && customerLeadSourceFilter === "all"} onClick={() => { setCustomerTierFilter("all"); setCustomerFollowFilter("all"); setCustomerStatusFilter("all"); setCustomerLeadSourceFilter("all"); setStatus("已显示全部客户"); }}>全部 {visibleCustomerOwners.length}</button>
               <button className={customerFollowFilter === "due" ? "active" : ""} aria-pressed={customerFollowFilter === "due"} onClick={() => setCustomerFollowFilter((current) => { const next = current === "due" ? "all" : "due"; setStatus(next === "due" ? "已筛选待跟进客户" : "已取消待跟进筛选"); return next; })}>待跟进 {dueFollowUpCount}</button>
               <button className={customerTierFilter === "A" ? "active" : ""} aria-pressed={customerTierFilter === "A"} onClick={() => { setCustomerTierFilter("A"); setStatus("已筛选 A 类客户"); }}>A类 {customerTierCounts.A}</button>
               <button className={customerTierFilter === "B" ? "active" : ""} aria-pressed={customerTierFilter === "B"} onClick={() => { setCustomerTierFilter("B"); setStatus("已筛选 B 类客户"); }}>B类 {customerTierCounts.B}</button>
@@ -3588,14 +3593,22 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                   {(Object.keys(customerFollowStatusLabels) as CustomerFollowStatus[]).map((statusKey) => <option key={statusKey} value={statusKey}>{customerFollowStatusLabels[statusKey]}</option>)}
                 </select>
               </label>
+              <label className="customer-status-filter">
+                <span>来源</span>
+                <select aria-label="客户线索来源" value={customerLeadSourceFilter} onChange={(event) => { const next = event.target.value as "all" | CustomerLeadSource; setCustomerLeadSourceFilter(next); setStatus(next === "all" ? "已显示全部客户来源" : `已筛选客户来源：${customerLeadSourceLabels[next]}`); }}>
+                  <option value="all">全部来源</option>
+                  {(Object.keys(customerLeadSourceLabels) as CustomerLeadSource[]).map((source) => <option key={source} value={source}>{customerLeadSourceLabels[source]}</option>)}
+                </select>
+              </label>
               <button
                 type="button"
-                className={ownerSearchQuery || customerTierFilter !== "all" || customerFollowFilter !== "all" || customerStatusFilter !== "all" ? "active" : ""}
+                className={ownerSearchQuery || customerTierFilter !== "all" || customerFollowFilter !== "all" || customerStatusFilter !== "all" || customerLeadSourceFilter !== "all" ? "active" : ""}
                 onClick={() => {
                   setOwnerSearchQuery("");
                   setCustomerTierFilter("all");
                   setCustomerFollowFilter("all");
                   setCustomerStatusFilter("all");
+                  setCustomerLeadSourceFilter("all");
                   setShowAllCustomers(false);
                   setStatus("已清空客户池筛选");
                 }}
