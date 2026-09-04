@@ -1464,6 +1464,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [pendingCustomerOwnerVersion, setPendingCustomerOwnerVersion] = useState(0);
   const [pendingCustomerOwnerCount, setPendingCustomerOwnerCount] = useState(0);
   const [isRefreshingSharedWorkspace, setIsRefreshingSharedWorkspace] = useState(false);
+  const [metaWebhookCopied, setMetaWebhookCopied] = useState(false);
   const cloudVersionRef = useRef<number | null>(null);
   const cloudSyncInFlightRef = useRef(false);
   const sharedWorkspaceRefreshInFlightRef = useRef(false);
@@ -3508,6 +3509,36 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             ) : (
               <div className="account-permission-empty"><UsersRound size={18} /><span>还没有销售账号。销售在登录页注册后，会出现在这里，默认拥有销售端基础板块。</span></div>
             )}
+          </section>
+          <section className="account-permission-panel meta-integration-panel" aria-label="Meta广告线索接入">
+            <div className="admin-section-heading">
+              <div>
+                <p>Meta Lead Ads</p>
+                <h2>广告线索接入</h2>
+              </div>
+              <span>第一阶段：Webhook 已就绪</span>
+            </div>
+            <div className="meta-integration-summary">
+              <div>
+                <strong>Webhook 回调地址</strong>
+                <code>{typeof window === "undefined" ? "/api/meta/webhook" : `${window.location.origin}/api/meta/webhook`}</code>
+              </div>
+              <button type="button" onClick={() => {
+                const value = `${window.location.origin}/api/meta/webhook`;
+                void navigator.clipboard?.writeText(value).then(() => {
+                  setMetaWebhookCopied(true);
+                  window.setTimeout(() => setMetaWebhookCopied(false), 1800);
+                });
+              }} title="复制 Meta Webhook 回调地址">
+                <Copy size={14} />{metaWebhookCopied ? "已复制" : "复制地址"}
+              </button>
+            </div>
+            <div className="meta-integration-steps">
+              <span><b>01</b>在 Meta 开发者后台添加 Webhooks，并订阅 Page 的 <code>leadgen</code> 事件</span>
+              <span><b>02</b>在 Vercel 配置验证令牌、App Secret 和 Page Access Token</span>
+              <span><b>03</b>用 Meta Lead Ads Testing Tool 发一条测试线索，确认客户池收到 Meta 来源记录</span>
+            </div>
+            <small className="meta-integration-note">当前页面只显示接入准备状态；未完成 Meta 授权前，不会把普通客户标记为广告线索。</small>
           </section>
           <section className="pdf-import-panel" aria-label="PDF产品图册导入">
             <div className="admin-section-heading">
