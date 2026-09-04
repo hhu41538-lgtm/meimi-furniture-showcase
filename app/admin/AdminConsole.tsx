@@ -2851,9 +2851,11 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
     try {
       const savedAt = persistLocalData();
       setAutoSaveStatus(`已手动保存 ${shortDateTime(savedAt)}`);
-      setStatus(isOnline
-        ? `已保存 ${entries.length} 条资料、${pricingRules.length} 个公式和 ${quote.lines.length} 条报价明细`
-        : "已保存到本机，联网后会自动同步云端");
+      setStatus(adminUnlocked && isOnline
+        ? `已保存 ${entries.length} 条资料、${pricingRules.length} 个公式和 ${quote.lines.length} 条报价明细，并已提交云端同步`
+        : adminUnlocked
+          ? "已保存到本机，联网后会自动同步云端"
+          : "已保存到本机；产品目录和报价公式由云端统一更新");
       void syncSharedWorkspaceState();
     } catch {
       setStatus("保存失败：请检查浏览器是否允许本地存储");
@@ -3076,7 +3078,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
           </div>
           <button onClick={save}>
             <Save size={15} />
-            保存并同步
+            {adminUnlocked ? "保存并同步" : "保存本地资料"}
           </button>
           <a className="admin-link" href="/app" target="_blank" rel="noreferrer">
             <ExternalLink size={15} />
@@ -3090,7 +3092,9 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
         <div className="sales-cockpit-status" role="status" aria-live="polite">
           <span className="sales-cockpit-status-main"><CheckCircle2 size={15} />{storageReady ? "已保存最新内容" : "正在读取本地资料"}</span>
           <span>{lastSavedAt ? `最近保存 ${shortDateTime(lastSavedAt)}` : autoSaveStatus}</span>
-          <span>{isOnline ? "本地 + 云端" : "离线本地"}</span>
+            <span>{isOnline
+              ? (adminUnlocked ? "本地 + 云端" : "本地资料 + 云端目录")
+              : "离线本地"}</span>
           <strong>报价完成度 {quoteProgress}%</strong>
         </div>
         <div className="sales-cockpit-head">
