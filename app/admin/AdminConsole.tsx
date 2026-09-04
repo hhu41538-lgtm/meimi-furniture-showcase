@@ -1450,6 +1450,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [exchangeRateDate, setExchangeRateDate] = useState("离线参考");
   const [exchangeRateStatus, setExchangeRateStatus] = useState("正在获取今日汇率");
   const [isRefreshingExchangeRates, setIsRefreshingExchangeRates] = useState(false);
+  const [isExportingQuote, setIsExportingQuote] = useState(false);
   const [storageReady, setStorageReady] = useState(false);
   const [lastSavedAt, setLastSavedAt] = useState("");
   const [autoSaveStatus, setAutoSaveStatus] = useState("正在读取本地资料");
@@ -3107,15 +3108,19 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
 
   async function exportQuoteTemplate() {
     if (!ensureFormalCustomerOutputReady()) return;
+    if (isExportingQuote) return;
     if (quote.lines.length > QUOTATION_TEMPLATE_LINE_LIMIT) {
       setStatus(`当前模板最多支持 ${QUOTATION_TEMPLATE_LINE_LIMIT} 个产品，请拆分报价后再导出，避免明细被截断`);
       return;
     }
+    setIsExportingQuote(true);
     try {
       await downloadQuotationTemplate(quote, totals);
       setStatus("已按 XX furniture 报价模板导出 Excel 报价单");
     } catch {
       setStatus("Excel 模板导出失败，请检查模板文件或产品图片路径");
+    } finally {
+      setIsExportingQuote(false);
     }
   }
 
@@ -4562,7 +4567,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                 <div className="generated-customer-copy">
                   <span>客户版报价输出</span>
                   <button onClick={copyCustomerQuoteText}>复制客户版报价单</button>
-                  <button onClick={exportQuoteTemplate}><FileDown size={15} />导出 Excel 报价单</button>
+                  <button onClick={exportQuoteTemplate} disabled={isExportingQuote}><FileDown size={15} />{isExportingQuote ? "正在导出..." : "导出 Excel 报价单"}</button>
                 </div>
               </div>
             </div>
