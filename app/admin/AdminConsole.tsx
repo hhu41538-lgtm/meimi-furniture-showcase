@@ -1587,7 +1587,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
   }, [applySharedWorkspaceState, storageReady]);
 
   const syncSharedWorkspaceState = useCallback(async () => {
-    if (!adminUnlocked || !sharedSyncReady || cloudVersionRef.current === null || cloudSyncInFlightRef.current) return;
+    if (!isOnline || !adminUnlocked || !sharedSyncReady || cloudVersionRef.current === null || cloudSyncInFlightRef.current) return;
     cloudSyncInFlightRef.current = true;
     setCloudSyncStatus("正在发布产品与报价公式");
     try {
@@ -1611,7 +1611,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
     } finally {
       cloudSyncInFlightRef.current = false;
     }
-  }, [adminUnlocked, applySharedWorkspaceState, entries, pricingRules, session.name, sharedSyncReady, workflowPricingRuleId]);
+  }, [adminUnlocked, applySharedWorkspaceState, entries, isOnline, pricingRules, session.name, sharedSyncReady, workflowPricingRuleId]);
 
   useEffect(() => {
     if (!storageReady || !sharedSyncReady) return undefined;
