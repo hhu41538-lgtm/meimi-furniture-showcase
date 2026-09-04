@@ -139,7 +139,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
       if (!response.ok || !payload.account) { setStatus(payload.message || "云端账号验证失败，请稍后重试"); return; }
       const account = cloudAccountToStaff(payload.account);
       if (!account.active) { setStatus("这个销售账号已被管理员停用，请联系管理员"); return; }
-      setAccounts((current) => current.some((item) => item.id === account.id) ? current.map((item) => item.id === account.id ? account : item) : [account, ...current]);
+      saveAccounts(accounts.some((item) => item.id === account.id) ? accounts.map((item) => item.id === account.id ? account : item) : [account, ...accounts]);
       enterSession(accountToSession(account));
     } catch { setStatus("云端账号服务暂时不可用，请检查数据库配置"); }
   }
