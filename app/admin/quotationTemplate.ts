@@ -60,8 +60,8 @@ function formatGeneratedAt(value: string) {
     : new Intl.DateTimeFormat("zh-CN", { dateStyle: "short", timeStyle: "short" }).format(date);
 }
 
-function safeFilenamePart(value: string) {
-  return value.trim().replace(/[<>:"/\\|?*\u0000-\u001f]/g, "-").slice(0, 60);
+function safeFilenamePart(value: unknown) {
+  return String(value ?? "").trim().replace(/[<>:"/\\|?*\u0000-\u001f]/g, "-").slice(0, 60);
 }
 
 function formatDimension(line: TemplateQuoteLine) {
