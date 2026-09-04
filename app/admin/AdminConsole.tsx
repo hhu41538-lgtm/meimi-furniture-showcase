@@ -923,7 +923,7 @@ function currency(value: number) {
 
 function customerOwnerSummary(record?: CustomerOwnerRecord) {
   if (!record) return "未确认客户归属";
-  return `${record.owner || "未填销售"} / ${record.tier}类 / ${record.country || "-"} / ${record.phone || "-"} / ${record.client || "未填客户"}`;
+  return `${record.owner || "未填销售"} / ${record.tier}类 / ${customerLeadSourceLabels[record.leadSource]} / ${record.country || "-"} / ${record.phone || "-"} / ${record.client || "未填客户"}`;
 }
 
 function employeeOwnsCustomer(record: CustomerOwnerRecord, employee: string, accountId = "") {
