@@ -1466,6 +1466,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const cloudVersionRef = useRef<number | null>(null);
   const cloudSyncInFlightRef = useRef(false);
   const sharedWorkspaceRefreshInFlightRef = useRef(false);
+  const wasOnlineRef = useRef(true);
   const [pdfDropActive, setPdfDropActive] = useState(false);
   const [pdfImportState, setPdfImportState] = useState<PdfImportState>({ phase: "idle", fileName: "", message: "等待导入产品图册", importedCount: 0 });
   const [status, setStatus] = useState(`已进入${session.role === "admin" ? "管理员" : "销售"}版：${session.name}`);
@@ -1800,6 +1801,14 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     const timer = window.setInterval(() => { void syncSharedWorkspaceState(); }, 10000);
     return () => window.clearInterval(timer);
   }, [adminUnlocked, cloudSyncConflict, cloudSyncPending, isOnline, sharedSyncReady, storageReady, syncSharedWorkspaceState]);
+
+  useEffect(() => {
+    const becameOnline = !wasOnlineRef.current && isOnline;
+    wasOnlineRef.current = isOnline;
+    if (!becameOnline || !storageReady || !sharedSyncReady || !adminUnlocked || cloudSyncConflict) return undefined;
+    const timer = window.setTimeout(() => { void syncSharedWorkspaceState(); }, 500);
+    return () => window.clearTimeout(timer);
+  }, [adminUnlocked, cloudSyncConflict, isOnline, sharedSyncReady, storageReady, syncSharedWorkspaceState]);
 
   useEffect(() => {
     if (!storageReady || !sharedSyncReady || session.role !== "sales") return undefined;
