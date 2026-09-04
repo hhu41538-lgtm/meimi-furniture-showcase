@@ -51,6 +51,7 @@ function normalizeOwnerKey(country: string, phone: string) {
 
 type MetaLeadRow = { leadgen_id: string; raw_payload: Record<string, unknown> };
 type MetaLeadDetails = { name?: unknown; phone?: unknown; country?: unknown; email?: unknown; company?: unknown; createdTime?: unknown };
+type SalesAccountRow = { id: string; name: string };
 
 export async function POST(request: Request) {
   const key = request.headers.get("x-meimi-admin-key")?.trim() ?? "";
@@ -62,7 +63,10 @@ export async function POST(request: Request) {
   try {
     const sql = neon<false, false>(url);
     const rows = await sql`SELECT leadgen_id, raw_payload FROM meimi_meta_leads WHERE status = 'details_ready' ORDER BY received_at ASC LIMIT 100` as unknown as MetaLeadRow[];
-    const imported = [];
+    const salesAccounts = await sql`SELECT id, name FROM meimi_staff_accounts WHERE role = 'sales' AND active = TRUE ORDER BY created_at ASC, id ASC` as unknown as SalesAccountRow[];
+    const metaCountRows = await sql`SELECT COUNT(*)::int AS count FROM meimi_customer_owners WHERE record->>'leadSource' = 'meta'` as Array<{ count?: unknown }>;
+    const existingMetaCount = Number(metaCountRows[0]?.count) || 0;
+    const imported: Array<Record<string, unknown>> = [];
     let skipped = 0;
     let missingFields = 0;
     for (const row of rows) {
@@ -83,14 +87,15 @@ export async function POST(request: Request) {
         continue;
       }
       const now = new Date().toISOString();
+      const assignee: SalesAccountRow | null = salesAccounts.length ? salesAccounts[(existingMetaCount + imported.length) % salesAccounts.length] : null;
       const record = {
         id: `${ownerKey}:meta:${row.leadgen_id}`,
         country: rawCountry,
         phone: rawPhone,
         client: text(details?.name),
         clientContact: text(details?.company) || text(details?.email),
-        ownerAccountId: "",
-        owner: "待分配",
+        ownerAccountId: assignee?.id || "",
+        owner: assignee?.name || "待分配",
         ownerContact: "",
         createdAt: now,
         updatedAt: now,
