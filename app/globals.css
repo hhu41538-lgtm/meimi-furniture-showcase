@@ -358,6 +358,52 @@ body:has(.admin-shell) {
   line-height: 1.5;
 }
 
+.meta-pending-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.meta-pending-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(110px, .7fr) minmax(130px, .8fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #e5e0d7;
+  background: #fbfaf7;
+}
+
+.meta-pending-row > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.meta-pending-row small {
+  overflow: hidden;
+  color: #8a857d;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .meta-integration-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .meta-pending-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .meta-pending-row > div,
+  .meta-pending-row button {
+    grid-column: 1 / -1;
+  }
+}
+
 .admin-main-content {
   min-width: 0;
   padding: 42px clamp(18px, 4vw, 64px) 72px;

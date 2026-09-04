@@ -187,6 +187,7 @@ type ActiveModule = "home" | "customers" | "quote" | "products" | "search" | "lo
 type CustomerTier = "A" | "B" | "C";
 type CustomerFollowStatus = "new" | "following" | "quoted" | "won" | "paused";
 type CustomerLeadSource = "manual" | "meta" | "website" | "referral" | "other";
+type MetaPendingLead = { leadgenId: string; name: string; country: string; phone: string; email: string; company: string };
 
 type CustomerOwnerRecord = {
   id: string;
@@ -1468,6 +1469,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [isSyncingMetaLeads, setIsSyncingMetaLeads] = useState(false);
   const [metaConfigStatus, setMetaConfigStatus] = useState("");
   const [isCheckingMetaConfig, setIsCheckingMetaConfig] = useState(false);
+  const [metaPendingLeads, setMetaPendingLeads] = useState<MetaPendingLead[]>([]);
+  const [isLoadingMetaPending, setIsLoadingMetaPending] = useState(false);
   const cloudVersionRef = useRef<number | null>(null);
   const cloudSyncInFlightRef = useRef(false);
   const sharedWorkspaceRefreshInFlightRef = useRef(false);
@@ -3168,6 +3171,41 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     }
   }
 
+  async function loadMetaPendingLeads() {
+    if (!adminUnlocked || isLoadingMetaPending) return;
+    setIsLoadingMetaPending(true);
+    try {
+      const response = await fetch("/api/meta/pending", { headers: { "x-meimi-admin-key": adminSyncKey }, cache: "no-store" });
+      const payload = await response.json().catch(() => ({})) as { message?: string; leads?: MetaPendingLead[] };
+      if (!response.ok || !Array.isArray(payload.leads)) throw new Error(payload.message || "待补字段线索读取失败");
+      setMetaPendingLeads(payload.leads);
+      setStatus(payload.leads.length ? `已载入 ${payload.leads.length} 条待补字段 Meta 线索` : "当前没有待补字段的 Meta 线索");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "待补字段线索读取失败");
+    } finally {
+      setIsLoadingMetaPending(false);
+    }
+  }
+
+  async function saveMetaPendingLead(lead: MetaPendingLead) {
+    if (!lead.country.trim() || !lead.phone.trim()) {
+      setStatus("请先补充国家和电话");
+      return;
+    }
+    const response = await fetch("/api/meta/pending", {
+      method: "PATCH",
+      headers: { "content-type": "application/json", "x-meimi-admin-key": adminSyncKey },
+      body: JSON.stringify({ leadgenId: lead.leadgenId, country: lead.country, phone: lead.phone }),
+    });
+    const payload = await response.json().catch(() => ({})) as { message?: string };
+    if (!response.ok) {
+      setStatus(payload.message || "Meta 线索字段保存失败");
+      return;
+    }
+    setMetaPendingLeads((current) => current.filter((item) => item.leadgenId !== lead.leadgenId));
+    setStatus(`已补全 Meta 线索 ${lead.leadgenId}，请点击同步并导入`);
+  }
+
   function save() {
     try {
       const savedAt = persistLocalData();
@@ -3604,7 +3642,18 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             <button type="button" className="meta-integration-check" onClick={() => void checkMetaConfig()} disabled={isCheckingMetaConfig} aria-busy={isCheckingMetaConfig} title="检查云端和 Meta 环境变量是否齐全">
               <Settings2 size={15} />{isCheckingMetaConfig ? "检查中..." : "检查接入配置"}
             </button>
+            <button type="button" className="meta-integration-check" onClick={() => void loadMetaPendingLeads()} disabled={isLoadingMetaPending} aria-busy={isLoadingMetaPending} title="查看缺少国家或电话的 Meta 线索">
+              <UsersRound size={15} />{isLoadingMetaPending ? "读取中..." : "查看待补字段"}
+            </button>
             {metaConfigStatus ? <small className="meta-integration-result" role="status" aria-live="polite">{metaConfigStatus}</small> : null}
+            {metaPendingLeads.length ? <div className="meta-pending-list">
+              {metaPendingLeads.map((lead) => <div className="meta-pending-row" key={lead.leadgenId}>
+                <div><strong>{lead.name || "未填姓名"}</strong><small>{lead.company || lead.email || lead.leadgenId}</small></div>
+                <input aria-label={`Meta 线索 ${lead.leadgenId} 国家`} value={lead.country} onChange={(event) => setMetaPendingLeads((current) => current.map((item) => item.leadgenId === lead.leadgenId ? { ...item, country: event.target.value } : item))} placeholder="国家" />
+                <input aria-label={`Meta 线索 ${lead.leadgenId} 电话`} value={lead.phone} onChange={(event) => setMetaPendingLeads((current) => current.map((item) => item.leadgenId === lead.leadgenId ? { ...item, phone: event.target.value } : item))} placeholder="电话" />
+                <button type="button" onClick={() => void saveMetaPendingLead(lead)}>保存</button>
+              </div>)}
+            </div> : null}
           </section>
           <section className="pdf-import-panel" aria-label="PDF产品图册导入">
             <div className="admin-section-heading">
