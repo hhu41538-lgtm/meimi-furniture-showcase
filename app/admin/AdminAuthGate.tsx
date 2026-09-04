@@ -281,11 +281,11 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
             </div>
           ) : null}
           {mode === "sales" && salesAction === "register" ? (
-            <label>销售姓名<input value={name} onChange={(event) => setName(event.target.value)} placeholder="例如：张三" autoComplete="name" /></label>
+            <label>销售姓名<input value={name} onChange={(event) => setName(event.target.value)} placeholder="例如：张三" autoComplete="name" autoFocus /></label>
           ) : null}
           <label>
             <span>{mode === "admin" ? "管理员密钥" : "销售登录密钥"}</span>
-            <span className="auth-gate-input-wrap"><KeyRound size={16} /><input type="password" inputMode={mode === "admin" ? "numeric" : "text"} value={loginKey} onChange={(event) => setLoginKey(event.target.value)} placeholder={mode === "admin" ? "输入管理员密钥" : "输入销售密钥"} autoComplete="current-password" /></span>
+            <span className="auth-gate-input-wrap"><KeyRound size={16} /><input type="password" inputMode={mode === "admin" ? "numeric" : "text"} value={loginKey} onChange={(event) => setLoginKey(event.target.value)} placeholder={mode === "admin" ? "输入管理员密钥" : "输入销售密钥"} autoComplete="current-password" autoFocus={mode === "admin" || salesAction === "login"} /></span>
           </label>
           {mode === "sales" && salesAction === "register" ? (
             <label>确认销售密钥<input type="password" value={confirmKey} onChange={(event) => setConfirmKey(event.target.value)} placeholder="再次输入销售密钥" autoComplete="new-password" /></label>
