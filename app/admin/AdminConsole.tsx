@@ -3318,7 +3318,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
           {session.role === "sales" && pendingCustomerOwnerCount ? <button type="button" onClick={() => { setPendingCustomerOwnerVersion((current) => current + 1); setStatus("正在重试同步待上传客户"); }} disabled={!isOnline} title={isOnline ? "立即重试上传待同步客户" : "联网后才能同步客户"}>
             <CloudUpload size={15} />立即同步客户
           </button> : null}
-          {adminUnlocked && cloudSyncPending ? <button type="button" onClick={() => cloudSyncConflict ? refreshAfterSyncConflict() : void syncSharedWorkspaceState()} disabled={!isOnline || isRefreshingSharedWorkspace} title={isOnline ? (cloudSyncConflict ? "先读取云端最新版本，解决版本冲突" : "重新提交产品和报价公式到云端") : "联网后才能同步云端资料"}>
+          {adminUnlocked && cloudSyncPending ? <button type="button" onClick={() => cloudSyncConflict ? refreshAfterSyncConflict() : void syncSharedWorkspaceState()} disabled={!isOnline || isRefreshingSharedWorkspace || cloudSyncStatus === "正在发布产品与报价公式"} aria-busy={isRefreshingSharedWorkspace || cloudSyncStatus === "正在发布产品与报价公式"} title={isOnline ? (cloudSyncConflict ? "先读取云端最新版本，解决版本冲突" : "重新提交产品和报价公式到云端") : "联网后才能同步云端资料"}>
             {cloudSyncConflict ? <RotateCcw size={15} /> : <CloudUpload size={15} />}{cloudSyncConflict ? "刷新云端版本" : "重试云端同步"}
           </button> : null}
           <button onClick={save}>
