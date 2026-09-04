@@ -210,6 +210,10 @@ type CustomerOwnerRecord = {
   lastQuotedAt: string;
   lastQuoteNo: string;
   lastQuoteTotal: number;
+  metaLeadId?: string;
+  metaFormId?: string;
+  metaAdId?: string;
+  metaCampaignId?: string;
 };
 
 type CurrencyCode = "USD" | "EUR" | "GBP" | "AUD" | "AED" | "SAR" | "INR";
@@ -729,6 +733,10 @@ function normalizeCustomerOwnerRecord(value: unknown): CustomerOwnerRecord | nul
     lastQuotedAt: typeof record.lastQuotedAt === "string" ? record.lastQuotedAt : "",
     lastQuoteNo: typeof record.lastQuoteNo === "string" ? record.lastQuoteNo : "",
     lastQuoteTotal: typeof record.lastQuoteTotal === "number" ? record.lastQuoteTotal : 0,
+    metaLeadId: typeof record.metaLeadId === "string" ? record.metaLeadId : "",
+    metaFormId: typeof record.metaFormId === "string" ? record.metaFormId : "",
+    metaAdId: typeof record.metaAdId === "string" ? record.metaAdId : "",
+    metaCampaignId: typeof record.metaCampaignId === "string" ? record.metaCampaignId : "",
   };
 }
 
@@ -3837,7 +3845,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                   }}
                 >
                   <span><b>{record.tier}类</b> <b>{customerFollowStatusLabels[record.followStatus]}</b> {record.country} / {record.phone}</span>
-                  <small>{record.owner} · {record.client || "未填客户"} · {record.clientContact || "未填联系人"} · {customerLeadSourceLabels[record.leadSource]} · 更新 {shortDateTime(record.updatedAt)}</small>
+                  <small>{record.owner} · {record.client || "未填客户"} · {record.clientContact || "未填联系人"} · {customerLeadSourceLabels[record.leadSource]}{record.metaCampaignId ? ` · 广告系列 ${record.metaCampaignId}` : ""} · 更新 {shortDateTime(record.updatedAt)}</small>
                   <small>{ownerIdentityLabel(record.country, record.phone)}</small>
                   <small>{customerFollowUpLabel(record)}</small>
                   <small>

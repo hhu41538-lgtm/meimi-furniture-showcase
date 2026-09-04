@@ -49,6 +49,13 @@ function normalizeOwnerKey(country: string, phone: string) {
   return normalizedCountry && normalizedPhone ? `${normalizedCountry}:${normalizedPhone}` : "";
 }
 
+function sourceValue(payload: Record<string, unknown>, key: string) {
+  const value = payload.value;
+  if (!value || typeof value !== "object") return "";
+  const candidate = (value as Record<string, unknown>)[key];
+  return typeof candidate === "string" ? candidate.trim() : "";
+}
+
 type MetaLeadRow = { leadgen_id: string; raw_payload: Record<string, unknown> };
 type MetaLeadDetails = { name?: unknown; phone?: unknown; country?: unknown; email?: unknown; company?: unknown; createdTime?: unknown };
 type SalesAccountRow = { id: string; name: string };
@@ -110,6 +117,10 @@ export async function POST(request: Request) {
         lastQuotedAt: "",
         lastQuoteNo: "",
         lastQuoteTotal: 0,
+        metaLeadId: row.leadgen_id,
+        metaFormId: sourceValue(row.raw_payload, "form_id"),
+        metaAdId: sourceValue(row.raw_payload, "ad_id"),
+        metaCampaignId: sourceValue(row.raw_payload, "campaign_id"),
       };
       await sql`INSERT INTO meimi_customer_owners (owner_key, record) VALUES (${ownerKey}, ${JSON.stringify(record)}::jsonb)`;
       await sql`UPDATE meimi_meta_leads SET status = 'imported', updated_at = NOW() WHERE leadgen_id = ${row.leadgen_id}`;
