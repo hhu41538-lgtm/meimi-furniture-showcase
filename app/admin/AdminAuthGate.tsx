@@ -42,8 +42,13 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
   const [loginKey, setLoginKey] = useState("");
   const [confirmKey, setConfirmKey] = useState("");
   const [status, setStatus] = useState("");
+  const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
+    const updateOnlineState = () => setIsOnline(navigator.onLine);
+    updateOnlineState();
+    window.addEventListener("online", updateOnlineState);
+    window.addEventListener("offline", updateOnlineState);
     try {
       const storedAccounts = localStorage.getItem(AUTH_ACCOUNTS_STORAGE_KEY);
       if (storedAccounts) {
@@ -66,6 +71,10 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
     } catch {
       setStatus("账号资料读取失败，请重新登录");
     } finally { setAuthReady(true); }
+    return () => {
+      window.removeEventListener("online", updateOnlineState);
+      window.removeEventListener("offline", updateOnlineState);
+    };
   }, []);
 
   function saveAccounts(nextAccounts: StaffAccount[]) {
@@ -88,6 +97,10 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
   }
 
   async function loginAsSales() {
+    if (!navigator.onLine) {
+      setStatus("当前没有网络，销售账号需要联网验证；本机已保存的工作资料不会丢失");
+      return;
+    }
     setStatus("正在验证云端销售账号…");
     try {
       const response = await fetch("/api/staff-accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "login", loginKey: loginKey.trim() }) });
@@ -101,6 +114,10 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
   }
 
   async function registerSales() {
+    if (!navigator.onLine) {
+      setStatus("当前没有网络，暂时无法注册云端销售账号");
+      return;
+    }
     const trimmedName = name.trim();
     const trimmedKey = loginKey.trim();
     if (trimmedName.length < 2) {
@@ -195,6 +212,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
         <div className="auth-gate-heading">
           <h1 id="auth-title">进入内部报价工作台</h1>
           <p>选择工作版本后，用对应密钥进入客户、产品和报价工具。</p>
+          <p className="auth-gate-storage-note" role="status">{isOnline ? "云端账号服务在线 · 工作资料会同时保存到本机" : "当前离线 · 本机工作资料仍可读取，登录账号需联网验证"}</p>
         </div>
         <div className="auth-gate-mode-tabs" role="tablist" aria-label="工作版本">
           <button className={mode === "sales" ? "is-active" : ""} type="button" role="tab" aria-selected={mode === "sales"} onClick={() => { setMode("sales"); setStatus(""); }}>
