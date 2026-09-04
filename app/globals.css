@@ -343,7 +343,7 @@ body:has(.admin-shell) {
 
 .admin-header h1 {
   margin: 8px 0 6px;
-  font-size: clamp(28px, 4vw, 46px);
+  font-size: 36px;
   font-weight: 500;
   letter-spacing: 0;
 }
@@ -3086,6 +3086,10 @@ body:has(.admin-shell) {
 
   .admin-header {
     flex-direction: column;
+  }
+
+  .admin-header h1 {
+    font-size: 28px;
   }
 
   .admin-header h1 {
