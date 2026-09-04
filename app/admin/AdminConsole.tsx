@@ -1484,6 +1484,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [isCheckingMetaConfig, setIsCheckingMetaConfig] = useState(false);
   const [metaPendingLeads, setMetaPendingLeads] = useState<MetaPendingLead[]>([]);
   const [isLoadingMetaPending, setIsLoadingMetaPending] = useState(false);
+  const [metaAssignmentSalesId, setMetaAssignmentSalesId] = useState("");
+  const [metaAssignmentQuantity, setMetaAssignmentQuantity] = useState("10");
+  const [isAssigningMetaLeads, setIsAssigningMetaLeads] = useState(false);
   const cloudVersionRef = useRef<number | null>(null);
   const cloudSyncInFlightRef = useRef(false);
   const sharedWorkspaceRefreshInFlightRef = useRef(false);
@@ -3166,6 +3169,31 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     }
   }
 
+  async function assignMetaLeads() {
+    if (!adminUnlocked || isAssigningMetaLeads || !metaAssignmentSalesId) return;
+    const quantity = Number(metaAssignmentQuantity);
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 500) {
+      setStatus("请输入 1-500 的分配数量");
+      return;
+    }
+    setIsAssigningMetaLeads(true);
+    try {
+      const response = await fetch("/api/customer-owners", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-meimi-staff-key": adminSyncKey },
+        body: JSON.stringify({ action: "assign-meta", salesAccountId: metaAssignmentSalesId, quantity }),
+      });
+      const payload = await response.json().catch(() => ({})) as { message?: string; assigned?: number; salesAccountName?: string };
+      if (!response.ok) throw new Error(payload.message || "Meta 线索分配失败");
+      setStatus(`已将 ${payload.assigned ?? 0} 条 Meta 线索分配给 ${payload.salesAccountName || "销售"}`);
+      setPendingCustomerOwnerVersion((current) => current + 1);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Meta 线索分配失败");
+    } finally {
+      setIsAssigningMetaLeads(false);
+    }
+  }
+
   async function checkMetaConfig() {
     if (!adminUnlocked || isCheckingMetaConfig) return;
     setIsCheckingMetaConfig(true);
@@ -3657,6 +3685,17 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             <button type="button" className="meta-integration-sync" onClick={() => void syncMetaLeads()} disabled={!isOnline || isSyncingMetaLeads} aria-busy={isSyncingMetaLeads} title={!isOnline ? "联网后才能同步 Meta 线索" : "读取 Meta 线索并导入客户池"}>
               <CloudUpload size={15} />{isSyncingMetaLeads ? "同步中..." : "同步并导入 Meta 线索"}
             </button>
+            <div className="meta-assignment-controls">
+              <strong>管理员分配 Meta 线索</strong>
+              <select aria-label="选择接收 Meta 线索的销售" value={metaAssignmentSalesId} onChange={(event) => setMetaAssignmentSalesId(event.target.value)}>
+                <option value="">选择已注册销售</option>
+                {salesAccounts.filter((account) => account.active).map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
+              </select>
+              <input aria-label="Meta 线索分配数量" type="number" min="1" max="500" value={metaAssignmentQuantity} onChange={(event) => setMetaAssignmentQuantity(event.target.value)} />
+              <button type="button" className="meta-integration-check" onClick={() => void assignMetaLeads()} disabled={!metaAssignmentSalesId || isAssigningMetaLeads} aria-busy={isAssigningMetaLeads} title="按数量分配管理员待分配线索">
+                <UsersRound size={15} />{isAssigningMetaLeads ? "分配中..." : "按数量分配"}
+              </button>
+            </div>
             <button type="button" className="meta-integration-check" onClick={() => void checkMetaConfig()} disabled={isCheckingMetaConfig} aria-busy={isCheckingMetaConfig} title="检查云端和 Meta 环境变量是否齐全">
               <Settings2 size={15} />{isCheckingMetaConfig ? "检查中..." : "检查接入配置"}
             </button>

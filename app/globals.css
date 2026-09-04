@@ -358,6 +358,39 @@ body:has(.admin-shell) {
   line-height: 1.5;
 }
 
+.meta-assignment-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #d9e2ee;
+}
+
+.meta-assignment-controls strong {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: #17345f;
+}
+
+.meta-assignment-controls select,
+.meta-assignment-controls input {
+  min-height: 34px;
+  border: 1px solid #cbd8e8;
+  background: #fff;
+  padding: 0 9px;
+  color: #17345f;
+}
+
+.meta-assignment-controls select {
+  min-width: 170px;
+}
+
+.meta-assignment-controls input {
+  width: 82px;
+}
+
 .meta-pending-list {
   display: grid;
   gap: 8px;

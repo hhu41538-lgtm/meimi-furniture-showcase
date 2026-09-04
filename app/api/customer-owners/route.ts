@@ -67,7 +67,7 @@ export async function POST(request: Request) {
   if (!url) return errorResponse("尚未配置云端数据库", 503, "DATABASE_NOT_CONFIGURED");
   const key = request.headers.get("x-meimi-staff-key")?.trim() ?? "";
   if (!key) return errorResponse("缺少销售账号验证信息", 401, "UNAUTHORIZED");
-  let body: { action?: unknown; ownerKey?: unknown; record?: unknown; records?: unknown };
+  let body: { action?: unknown; ownerKey?: unknown; record?: unknown; records?: unknown; salesAccountId?: unknown; quantity?: unknown };
   try { body = await request.json() as typeof body; } catch { return errorResponse("请求格式不正确", 400, "INVALID_JSON"); }
   try {
     const sql = neon<false, false>(url);
@@ -76,7 +76,21 @@ export async function POST(request: Request) {
     if (!identity) return errorResponse("销售账号验证失败，请重新登录", 401, "UNAUTHORIZED");
     if (body.action === "list") {
       const rows = await sql`SELECT record FROM meimi_customer_owners ORDER BY updated_at DESC`;
-      return NextResponse.json({ ok: true, records: rows.map((row) => row.record) });
+      const records = rows.map((row) => row.record as Record<string, unknown>);
+      return NextResponse.json({ ok: true, records: identity.role === "admin" ? records : records.filter((record) => record.ownerAccountId === identity.id) });
+    }
+    if (body.action === "assign-meta" && identity.role === "admin") {
+      const salesAccountId = typeof body.salesAccountId === "string" ? body.salesAccountId.trim() : "";
+      const quantity = typeof body.quantity === "number" && Number.isInteger(body.quantity) ? body.quantity : Number(body.quantity);
+      if (!salesAccountId || !Number.isInteger(quantity) || quantity < 1 || quantity > 500) return errorResponse("请选择销售账号并填写 1-500 的分配数量", 400, "INVALID_ASSIGNMENT");
+      const accountRows = await sql`SELECT id, name FROM meimi_staff_accounts WHERE id = ${salesAccountId} AND role = 'sales' AND active = TRUE LIMIT 1`;
+      if (!accountRows[0]) return errorResponse("销售账号不存在或已停用", 404, "SALES_ACCOUNT_NOT_FOUND");
+      const leads = await sql`SELECT owner_key, record FROM meimi_customer_owners WHERE record->>'leadSource' = 'meta' AND COALESCE(record->>'ownerAccountId', '') = '' ORDER BY updated_at ASC LIMIT ${quantity}`;
+      for (const lead of leads as Array<{ owner_key: string; record: Record<string, unknown> }>) {
+        const record = { ...lead.record, ownerAccountId: String(accountRows[0].id), owner: String(accountRows[0].name), updatedAt: new Date().toISOString() };
+        await sql`UPDATE meimi_customer_owners SET record = ${JSON.stringify(record)}::jsonb, updated_at = NOW() WHERE owner_key = ${lead.owner_key} AND COALESCE(record->>'ownerAccountId', '') = ''`;
+      }
+      return NextResponse.json({ ok: true, assigned: leads.length, requested: quantity, salesAccountId, salesAccountName: String(accountRows[0].name) });
     }
     if (body.action === "replace" && identity.role === "admin" && Array.isArray(body.records) && body.records.length <= 500) {
       for (const item of body.records) {
