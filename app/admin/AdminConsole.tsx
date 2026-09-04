@@ -1569,7 +1569,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   }, [legacyQuoteStorageKey, quoteStorageKey, session.name, session.role, workflowPricingStorageKey, workflowStageStorageKey]);
 
   useEffect(() => {
-    if (!storageReady || !customerOwnerSyncKey) return undefined;
+    if (!storageReady || !isOnline || !customerOwnerSyncKey) return undefined;
     let cancelled = false;
     void fetchSharedCustomerOwners(customerOwnerSyncKey).then((records) => {
       if (cancelled) return;
@@ -1584,7 +1584,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       if (!cancelled) setStatus("客户归属云端暂时无法读取，当前继续使用本机资料");
     });
     return () => { cancelled = true; };
-  }, [customerOwnerSyncKey, storageReady]);
+  }, [customerOwnerSyncKey, isOnline, storageReady]);
 
   useEffect(() => {
     if (adminUnlocked || !isOnline || !staffSyncKey) return undefined;
