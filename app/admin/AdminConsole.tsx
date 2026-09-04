@@ -1806,8 +1806,27 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     const becameOnline = !wasOnlineRef.current && isOnline;
     wasOnlineRef.current = isOnline;
     if (!becameOnline || !storageReady || !sharedSyncReady || !adminUnlocked || cloudSyncConflict) return undefined;
-    const timer = window.setTimeout(() => { void syncSharedWorkspaceState(); }, 500);
-    return () => window.clearTimeout(timer);
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      void (async () => {
+        if (cloudVersionRef.current === null) {
+          setCloudSyncStatus("正在读取云端版本");
+          const result = await fetchSharedWorkspaceState();
+          if (cancelled) return;
+          if (result.kind !== "ready") {
+            setCloudSyncPending(true);
+            setCloudSyncStatus(result.message);
+            return;
+          }
+          cloudVersionRef.current = result.state.version;
+        }
+        if (!cancelled) void syncSharedWorkspaceState();
+      })();
+    }, 500);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [adminUnlocked, cloudSyncConflict, isOnline, sharedSyncReady, storageReady, syncSharedWorkspaceState]);
 
   useEffect(() => {
