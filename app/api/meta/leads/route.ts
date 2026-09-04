@@ -71,7 +71,7 @@ export async function POST(request: Request) {
   const version = (process.env.META_GRAPH_API_VERSION?.trim() || "v24.0").replace(/^v?/, "v");
   try {
     const sql = neon<false, false>(url);
-    const rows = await sql`SELECT leadgen_id, page_id, form_id, raw_payload, status FROM meimi_meta_leads WHERE status <> 'imported' ORDER BY received_at ASC LIMIT 50` as unknown as StoredLead[];
+    const rows = await sql`SELECT leadgen_id, page_id, form_id, raw_payload, status FROM meimi_meta_leads WHERE status IN ('received', 'read_failed') ORDER BY received_at ASC LIMIT 50` as unknown as StoredLead[];
     const leads = [];
     let failed = 0;
     for (const row of rows) {

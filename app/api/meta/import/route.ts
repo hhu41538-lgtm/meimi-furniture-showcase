@@ -77,6 +77,7 @@ export async function POST(request: Request) {
       const phone = normalizePhone(rawCountry, rawPhone);
       if (!country || !phone) {
         missingFields += 1;
+        await sql`UPDATE meimi_meta_leads SET status = 'needs_mapping', updated_at = NOW() WHERE leadgen_id = ${row.leadgen_id}`;
         continue;
       }
       const ownerKey = normalizeOwnerKey(country, phone);
