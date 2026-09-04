@@ -100,7 +100,7 @@ export async function downloadQuotationTemplate(quote: TemplateQuote, totals: Te
   sheet.getCell("J5").value = `备注：(remark) ${quote.remarks || ""}`;
 
   const firstLineRow = 8;
-  const lastLineRow = 24;
+  const lastLineRow = firstLineRow + QUOTATION_TEMPLATE_LINE_LIMIT - 1;
   for (let row = firstLineRow; row <= lastLineRow; row += 1) {
     for (let col = 1; col <= 11; col += 1) sheet.getRow(row).getCell(col).value = null;
   }
