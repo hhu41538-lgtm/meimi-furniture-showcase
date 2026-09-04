@@ -285,7 +285,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
           ) : null}
           <label>
             <span>{mode === "admin" ? "管理员密钥" : "销售登录密钥"}</span>
-            <span className="auth-gate-input-wrap"><KeyRound size={16} /><input type="password" value={loginKey} onChange={(event) => setLoginKey(event.target.value)} placeholder={mode === "admin" ? "输入管理员密钥" : "输入销售密钥"} autoComplete="current-password" /></span>
+            <span className="auth-gate-input-wrap"><KeyRound size={16} /><input type="password" inputMode={mode === "admin" ? "numeric" : "text"} value={loginKey} onChange={(event) => setLoginKey(event.target.value)} placeholder={mode === "admin" ? "输入管理员密钥" : "输入销售密钥"} autoComplete="current-password" /></span>
           </label>
           {mode === "sales" && salesAction === "register" ? (
             <label>确认销售密钥<input type="password" value={confirmKey} onChange={(event) => setConfirmKey(event.target.value)} placeholder="再次输入销售密钥" autoComplete="new-password" /></label>
