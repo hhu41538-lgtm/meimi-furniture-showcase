@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowRight, KeyRound, LogIn, ShieldCheck, UserPlus, UsersRound } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, KeyRound, LogIn, ShieldCheck, UserPlus, UsersRound } from "lucide-react";
 import AdminConsole, { type ManagedEntry } from "./AdminConsole";
 import {
   accountToSession,
@@ -45,6 +45,8 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
   const [name, setName] = useState("");
   const [loginKey, setLoginKey] = useState("");
   const [confirmKey, setConfirmKey] = useState("");
+  const [showLoginKey, setShowLoginKey] = useState(false);
+  const [showConfirmKey, setShowConfirmKey] = useState(false);
   const [status, setStatus] = useState("");
   const [isOnline, setIsOnline] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -285,10 +287,10 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
           ) : null}
           <label>
             <span>{mode === "admin" ? "管理员密钥" : "销售登录密钥"}</span>
-            <span className="auth-gate-input-wrap"><KeyRound size={16} /><input type="password" inputMode={mode === "admin" ? "numeric" : "text"} minLength={mode === "sales" && salesAction === "register" ? 6 : undefined} maxLength={mode === "sales" && salesAction === "register" ? 32 : undefined} pattern={mode === "sales" && salesAction === "register" ? "\\S{6,32}" : undefined} value={loginKey} onChange={(event) => setLoginKey(event.target.value)} placeholder={mode === "admin" ? "输入管理员密钥" : "输入销售密钥"} autoComplete="current-password" autoFocus={mode === "admin" || salesAction === "login"} /></span>
+            <span className="auth-gate-input-wrap"><KeyRound size={16} /><input type={showLoginKey ? "text" : "password"} inputMode={mode === "admin" ? "numeric" : "text"} minLength={mode === "sales" && salesAction === "register" ? 6 : undefined} maxLength={mode === "sales" && salesAction === "register" ? 32 : undefined} pattern={mode === "sales" && salesAction === "register" ? "\\S{6,32}" : undefined} value={loginKey} onChange={(event) => setLoginKey(event.target.value)} placeholder={mode === "admin" ? "输入管理员密钥" : "输入销售密钥"} autoComplete="current-password" autoFocus={mode === "admin" || salesAction === "login"} /><button className="auth-gate-password-toggle" type="button" onClick={() => setShowLoginKey((current) => !current)} aria-label={showLoginKey ? "隐藏密钥" : "显示密钥"} title={showLoginKey ? "隐藏密钥" : "显示密钥"}>{showLoginKey ? <EyeOff size={16} /> : <Eye size={16} />}</button></span>
           </label>
           {mode === "sales" && salesAction === "register" ? (
-            <label>确认销售密钥<input type="password" minLength={6} maxLength={32} value={confirmKey} onChange={(event) => setConfirmKey(event.target.value)} placeholder="再次输入销售密钥" autoComplete="new-password" /></label>
+            <label>确认销售密钥<span className="auth-gate-input-wrap"><input type={showConfirmKey ? "text" : "password"} minLength={6} maxLength={32} value={confirmKey} onChange={(event) => setConfirmKey(event.target.value)} placeholder="再次输入销售密钥" autoComplete="new-password" /><button className="auth-gate-password-toggle" type="button" onClick={() => setShowConfirmKey((current) => !current)} aria-label={showConfirmKey ? "隐藏确认密钥" : "显示确认密钥"} title={showConfirmKey ? "隐藏确认密钥" : "显示确认密钥"}>{showConfirmKey ? <EyeOff size={16} /> : <Eye size={16} />}</button></span></label>
           ) : null}
           {status ? <p className="auth-gate-status" role="alert">{status}</p> : null}
           <button className="auth-gate-submit" type="submit" disabled={isSubmitting} aria-disabled={isSubmitting}>
