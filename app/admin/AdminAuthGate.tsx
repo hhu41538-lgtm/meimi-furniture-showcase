@@ -285,10 +285,10 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
           ) : null}
           <label>
             <span>{mode === "admin" ? "管理员密钥" : "销售登录密钥"}</span>
-            <span className="auth-gate-input-wrap"><KeyRound size={16} /><input type="password" inputMode={mode === "admin" ? "numeric" : "text"} value={loginKey} onChange={(event) => setLoginKey(event.target.value)} placeholder={mode === "admin" ? "输入管理员密钥" : "输入销售密钥"} autoComplete="current-password" autoFocus={mode === "admin" || salesAction === "login"} /></span>
+            <span className="auth-gate-input-wrap"><KeyRound size={16} /><input type="password" inputMode={mode === "admin" ? "numeric" : "text"} minLength={mode === "sales" && salesAction === "register" ? 6 : undefined} maxLength={mode === "sales" && salesAction === "register" ? 32 : undefined} pattern={mode === "sales" && salesAction === "register" ? "\\S{6,32}" : undefined} value={loginKey} onChange={(event) => setLoginKey(event.target.value)} placeholder={mode === "admin" ? "输入管理员密钥" : "输入销售密钥"} autoComplete="current-password" autoFocus={mode === "admin" || salesAction === "login"} /></span>
           </label>
           {mode === "sales" && salesAction === "register" ? (
-            <label>确认销售密钥<input type="password" value={confirmKey} onChange={(event) => setConfirmKey(event.target.value)} placeholder="再次输入销售密钥" autoComplete="new-password" /></label>
+            <label>确认销售密钥<input type="password" minLength={6} maxLength={32} value={confirmKey} onChange={(event) => setConfirmKey(event.target.value)} placeholder="再次输入销售密钥" autoComplete="new-password" /></label>
           ) : null}
           {status ? <p className="auth-gate-status" role="alert">{status}</p> : null}
           <button className="auth-gate-submit" type="submit" disabled={isSubmitting} aria-disabled={isSubmitting}>
