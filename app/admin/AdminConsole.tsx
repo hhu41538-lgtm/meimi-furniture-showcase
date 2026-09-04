@@ -1830,7 +1830,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   }, [adminUnlocked, cloudSyncConflict, isOnline, sharedSyncReady, storageReady, syncSharedWorkspaceState]);
 
   useEffect(() => {
-    if (!storageReady || !sharedSyncReady || session.role !== "sales") return undefined;
+    if (!storageReady || !sharedSyncReady || session.role !== "sales" || !isOnline) return undefined;
     const refresh = async () => {
       const previousVersion = cloudVersionRef.current ?? 0;
       await refreshSharedWorkspaceState();
@@ -1846,7 +1846,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       window.removeEventListener("focus", refresh);
       window.removeEventListener("online", refresh);
     };
-  }, [refreshSharedWorkspaceState, session.role, sharedSyncReady, storageReady]);
+  }, [isOnline, refreshSharedWorkspaceState, session.role, sharedSyncReady, storageReady]);
 
 
   const refreshExchangeRates = useCallback(async (signal?: AbortSignal) => {
