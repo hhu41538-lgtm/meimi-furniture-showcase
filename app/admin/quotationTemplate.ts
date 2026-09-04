@@ -59,7 +59,7 @@ function formatGeneratedAt(value: string) {
 }
 
 function formatDimension(line: TemplateQuoteLine) {
-  const spec = line.spec.trim();
+  const spec = typeof line.spec === "string" ? line.spec.trim() : "";
   return /^(basePrice|unitPrice|sizeUpgrade|materialUpgrade|customOption)\s*:/i.test(spec) ? "" : spec;
 }
 
