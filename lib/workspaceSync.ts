@@ -1,6 +1,7 @@
 export type CloudWorkspaceState = {
   entries: unknown[];
   pricingRules: unknown[];
+  customerOwners: unknown[];
   workflowPricingRuleId: string;
   initialized: boolean;
   version: number;
@@ -34,6 +35,7 @@ function normalizedState(value: unknown): CloudWorkspaceState | null {
   return {
     entries: state.entries,
     pricingRules: state.pricingRules,
+    customerOwners: Array.isArray(state.customerOwners) ? state.customerOwners : [],
     workflowPricingRuleId: typeof state.workflowPricingRuleId === "string" ? state.workflowPricingRuleId : "",
     initialized: state.initialized === true,
     version: Number.isInteger(state.version) && Number(state.version) > 0 ? Number(state.version) : 1,
@@ -72,6 +74,7 @@ export async function fetchSharedWorkspaceState(): Promise<WorkspaceReadResult> 
 export async function publishSharedWorkspaceState({
   entries,
   pricingRules,
+  customerOwners,
   workflowPricingRuleId,
   version,
   updatedBy,
@@ -79,6 +82,7 @@ export async function publishSharedWorkspaceState({
 }: {
   entries: unknown[];
   pricingRules: unknown[];
+  customerOwners: unknown[];
   workflowPricingRuleId: string;
   version: number;
   updatedBy: string;
@@ -90,7 +94,7 @@ export async function publishSharedWorkspaceState({
     const response = await fetch("/api/workspace-state", {
       method: "PUT",
       headers: { "content-type": "application/json", "x-meimi-admin-key": adminKey },
-      body: JSON.stringify({ entries, pricingRules, workflowPricingRuleId, version, updatedBy }),
+      body: JSON.stringify({ entries, pricingRules, customerOwners, workflowPricingRuleId, version, updatedBy }),
       signal: controller.signal,
     });
     const payload = await responsePayload(response);

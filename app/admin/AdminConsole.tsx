@@ -1570,8 +1570,13 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
     }
     const normalizedEntries = state.entries.map(normalizeEntry).filter((entry): entry is ManagedEntry => Boolean(entry));
     const normalizedRules = state.pricingRules.filter(isPricingRule);
+    const normalizedOwners = state.customerOwners.map(normalizeCustomerOwnerRecord).filter((record): record is CustomerOwnerRecord => Boolean(record));
     setEntries(normalizedEntries);
     setPricingRules(normalizedRules);
+    setCustomerOwners((current) => normalizedOwners.map((record) => ({
+      ...record,
+      privateNote: current.find((item) => item.id === record.id)?.privateNote ?? record.privateNote,
+    })));
     if (state.workflowPricingRuleId && normalizedRules.some((rule) => rule.id === state.workflowPricingRuleId)) {
       setWorkflowPricingRuleId(state.workflowPricingRuleId);
     }
@@ -1621,6 +1626,11 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
       const result = await publishSharedWorkspaceState({
         entries,
         pricingRules,
+        customerOwners: customerOwners.map((record) => {
+          const { privateNote, ...cloudRecord } = record;
+          void privateNote;
+          return cloudRecord;
+        }),
         workflowPricingRuleId,
         version: cloudVersionRef.current,
         updatedBy: session.name,
@@ -1638,7 +1648,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
     } finally {
       cloudSyncInFlightRef.current = false;
     }
-  }, [adminSyncKey, adminUnlocked, applySharedWorkspaceState, entries, isOnline, pricingRules, session.name, sharedSyncReady, workflowPricingRuleId]);
+  }, [adminSyncKey, adminUnlocked, applySharedWorkspaceState, customerOwners, entries, isOnline, pricingRules, session.name, sharedSyncReady, workflowPricingRuleId]);
 
   useEffect(() => {
     if (!storageReady || !sharedSyncReady) return undefined;
