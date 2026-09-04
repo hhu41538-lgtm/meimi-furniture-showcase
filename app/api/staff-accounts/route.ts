@@ -98,12 +98,19 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const url = databaseUrl();
-  if (!url) return errorResponse("尚未配置云端数据库，暂时不能注册或登录销售账号", 503, "DATABASE_NOT_CONFIGURED");
   let body: unknown;
   try { body = await request.json(); } catch { return errorResponse("请求格式不正确", 400, "INVALID_JSON"); }
   if (!body || typeof body !== "object") return errorResponse("请求参数不正确", 400, "INVALID_PAYLOAD");
   const action = (body as { action?: unknown }).action;
+
+  if (action === "admin-login") {
+    const loginKey = typeof (body as { loginKey?: unknown }).loginKey === "string" ? (body as { loginKey: string }).loginKey.trim() : "";
+    if (!loginKey || !adminKey() || loginKey !== adminKey()) return errorResponse("管理员密钥不正确，请重新输入", 401, "ADMIN_KEY_INVALID");
+    return NextResponse.json({ ok: true, role: "admin" });
+  }
+
+  const url = databaseUrl();
+  if (!url) return errorResponse("尚未配置云端数据库，暂时不能注册或登录销售账号", 503, "DATABASE_NOT_CONFIGURED");
 
   try {
     const sql = neon<false, false>(url);

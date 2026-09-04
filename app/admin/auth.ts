@@ -19,7 +19,6 @@ export type AuthSession = {
   permissions: PermissionKey[];
 };
 
-export const ADMIN_LOGIN_KEY = "2675982129";
 export const AUTH_ACCOUNTS_STORAGE_KEY = "meimih-workbench-sales-accounts-v1";
 export const AUTH_SESSION_STORAGE_KEY = "meimih-workbench-session-v1";
 

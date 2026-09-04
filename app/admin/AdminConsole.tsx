@@ -32,7 +32,7 @@ import {
   X,
 } from "lucide-react";
 import { productCodePrefix } from "@/lib/productCodes";
-import { ADMIN_LOGIN_KEY, SALES_PERMISSION_OPTIONS, type AuthSession, type PermissionKey, type StaffAccount } from "./auth";
+import { SALES_PERMISSION_OPTIONS, type AuthSession, type PermissionKey, type StaffAccount } from "./auth";
 import { downloadQuotationTemplate } from "./quotationTemplate";
 import { fetchSharedWorkspaceState, publishSharedWorkspaceState, type CloudWorkspaceState } from "@/lib/workspaceSync";
 
@@ -1345,6 +1345,7 @@ function buildWarehousePickListText(quote: QuoteDraft, totals: QuoteTotals) {
 type AdminConsoleProps = {
   initialEntries: ManagedEntry[];
   session: AuthSession;
+  adminSyncKey: string;
   salesAccounts: StaffAccount[];
   onUpdateSalesAccount: (id: string, patch: Partial<Pick<StaffAccount, "permissions" | "active">>) => void;
   onDeleteSalesAccount: (id: string) => void;
@@ -1358,7 +1359,7 @@ type PdfImportState = {
   importedCount: number;
 };
 
-export default function AdminConsole({ initialEntries, session, salesAccounts, onUpdateSalesAccount, onDeleteSalesAccount, onLogout }: AdminConsoleProps) {
+export default function AdminConsole({ initialEntries, session, adminSyncKey, salesAccounts, onUpdateSalesAccount, onDeleteSalesAccount, onLogout }: AdminConsoleProps) {
   const adminUnlocked = session.role === "admin";
   const quoteStorageKey = `${QUOTE_STORAGE_KEY}:${session.accountId}`;
   const legacyQuoteStorageKey = session.role === "admin" ? LEGACY_QUOTE_STORAGE_KEY : "";
@@ -1597,7 +1598,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
         workflowPricingRuleId,
         version: cloudVersionRef.current,
         updatedBy: session.name,
-        adminKey: ADMIN_LOGIN_KEY,
+        adminKey: adminSyncKey,
       });
       if (result.kind === "saved") {
         applySharedWorkspaceState(result.state);
@@ -1611,7 +1612,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
     } finally {
       cloudSyncInFlightRef.current = false;
     }
-  }, [adminUnlocked, applySharedWorkspaceState, entries, isOnline, pricingRules, session.name, sharedSyncReady, workflowPricingRuleId]);
+  }, [adminSyncKey, adminUnlocked, applySharedWorkspaceState, entries, isOnline, pricingRules, session.name, sharedSyncReady, workflowPricingRuleId]);
 
   useEffect(() => {
     if (!storageReady || !sharedSyncReady) return undefined;

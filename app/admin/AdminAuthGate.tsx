@@ -5,7 +5,6 @@ import { ArrowRight, KeyRound, LogIn, ShieldCheck, UserPlus, UsersRound } from "
 import AdminConsole, { type ManagedEntry } from "./AdminConsole";
 import {
   accountToSession,
-  ADMIN_LOGIN_KEY,
   AUTH_ACCOUNTS_STORAGE_KEY,
   AUTH_SESSION_STORAGE_KEY,
   DEFAULT_SALES_PERMISSIONS,
@@ -35,6 +34,7 @@ function adminSession(): AuthSession {
 export default function AdminAuthGate({ initialEntries }: { initialEntries: ManagedEntry[] }) {
   const [accounts, setAccounts] = useState<StaffAccount[]>([]);
   const [session, setSession] = useState<AuthSession | null>(null);
+  const [adminSyncKey, setAdminSyncKey] = useState("");
   const [authReady, setAuthReady] = useState(false);
   const [mode, setMode] = useState<AuthMode>("sales");
   const [salesAction, setSalesAction] = useState<SalesAction>("login");
@@ -60,9 +60,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
       const storedSession = localStorage.getItem(AUTH_SESSION_STORAGE_KEY);
       if (storedSession) {
         const parsedSession = JSON.parse(storedSession) as Partial<AuthSession>;
-        if (parsedSession.role === "admin" && parsedSession.accountId === "admin") {
-          setSession(adminSession());
-        } else if (parsedSession.role === "sales" && typeof parsedSession.accountId === "string") {
+        if (parsedSession.role === "sales" && typeof parsedSession.accountId === "string") {
           const restoredAccounts: StaffAccount[] = (JSON.parse(storedAccounts ?? "[]") as unknown[]).map(normalizeStaffAccount).filter((item: StaffAccount | null): item is StaffAccount => item !== null);
           const account = restoredAccounts.find((item) => item.id === parsedSession.accountId && item.active);
           if (account) setSession(accountToSession(account));
@@ -88,12 +86,29 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
     setStatus("");
   }
 
-  function loginAsAdmin() {
-    if (loginKey.trim() !== ADMIN_LOGIN_KEY) {
-      setStatus("管理员密钥不正确，请重新输入");
+  async function loginAsAdmin() {
+    const trimmedKey = loginKey.trim();
+    if (!trimmedKey) {
+      setStatus("请输入管理员密钥");
       return;
     }
-    enterSession(adminSession());
+    setStatus("正在验证管理员密钥…");
+    try {
+      const response = await fetch("/api/staff-accounts", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action: "admin-login", loginKey: trimmedKey }) });
+      const payload = await response.json().catch(() => ({})) as { ok?: boolean; message?: string };
+      if (!response.ok || payload.ok !== true) {
+        setStatus(payload.message || "管理员密钥不正确，请重新输入");
+        return;
+      }
+      setAdminSyncKey(trimmedKey);
+      enterSession(adminSession());
+      try {
+        const accountResponse = await fetch("/api/staff-accounts", { headers: { "x-meimi-admin-key": trimmedKey }, cache: "no-store" });
+        const accountPayload = await accountResponse.json().catch(() => ({})) as { accounts?: CloudAccount[]; message?: string };
+        if (accountResponse.ok && Array.isArray(accountPayload.accounts)) saveAccounts(accountPayload.accounts.map(cloudAccountToStaff));
+        else if (accountPayload.message) setStatus(`管理员已进入，但账号云端列表读取失败：${accountPayload.message}`);
+      } catch { setStatus("管理员已进入，云端账号列表暂时无法读取"); }
+    } catch { setStatus("管理员验证服务暂时不可用，请稍后重试"); }
   }
 
   async function loginAsSales() {
@@ -146,17 +161,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (mode === "admin") {
-      loginAsAdmin();
-      if (loginKey.trim() === ADMIN_LOGIN_KEY) {
-        try {
-          const response = await fetch("/api/staff-accounts", { headers: { "x-meimi-admin-key": ADMIN_LOGIN_KEY }, cache: "no-store" });
-          const payload = await response.json().catch(() => ({})) as { accounts?: CloudAccount[]; message?: string };
-          if (response.ok && Array.isArray(payload.accounts)) {
-            const next = payload.accounts.map(cloudAccountToStaff);
-            saveAccounts(next);
-          } else if (payload.message) setStatus(`管理员已进入，但账号云端列表读取失败：${payload.message}`);
-        } catch { setStatus("管理员已进入，云端账号列表暂时无法读取"); }
-      }
+      await loginAsAdmin();
     } else if (salesAction === "register") await registerSales();
     else await loginAsSales();
   }
@@ -164,6 +169,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
   function logout() {
     localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
     setSession(null);
+    setAdminSyncKey("");
     setLoginKey("");
     setConfirmKey("");
     setStatus("已退出当前账号");
@@ -172,7 +178,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
   async function updateSalesAccount(id: string, patch: Partial<Pick<StaffAccount, "permissions" | "active">>) {
     if (session?.role !== "admin") return;
     try {
-      const response = await fetch("/api/staff-accounts", { method: "PATCH", headers: { "content-type": "application/json", "x-meimi-admin-key": ADMIN_LOGIN_KEY }, body: JSON.stringify({ id, ...patch }) });
+      const response = await fetch("/api/staff-accounts", { method: "PATCH", headers: { "content-type": "application/json", "x-meimi-admin-key": adminSyncKey }, body: JSON.stringify({ id, ...patch }) });
       const payload = await response.json().catch(() => ({})) as { account?: CloudAccount; message?: string };
       if (!response.ok || !payload.account) { setStatus(payload.message || "云端账号修改失败"); return; }
       const account = cloudAccountToStaff(payload.account);
@@ -185,7 +191,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
     const account = accounts.find((item) => item.id === id);
     if (!account || !window.confirm(`确定删除销售账号“${account.name}”吗？`)) return;
     try {
-      const response = await fetch(`/api/staff-accounts?id=${encodeURIComponent(id)}`, { method: "DELETE", headers: { "x-meimi-admin-key": ADMIN_LOGIN_KEY } });
+      const response = await fetch(`/api/staff-accounts?id=${encodeURIComponent(id)}`, { method: "DELETE", headers: { "x-meimi-admin-key": adminSyncKey } });
       if (!response.ok) { const payload = await response.json().catch(() => ({})) as { message?: string }; setStatus(payload.message || "云端账号删除失败"); return; }
       saveAccounts(accounts.filter((item) => item.id !== id));
     } catch { setStatus("云端账号服务暂时不可用"); }
@@ -196,7 +202,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
   }
 
   if (session) {
-    return <AdminConsole initialEntries={initialEntries} session={session} salesAccounts={accounts} onUpdateSalesAccount={updateSalesAccount} onDeleteSalesAccount={deleteSalesAccount} onLogout={logout} />;
+    return <AdminConsole initialEntries={initialEntries} session={session} adminSyncKey={adminSyncKey} salesAccounts={accounts} onUpdateSalesAccount={updateSalesAccount} onDeleteSalesAccount={deleteSalesAccount} onLogout={logout} />;
   }
 
   return (
