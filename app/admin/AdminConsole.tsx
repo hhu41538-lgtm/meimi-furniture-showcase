@@ -1979,6 +1979,12 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       { A: 0, B: 0, C: 0 },
     );
   }, [visibleCustomerOwners]);
+  const customerLeadSourceCounts = useMemo(() => {
+    return visibleCustomerOwners.reduce<Record<CustomerLeadSource, number>>(
+      (counts, record) => ({ ...counts, [record.leadSource]: counts[record.leadSource] + 1 }),
+      { manual: 0, meta: 0, website: 0, referral: 0, other: 0 },
+    );
+  }, [visibleCustomerOwners]);
   const dueFollowUpCount = useMemo(() => visibleCustomerOwners.filter(customerNeedsFollowUp).length, [visibleCustomerOwners]);
   const categoryOptions = useMemo(() => {
     return Array.from(new Set(entries.map((entry) => entry.category).filter(Boolean))).sort((left, right) => left.localeCompare(right));
@@ -3597,7 +3603,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                 <span>来源</span>
                 <select aria-label="客户线索来源" value={customerLeadSourceFilter} onChange={(event) => { const next = event.target.value as "all" | CustomerLeadSource; setCustomerLeadSourceFilter(next); setStatus(next === "all" ? "已显示全部客户来源" : `已筛选客户来源：${customerLeadSourceLabels[next]}`); }}>
                   <option value="all">全部来源</option>
-                  {(Object.keys(customerLeadSourceLabels) as CustomerLeadSource[]).map((source) => <option key={source} value={source}>{customerLeadSourceLabels[source]}</option>)}
+                  {(Object.keys(customerLeadSourceLabels) as CustomerLeadSource[]).map((source) => <option key={source} value={source}>{customerLeadSourceLabels[source]} ({customerLeadSourceCounts[source]})</option>)}
                 </select>
               </label>
               <button
