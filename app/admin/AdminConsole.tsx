@@ -1458,6 +1458,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [cloudSyncStatus, setCloudSyncStatus] = useState("正在连接云端资料");
   const [isOnline, setIsOnline] = useState(true);
   const [cloudSyncPending, setCloudSyncPending] = useState(false);
+  const [cloudSyncConflict, setCloudSyncConflict] = useState(false);
   const [customerOwnerCloudReady, setCustomerOwnerCloudReady] = useState(false);
   const [pendingCustomerOwnerVersion, setPendingCustomerOwnerVersion] = useState(0);
   const [pendingCustomerOwnerCount, setPendingCustomerOwnerCount] = useState(0);
@@ -1715,6 +1716,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       const result = await fetchSharedWorkspaceState();
       if (result.kind === "ready") {
         applySharedWorkspaceState(result.state);
+        setCloudSyncPending(false);
+        setCloudSyncConflict(false);
         if (announce) setStatus(`已刷新云端目录 V${result.state.version}`);
       } else {
         cloudVersionRef.current = null;
@@ -1738,7 +1741,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   }, [refreshSharedWorkspaceState, storageReady]);
 
   const syncSharedWorkspaceState = useCallback(async () => {
-    if (!isOnline || !adminUnlocked || !sharedSyncReady || cloudVersionRef.current === null || cloudSyncInFlightRef.current) return;
+    if (!isOnline || !adminUnlocked || !sharedSyncReady || cloudVersionRef.current === null || cloudSyncInFlightRef.current || cloudSyncConflict) return;
     cloudSyncInFlightRef.current = true;
     setCloudSyncStatus("正在发布产品与报价公式");
     try {
@@ -1753,16 +1756,18 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       if (result.kind === "saved") {
         applySharedWorkspaceState(result.state);
         setCloudSyncPending(false);
+        setCloudSyncConflict(false);
         setStatus(`云端已同步 ${entries.length} 条资料和 ${pricingRules.length} 个报价公式`);
       } else {
         setCloudSyncPending(true);
+        setCloudSyncConflict(result.kind === "conflict");
         setCloudSyncStatus(result.message);
         if (result.kind === "conflict") setStatus("云端已有其他管理员更新，请刷新后再保存");
       }
     } finally {
       cloudSyncInFlightRef.current = false;
     }
-  }, [adminSyncKey, adminUnlocked, applySharedWorkspaceState, entries, isOnline, pricingRules, session.name, sharedSyncReady, workflowPricingRuleId]);
+  }, [adminSyncKey, adminUnlocked, applySharedWorkspaceState, cloudSyncConflict, entries, isOnline, pricingRules, session.name, sharedSyncReady, workflowPricingRuleId]);
 
   useEffect(() => {
     if (!storageReady || !sharedSyncReady) return undefined;
@@ -1779,22 +1784,22 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   }, [persistLocalData, sharedSyncReady, storageReady]);
 
   useEffect(() => {
-    if (!storageReady || !sharedSyncReady || !adminUnlocked || cloudVersionRef.current === null) return undefined;
+    if (!storageReady || !sharedSyncReady || !adminUnlocked || cloudVersionRef.current === null || cloudSyncConflict) return undefined;
     const timer = window.setTimeout(() => { void syncSharedWorkspaceState(); }, 900);
     return () => window.clearTimeout(timer);
-  }, [adminUnlocked, entries, pricingRules, sharedSyncReady, storageReady, syncSharedWorkspaceState, workflowPricingRuleId]);
+  }, [adminUnlocked, cloudSyncConflict, entries, pricingRules, sharedSyncReady, storageReady, syncSharedWorkspaceState, workflowPricingRuleId]);
 
   useEffect(() => {
-    if (!isOnline || !storageReady || !sharedSyncReady || !adminUnlocked || !cloudSyncPending) return undefined;
+    if (!isOnline || !storageReady || !sharedSyncReady || !adminUnlocked || !cloudSyncPending || cloudSyncConflict) return undefined;
     const timer = window.setTimeout(() => { void syncSharedWorkspaceState(); }, 400);
     return () => window.clearTimeout(timer);
-  }, [adminUnlocked, cloudSyncPending, isOnline, sharedSyncReady, storageReady, syncSharedWorkspaceState]);
+  }, [adminUnlocked, cloudSyncConflict, cloudSyncPending, isOnline, sharedSyncReady, storageReady, syncSharedWorkspaceState]);
 
   useEffect(() => {
-    if (!isOnline || !storageReady || !sharedSyncReady || !adminUnlocked || !cloudSyncPending) return undefined;
+    if (!isOnline || !storageReady || !sharedSyncReady || !adminUnlocked || !cloudSyncPending || cloudSyncConflict) return undefined;
     const timer = window.setInterval(() => { void syncSharedWorkspaceState(); }, 10000);
     return () => window.clearInterval(timer);
-  }, [adminUnlocked, cloudSyncPending, isOnline, sharedSyncReady, storageReady, syncSharedWorkspaceState]);
+  }, [adminUnlocked, cloudSyncConflict, cloudSyncPending, isOnline, sharedSyncReady, storageReady, syncSharedWorkspaceState]);
 
   useEffect(() => {
     if (!storageReady || !sharedSyncReady || session.role !== "sales") return undefined;
@@ -3291,7 +3296,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
           <p className="admin-save-state">
             {autoSaveStatus}
             {lastSavedAt ? ` · 最近保存 ${shortDateTime(lastSavedAt)}` : ""}
-            {` · ${isOnline ? (cloudSyncPending ? "等待云端重试" : cloudSyncStatus) : "当前离线，本地资料仍会保存"}`}
+            {` · ${isOnline ? (cloudSyncConflict ? "云端版本冲突，需先刷新" : cloudSyncPending ? "等待云端重试" : cloudSyncStatus) : "当前离线，本地资料仍会保存"}`}
             {pendingCustomerOwnerCount ? ` · ${pendingCustomerOwnerCount} 条客户待同步` : ""}
           </p>
         </div>
@@ -3306,8 +3311,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
           {session.role === "sales" && pendingCustomerOwnerCount ? <button type="button" onClick={() => { setPendingCustomerOwnerVersion((current) => current + 1); setStatus("正在重试同步待上传客户"); }} disabled={!isOnline} title={isOnline ? "立即重试上传待同步客户" : "联网后才能同步客户"}>
             <CloudUpload size={15} />立即同步客户
           </button> : null}
-          {adminUnlocked && cloudSyncPending ? <button type="button" onClick={() => void syncSharedWorkspaceState()} disabled={!isOnline || isRefreshingSharedWorkspace} title={isOnline ? "重新提交产品和报价公式到云端" : "联网后才能同步云端资料"}>
-            <CloudUpload size={15} />重试云端同步
+          {adminUnlocked && cloudSyncPending ? <button type="button" onClick={() => void (cloudSyncConflict ? refreshSharedWorkspaceState(true) : syncSharedWorkspaceState())} disabled={!isOnline || isRefreshingSharedWorkspace} title={isOnline ? (cloudSyncConflict ? "先读取云端最新版本，解决版本冲突" : "重新提交产品和报价公式到云端") : "联网后才能同步云端资料"}>
+            {cloudSyncConflict ? <RotateCcw size={15} /> : <CloudUpload size={15} />}{cloudSyncConflict ? "刷新云端版本" : "重试云端同步"}
           </button> : null}
           <button onClick={save}>
             <Save size={15} />
