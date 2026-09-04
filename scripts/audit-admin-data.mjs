@@ -176,6 +176,8 @@ if (!adminSource.includes("categoryGroupLabel")) failures.push("Major/minor cate
 if (!adminSource.includes("groupedCategoryOptions")) failures.push("Grouped category menu is missing");
 if (!adminSource.includes("categoryStats")) failures.push("Category stock counts are missing");
 if (!adminSource.includes("warehouseStats")) failures.push("Warehouse stock metrics are missing");
+if (!adminSource.includes('type CurrencyCode = "USD" | "EUR" | "GBP" | "AUD" | "AED" | "SAR" | "INR"')) failures.push("INR exchange-rate support is missing");
+if (!adminSource.includes("clearCustomerEntry") || !adminSource.includes("一键清空")) failures.push("Customer one-click reset action is missing");
 if (!adminSource.includes('activeModule === "products" ?') || !adminSource.includes("打印第三步生成的正式报价单")) failures.push("Product warehouse action simplification is missing");
 if (!adminSource.includes("pdfjs-dist/legacy/build/pdf.mjs") || !packageSource.includes('"pdfjs-dist"')) failures.push("Browser PDF catalogue parser is missing");
 if (!adminSource.includes("handlePdfDrop") || !adminSource.includes("PDF_IMPORT_MAX_PAGES")) failures.push("Administrator PDF drop import is missing");
