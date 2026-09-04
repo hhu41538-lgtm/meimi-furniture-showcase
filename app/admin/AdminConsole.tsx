@@ -2068,6 +2068,10 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     () => visibleCustomerOwners.filter((record) => record.leadSource === "meta" && !record.ownerAccountId).length,
     [visibleCustomerOwners],
   );
+  const unassignedLeadCount = useMemo(
+    () => visibleCustomerOwners.filter((record) => !record.ownerAccountId).length,
+    [visibleCustomerOwners],
+  );
   const metaAssignedCountBySales = useMemo(() => visibleCustomerOwners.reduce<Record<string, number>>((counts, record) => {
     if (record.leadSource === "meta" && record.ownerAccountId) counts[record.ownerAccountId] = (counts[record.ownerAccountId] ?? 0) + 1;
     return counts;
@@ -3199,7 +3203,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       const response = await fetch("/api/customer-owners", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-meimi-staff-key": adminSyncKey },
-        body: JSON.stringify({ action: "assign-meta", salesAccountId: metaAssignmentSalesId, quantity }),
+        body: JSON.stringify({ action: "assign-pending", salesAccountId: metaAssignmentSalesId, quantity }),
       });
       const payload = await response.json().catch(() => ({})) as { message?: string; assigned?: number; salesAccountName?: string };
       if (!response.ok) throw new Error(payload.message || "Meta 线索分配失败");
@@ -3704,7 +3708,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               <CloudUpload size={15} />{isSyncingMetaLeads ? "同步中..." : "同步并导入 Meta 线索"}
             </button>
             <div className="meta-assignment-controls">
-              <strong>管理员分配 Meta 线索{metaUnassignedCount ? ` · 待分配 ${metaUnassignedCount} 条` : " · 当前没有待分配线索"}</strong>
+              <strong>管理员分配待处理线索{unassignedLeadCount ? ` · 待分配 ${unassignedLeadCount} 条` : " · 当前没有待分配线索"}</strong>
               <select aria-label="选择接收 Meta 线索的销售" value={metaAssignmentSalesId} onChange={(event) => setMetaAssignmentSalesId(event.target.value)}>
                 <option value="">选择已注册销售</option>
                 {salesAccounts.filter((account) => account.active).map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}

@@ -79,13 +79,13 @@ export async function POST(request: Request) {
       const records = rows.map((row) => row.record as Record<string, unknown>);
       return NextResponse.json({ ok: true, records: identity.role === "admin" ? records : records.filter((record) => record.ownerAccountId === identity.id) });
     }
-    if (body.action === "assign-meta" && identity.role === "admin") {
+    if ((body.action === "assign-meta" || body.action === "assign-pending") && identity.role === "admin") {
       const salesAccountId = typeof body.salesAccountId === "string" ? body.salesAccountId.trim() : "";
       const quantity = typeof body.quantity === "number" && Number.isInteger(body.quantity) ? body.quantity : Number(body.quantity);
       if (!salesAccountId || !Number.isInteger(quantity) || quantity < 1 || quantity > 500) return errorResponse("请选择销售账号并填写 1-500 的分配数量", 400, "INVALID_ASSIGNMENT");
       const accountRows = await sql`SELECT id, name FROM meimi_staff_accounts WHERE id = ${salesAccountId} AND role = 'sales' AND active = TRUE LIMIT 1`;
       if (!accountRows[0]) return errorResponse("销售账号不存在或已停用", 404, "SALES_ACCOUNT_NOT_FOUND");
-      const leads = await sql`SELECT owner_key, record FROM meimi_customer_owners WHERE record->>'leadSource' = 'meta' AND COALESCE(record->>'ownerAccountId', '') = '' ORDER BY updated_at ASC LIMIT ${quantity}`;
+      const leads = await sql`SELECT owner_key, record FROM meimi_customer_owners WHERE COALESCE(record->>'ownerAccountId', '') = '' ORDER BY updated_at ASC LIMIT ${quantity}`;
       let assigned = 0;
       for (const lead of leads as Array<{ owner_key: string; record: Record<string, unknown> }>) {
         const assignedAt = new Date().toISOString();
