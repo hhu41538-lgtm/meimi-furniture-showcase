@@ -152,6 +152,11 @@ export async function downloadQuotationTemplate(quote: TemplateQuote, totals: Te
   link.href = objectUrl;
   const filename = [quote.quoteNo, quote.client, quote.quoteDate].map(safeFilenamePart).filter(Boolean).join("-") || "meimih-quotation";
   link.download = `${filename}.xlsx`;
+  link.style.display = "none";
+  document.body.appendChild(link);
   link.click();
-  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  window.setTimeout(() => {
+    link.remove();
+    URL.revokeObjectURL(objectUrl);
+  }, 1000);
 }
