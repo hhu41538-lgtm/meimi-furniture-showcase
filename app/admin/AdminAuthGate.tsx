@@ -261,7 +261,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
         </form>
         <div className="auth-gate-note">
           <strong>{mode === "admin" ? "管理员可以做什么？" : "销售登录后可以做什么？"}</strong>
-          <span>{mode === "admin" ? "添加 / 下架产品、删除旧产品、维护报价公式、统一销售端价格和分配销售权限。" : "客户归属、报价流程、产品浏览、产品搜索和汇率物流，具体权限由管理员分配。"}</span>
+          <span>{mode === "admin" ? "添加 / 下架产品、删除旧产品、维护报价公式、统一销售端价格和分配销售权限。" : "客户归属、报价流程、产品仓库（含搜索）和汇率物流，具体权限由管理员分配。"}</span>
         </div>
         <small className="auth-gate-local-note">销售账号注册与登录以云端数据库为准；本浏览器仅缓存当前登录状态，换设备不会丢失账号。</small>
       </section>
