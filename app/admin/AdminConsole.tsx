@@ -1580,21 +1580,28 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
     setCloudSyncStatus(`已同步云端 V${state.version} · ${shortDateTime(state.updatedAt)}`);
   }, [workflowPricingStorageKey]);
 
+  const refreshSharedWorkspaceState = useCallback(async (announce = false) => {
+    setCloudSyncStatus("正在读取云端产品与报价公式");
+    const result = await fetchSharedWorkspaceState();
+    if (result.kind === "ready") {
+      applySharedWorkspaceState(result.state);
+      if (announce) setStatus(`已刷新云端目录 V${result.state.version}`);
+    } else {
+      cloudVersionRef.current = null;
+      setCloudSyncStatus(result.message);
+      if (announce) setStatus(result.message);
+    }
+  }, [applySharedWorkspaceState]);
+
   useEffect(() => {
     if (!storageReady) return undefined;
     let cancelled = false;
-    setCloudSyncStatus("正在读取云端产品与报价公式");
-    void fetchSharedWorkspaceState().then((result) => {
+    void refreshSharedWorkspaceState().then(() => {
       if (cancelled) return;
-      if (result.kind === "ready") applySharedWorkspaceState(result.state);
-      else {
-        cloudVersionRef.current = null;
-        setCloudSyncStatus(result.message);
-      }
       setSharedSyncReady(true);
     });
     return () => { cancelled = true; };
-  }, [applySharedWorkspaceState, storageReady]);
+  }, [refreshSharedWorkspaceState, storageReady]);
 
   const syncSharedWorkspaceState = useCallback(async () => {
     if (!isOnline || !adminUnlocked || !sharedSyncReady || cloudVersionRef.current === null || cloudSyncInFlightRef.current) return;
@@ -1658,9 +1665,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
   useEffect(() => {
     if (!storageReady || !sharedSyncReady || session.role !== "sales") return undefined;
     const refresh = async () => {
-      const result = await fetchSharedWorkspaceState();
-      if (result.kind === "ready" && result.state.initialized && result.state.version > (cloudVersionRef.current ?? 0)) {
-        applySharedWorkspaceState(result.state);
+      const previousVersion = cloudVersionRef.current ?? 0;
+      await refreshSharedWorkspaceState();
+      if (cloudVersionRef.current !== null && cloudVersionRef.current > previousVersion) {
         setStatus("产品与报价公式已自动更新");
       }
     };
@@ -1672,7 +1679,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
       window.removeEventListener("focus", refresh);
       window.removeEventListener("online", refresh);
     };
-  }, [applySharedWorkspaceState, session.role, sharedSyncReady, storageReady]);
+  }, [refreshSharedWorkspaceState, session.role, sharedSyncReady, storageReady]);
 
 
   const refreshExchangeRates = useCallback(async (signal?: AbortSignal) => {
@@ -3107,6 +3114,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
             <strong>{session.name}</strong>
             <span>{session.role === "admin" ? "管理员版" : "销售版"}</span>
           </div>
+          {session.role === "sales" ? <button type="button" onClick={() => void refreshSharedWorkspaceState(true)} title="立即读取管理员发布的产品和报价公式">
+            <RotateCcw size={15} />刷新云端目录
+          </button> : null}
           <button onClick={save}>
             <Save size={15} />
             {adminUnlocked ? "保存并同步" : "保存本地资料"}
