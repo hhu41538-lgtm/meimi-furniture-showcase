@@ -69,7 +69,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, records: rows.map((row) => row.record) });
     }
     if (body.action === "replace" && identity.role === "admin" && Array.isArray(body.records) && body.records.length <= 500) {
-      await sql`DELETE FROM meimi_customer_owners`;
       for (const item of body.records) {
         if (!item || typeof item !== "object") continue;
         const itemData = item as { ownerKey?: unknown; record?: unknown };
@@ -80,6 +79,10 @@ export async function POST(request: Request) {
         const record: Record<string, unknown> = { ...source, privateNote: "" };
         await sql`INSERT INTO meimi_customer_owners (owner_key, record) VALUES (${ownerKey}, ${JSON.stringify(record)}::jsonb)`;
       }
+      return NextResponse.json({ ok: true });
+    }
+    if (body.action === "delete" && identity.role === "admin" && typeof body.ownerKey === "string" && body.ownerKey.length <= 200) {
+      await sql`DELETE FROM meimi_customer_owners WHERE owner_key = ${body.ownerKey}`;
       return NextResponse.json({ ok: true });
     }
     if (body.action === "upsert" && typeof body.ownerKey === "string" && body.ownerKey.length <= 200 && body.record && typeof body.record === "object") {

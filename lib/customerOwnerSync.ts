@@ -28,3 +28,12 @@ export async function replaceCustomerOwners(authKey: string, records: unknown[])
   });
   if (!response.ok) throw new Error("客户归属云端更新失败");
 }
+
+export async function deleteSharedCustomerOwner(authKey: string, ownerKey: string) {
+  const response = await fetch("/api/customer-owners", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-meimi-staff-key": authKey },
+    body: JSON.stringify({ action: "delete", ownerKey }),
+  });
+  if (!response.ok) throw new Error("客户归属云端删除失败");
+}

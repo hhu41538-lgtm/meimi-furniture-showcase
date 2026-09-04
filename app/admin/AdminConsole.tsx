@@ -32,7 +32,7 @@ import {
   X,
 } from "lucide-react";
 import { productCodePrefix } from "@/lib/productCodes";
-import { fetchSharedCustomerOwners, publishCustomerOwner, replaceCustomerOwners } from "@/lib/customerOwnerSync";
+import { deleteSharedCustomerOwner, fetchSharedCustomerOwners, publishCustomerOwner, replaceCustomerOwners } from "@/lib/customerOwnerSync";
 import { SALES_PERMISSION_OPTIONS, type AuthSession, type PermissionKey, type StaffAccount } from "./auth";
 import { downloadQuotationTemplate } from "./quotationTemplate";
 import { fetchSharedWorkspaceState, publishSharedWorkspaceState, type CloudWorkspaceState } from "@/lib/workspaceSync";
@@ -2701,6 +2701,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       localStorage.setItem(CUSTOMER_OWNER_STORAGE_KEY, JSON.stringify(next));
       return next;
     });
+    if (adminUnlocked && customerOwnerSyncKey) {
+      void deleteSharedCustomerOwner(customerOwnerSyncKey, normalizeOwnerKey(record.country, record.phone)).catch(() => setStatus("客户已从本机删除，但云端删除失败"));
+    }
     setStatus("已删除一条客户归属记录");
   }
 
