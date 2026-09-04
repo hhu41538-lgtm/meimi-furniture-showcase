@@ -236,6 +236,16 @@ const QUOTE_STORAGE_KEY = "meimih-staff-quote-v2";
 const LEGACY_QUOTE_STORAGE_KEY = "meimih-staff-quote-v1";
 const QUOTE_HISTORY_STORAGE_KEY = "meimih-staff-quote-history-v1";
 const CUSTOMER_OWNER_PENDING_STORAGE_KEY = "meimih-pending-customer-owners-v1";
+
+function readPendingCustomerOwnerCount(): number {
+  try {
+    const stored = localStorage.getItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY);
+    const parsed = stored ? JSON.parse(stored) as unknown : [];
+    return Array.isArray(parsed) ? parsed.length : 0;
+  } catch {
+    return 0;
+  }
+}
 const PRICING_STORAGE_KEY = "meimih-pricing-rules-v1";
 const WORKFLOW_PRICING_STORAGE_KEY = "meimih-workflow-pricing-rule-v1";
 const WORKFLOW_STAGE_STORAGE_KEY = "meimih-workflow-stage-v1";
@@ -1416,6 +1426,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [cloudSyncPending, setCloudSyncPending] = useState(false);
   const [customerOwnerCloudReady, setCustomerOwnerCloudReady] = useState(false);
   const [pendingCustomerOwnerVersion, setPendingCustomerOwnerVersion] = useState(0);
+  const [pendingCustomerOwnerCount, setPendingCustomerOwnerCount] = useState(0);
   const [isRefreshingSharedWorkspace, setIsRefreshingSharedWorkspace] = useState(false);
   const cloudVersionRef = useRef<number | null>(null);
   const cloudSyncInFlightRef = useRef(false);
@@ -1564,6 +1575,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       setStatus("本地缓存读取失败，已使用代码中的默认资料");
     } finally {
       setStorageReady(true);
+      setPendingCustomerOwnerCount(readPendingCustomerOwnerCount());
       setAutoSaveStatus("本地资料已读取，后续修改会自动保存");
     }
   }, [legacyQuoteStorageKey, quoteStorageKey, session.name, session.role, workflowPricingStorageKey, workflowStageStorageKey]);
@@ -1611,6 +1623,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       });
       if (failed.length) localStorage.setItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY, JSON.stringify(failed));
       else localStorage.removeItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY);
+      setPendingCustomerOwnerCount(failed.length);
       if (conflictedKeys.size) {
         setCustomerOwners((current) => {
           const next = current.filter((record) => !conflictedKeys.has(normalizeOwnerKey(record.country, record.phone)));
@@ -2654,6 +2667,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               const pending = stored ? JSON.parse(stored) as unknown : [];
               const next = Array.isArray(pending) ? [record, ...pending].slice(0, 100) : [record];
               localStorage.setItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY, JSON.stringify(next));
+              setPendingCustomerOwnerCount(next.length);
             } catch { /* Keep the local record even if the retry queue cannot be written. */ }
             setPendingCustomerOwnerVersion((current) => current + 1);
             setStatus("客户已保存到本机，云端暂不可用，联网后会自动重试");
@@ -3219,6 +3233,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             {autoSaveStatus}
             {lastSavedAt ? ` · 最近保存 ${shortDateTime(lastSavedAt)}` : ""}
             {` · ${isOnline ? (cloudSyncPending ? "等待云端重试" : cloudSyncStatus) : "当前离线，本地资料仍会保存"}`}
+            {pendingCustomerOwnerCount ? ` · ${pendingCustomerOwnerCount} 条客户待同步` : ""}
           </p>
         </div>
         <div className="admin-header-actions">
