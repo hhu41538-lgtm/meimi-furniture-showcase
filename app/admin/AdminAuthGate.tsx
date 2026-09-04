@@ -36,6 +36,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
   const [accounts, setAccounts] = useState<StaffAccount[]>([]);
   const [session, setSession] = useState<AuthSession | null>(null);
   const [adminSyncKey, setAdminSyncKey] = useState("");
+  const [staffSyncKey, setStaffSyncKey] = useState("");
   const [authReady, setAuthReady] = useState(false);
   const [mode, setMode] = useState<AuthMode>("sales");
   const [salesAction, setSalesAction] = useState<SalesAction>("login");
@@ -139,6 +140,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
       if (!response.ok || !payload.account) { setStatus(payload.message || "云端账号验证失败，请稍后重试"); return; }
       const account = cloudAccountToStaff(payload.account);
       if (!account.active) { setStatus("这个销售账号已被管理员停用，请联系管理员"); return; }
+      setStaffSyncKey(loginKey.trim());
       saveAccounts(accounts.some((item) => item.id === account.id) ? accounts.map((item) => item.id === account.id ? account : item) : [account, ...accounts]);
       enterSession(accountToSession(account));
     } catch { setStatus("云端账号服务暂时不可用，请检查数据库配置"); }
@@ -169,6 +171,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
       const payload = await response.json().catch(() => ({})) as { account?: CloudAccount; message?: string };
       if (!response.ok || !payload.account) { setStatus(payload.message || "云端注册失败，请稍后重试"); return; }
       const account = cloudAccountToStaff(payload.account);
+      setStaffSyncKey(trimmedKey);
       saveAccounts([account, ...accounts.filter((item) => item.id !== account.id)]);
       enterSession(accountToSession(account));
     } catch { setStatus("云端账号服务暂时不可用，账号未注册"); }
@@ -192,6 +195,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
     localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
     setSession(null);
     setAdminSyncKey("");
+    setStaffSyncKey("");
     setLoginKey("");
     setConfirmKey("");
     setStatus("已退出当前账号");
@@ -224,7 +228,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
   }
 
   if (session) {
-    return <AdminConsole initialEntries={initialEntries} session={session} adminSyncKey={adminSyncKey} salesAccounts={accounts} onUpdateSalesAccount={updateSalesAccount} onDeleteSalesAccount={deleteSalesAccount} onLogout={logout} />;
+    return <AdminConsole initialEntries={initialEntries} session={session} adminSyncKey={adminSyncKey} staffSyncKey={staffSyncKey} salesAccounts={accounts} onUpdateSalesAccount={updateSalesAccount} onDeleteSalesAccount={deleteSalesAccount} onLogout={logout} />;
   }
 
   return (

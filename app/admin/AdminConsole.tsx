@@ -32,6 +32,7 @@ import {
   X,
 } from "lucide-react";
 import { productCodePrefix } from "@/lib/productCodes";
+import { fetchSharedCustomerOwners, publishCustomerOwner } from "@/lib/customerOwnerSync";
 import { SALES_PERMISSION_OPTIONS, type AuthSession, type PermissionKey, type StaffAccount } from "./auth";
 import { downloadQuotationTemplate } from "./quotationTemplate";
 import { fetchSharedWorkspaceState, publishSharedWorkspaceState, type CloudWorkspaceState } from "@/lib/workspaceSync";
@@ -1348,6 +1349,7 @@ type AdminConsoleProps = {
   initialEntries: ManagedEntry[];
   session: AuthSession;
   adminSyncKey: string;
+  staffSyncKey: string;
   salesAccounts: StaffAccount[];
   onUpdateSalesAccount: (id: string, patch: Partial<Pick<StaffAccount, "permissions" | "active">>) => void;
   onDeleteSalesAccount: (id: string) => void;
@@ -1361,7 +1363,7 @@ type PdfImportState = {
   importedCount: number;
 };
 
-export default function AdminConsole({ initialEntries, session, adminSyncKey, salesAccounts, onUpdateSalesAccount, onDeleteSalesAccount, onLogout }: AdminConsoleProps) {
+export default function AdminConsole({ initialEntries, session, adminSyncKey, staffSyncKey, salesAccounts, onUpdateSalesAccount, onDeleteSalesAccount, onLogout }: AdminConsoleProps) {
   const adminUnlocked = session.role === "admin";
   const quoteStorageKey = `${QUOTE_STORAGE_KEY}:${session.accountId}`;
   const legacyQuoteStorageKey = session.role === "admin" ? LEGACY_QUOTE_STORAGE_KEY : "";
@@ -1561,6 +1563,23 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
       setAutoSaveStatus("本地资料已读取，后续修改会自动保存");
     }
   }, [legacyQuoteStorageKey, quoteStorageKey, session.name, session.role, workflowPricingStorageKey, workflowStageStorageKey]);
+
+  useEffect(() => {
+    if (!storageReady || adminUnlocked || !staffSyncKey) return undefined;
+    let cancelled = false;
+    void fetchSharedCustomerOwners(staffSyncKey).then((records) => {
+      if (cancelled) return;
+      const normalized = records.map(normalizeCustomerOwnerRecord).filter((record): record is CustomerOwnerRecord => Boolean(record));
+      setCustomerOwners((current) => normalized.map((record) => ({
+        ...record,
+        privateNote: current.find((item) => item.id === record.id)?.privateNote ?? record.privateNote,
+      })));
+      setStatus(`已读取 ${normalized.length} 条云端客户归属`);
+    }).catch(() => {
+      if (!cancelled) setStatus("客户归属云端暂时无法读取，当前继续使用本机资料");
+    });
+    return () => { cancelled = true; };
+  }, [adminUnlocked, staffSyncKey, storageReady]);
 
   const applySharedWorkspaceState = useCallback((state: CloudWorkspaceState) => {
     cloudVersionRef.current = state.version;
@@ -2571,6 +2590,11 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
     setQuote((current) => ({ ...current, employee: current.employee.trim() || ownerName, country, clientPhone: phone }));
     setExpandedCustomerId(record.id);
     setStatus(`已录入客户：${record.country} / ${record.phone} · 销售账号：${record.owner}`);
+    if (!adminUnlocked && staffSyncKey) {
+      void publishCustomerOwner(staffSyncKey, customerOwnerKey, record)
+        .then(() => setStatus(`已录入客户并同步云端：${record.country} / ${record.phone}`))
+        .catch(() => setStatus("客户已保存到本机，但云端同步失败；联网后请重新确认录入"));
+    }
     return true;
   }
 
