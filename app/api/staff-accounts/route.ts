@@ -29,7 +29,15 @@ type SqlClient = NeonQueryFunction<false, false>;
 
 const permissionKeys = ["customers", "quote", "products", "search", "logistics"] as const;
 const adminKey = () => process.env.MEIMI_ADMIN_SYNC_KEY?.trim() ?? "";
-const databaseUrl = () => process.env.DATABASE_URL ?? process.env.POSTGRES_URL ?? process.env.POSTGRES_URL_NON_POOLING ?? "";
+const databaseUrl = () => [
+  process.env.DATABASE_URL,
+  process.env.POSTGRES_URL,
+  process.env.POSTGRES_PRISMA_URL,
+  process.env.POSTGRES_URL_NON_POOLING,
+  process.env.POSTGRES_URL_NO_SSL,
+  process.env.NEON_DATABASE_URL,
+  process.env.NEON_DATABASE_URL_UNPOOLED,
+].map((value) => value?.trim()).find(Boolean) ?? "";
 
 function errorResponse(message: string, status: number, code: string) {
   return NextResponse.json({ ok: false, code, message }, { status });

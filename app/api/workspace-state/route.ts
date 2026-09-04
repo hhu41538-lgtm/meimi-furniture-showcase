@@ -26,7 +26,15 @@ type WorkspaceStateInput = {
 type SqlClient = NeonQueryFunction<false, false>;
 
 function databaseUrl() {
-  return process.env.DATABASE_URL ?? process.env.POSTGRES_URL ?? process.env.POSTGRES_URL_NON_POOLING ?? "";
+  return [
+    process.env.DATABASE_URL,
+    process.env.POSTGRES_URL,
+    process.env.POSTGRES_PRISMA_URL,
+    process.env.POSTGRES_URL_NON_POOLING,
+    process.env.POSTGRES_URL_NO_SSL,
+    process.env.NEON_DATABASE_URL,
+    process.env.NEON_DATABASE_URL_UNPOOLED,
+  ].map((value) => value?.trim()).find(Boolean) ?? "";
 }
 
 function errorResponse(message: string, status: number, code: string) {
