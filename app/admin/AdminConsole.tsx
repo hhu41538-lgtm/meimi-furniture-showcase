@@ -1406,6 +1406,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
   const [autoSaveStatus, setAutoSaveStatus] = useState("正在读取本地资料");
   const [sharedSyncReady, setSharedSyncReady] = useState(false);
   const [cloudSyncStatus, setCloudSyncStatus] = useState("正在连接云端资料");
+  const [isOnline, setIsOnline] = useState(true);
   const cloudVersionRef = useRef<number | null>(null);
   const [pdfDropActive, setPdfDropActive] = useState(false);
   const [pdfImportState, setPdfImportState] = useState<PdfImportState>({ phase: "idle", fileName: "", message: "等待导入产品图册", importedCount: 0 });
@@ -1448,6 +1449,18 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
   useEffect(() => {
     if (storageReady) localStorage.setItem("meimi-admin-sidebar-collapsed", String(sidebarCollapsed));
   }, [sidebarCollapsed, storageReady]);
+
+  useEffect(() => {
+    const updateOnlineState = () => setIsOnline(navigator.onLine);
+    updateOnlineState();
+    window.addEventListener("online", updateOnlineState);
+    window.addEventListener("offline", updateOnlineState);
+    void navigator.storage?.persist?.().catch(() => false);
+    return () => {
+      window.removeEventListener("online", updateOnlineState);
+      window.removeEventListener("offline", updateOnlineState);
+    };
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = sidebarOpen ? "hidden" : "";
@@ -3030,7 +3043,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
           <p className="admin-save-state">
             {autoSaveStatus}
             {lastSavedAt ? ` · 最近保存 ${shortDateTime(lastSavedAt)}` : ""}
-            {` · ${cloudSyncStatus}`}
+            {` · ${isOnline ? cloudSyncStatus : "当前离线，本地资料仍会保存"}`}
           </p>
         </div>
         <div className="admin-header-actions">
@@ -3054,6 +3067,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
         <div className="sales-cockpit-status" role="status" aria-live="polite">
           <span className="sales-cockpit-status-main"><CheckCircle2 size={15} />{storageReady ? "已保存最新内容" : "正在读取本地资料"}</span>
           <span>{lastSavedAt ? `最近保存 ${shortDateTime(lastSavedAt)}` : autoSaveStatus}</span>
+          <span>{isOnline ? "本地 + 云端" : "离线本地"}</span>
           <strong>报价完成度 {quoteProgress}%</strong>
         </div>
         <div className="sales-cockpit-head">
