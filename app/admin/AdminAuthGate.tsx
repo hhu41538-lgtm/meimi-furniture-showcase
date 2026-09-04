@@ -43,6 +43,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
   const [confirmKey, setConfirmKey] = useState("");
   const [status, setStatus] = useState("");
   const [isOnline, setIsOnline] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const updateOnlineState = () => setIsOnline(navigator.onLine);
@@ -160,10 +161,16 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (mode === "admin") {
-      await loginAsAdmin();
-    } else if (salesAction === "register") await registerSales();
-    else await loginAsSales();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      if (mode === "admin") {
+        await loginAsAdmin();
+      } else if (salesAction === "register") await registerSales();
+      else await loginAsSales();
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   function logout() {
@@ -246,9 +253,9 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
             <label>确认销售密钥<input type="password" value={confirmKey} onChange={(event) => setConfirmKey(event.target.value)} placeholder="再次输入销售密钥" autoComplete="new-password" /></label>
           ) : null}
           {status ? <p className="auth-gate-status" role="alert">{status}</p> : null}
-          <button className="auth-gate-submit" type="submit">
+          <button className="auth-gate-submit" type="submit" disabled={isSubmitting} aria-disabled={isSubmitting}>
             {mode === "admin" || salesAction === "login" ? <LogIn size={17} /> : <UserPlus size={17} />}
-            {mode === "admin" || salesAction === "login" ? "进入工作台" : "注册并进入"}
+            {isSubmitting ? "正在验证…" : mode === "admin" || salesAction === "login" ? "进入工作台" : "注册并进入"}
             <ArrowRight size={16} />
           </button>
         </form>
