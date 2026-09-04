@@ -343,6 +343,10 @@ body:has(.admin-shell) {
   line-height: 1.6;
 }
 
+.meta-integration-sync {
+  margin-top: 14px;
+}
+
 .admin-main-content {
   min-width: 0;
   padding: 42px clamp(18px, 4vw, 64px) 72px;

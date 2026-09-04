@@ -1465,6 +1465,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [pendingCustomerOwnerCount, setPendingCustomerOwnerCount] = useState(0);
   const [isRefreshingSharedWorkspace, setIsRefreshingSharedWorkspace] = useState(false);
   const [metaWebhookCopied, setMetaWebhookCopied] = useState(false);
+  const [isSyncingMetaLeads, setIsSyncingMetaLeads] = useState(false);
   const cloudVersionRef = useRef<number | null>(null);
   const cloudSyncInFlightRef = useRef(false);
   const sharedWorkspaceRefreshInFlightRef = useRef(false);
@@ -3109,6 +3110,39 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     setStatus(adminUnlocked ? "已清空全部本地报价留档" : "已清空自己的本地报价留档");
   }
 
+  async function syncMetaLeads() {
+    if (!adminUnlocked || !isOnline || isSyncingMetaLeads) return;
+    setIsSyncingMetaLeads(true);
+    setStatus("正在读取并导入 Meta 广告线索");
+    try {
+      const detailsResponse = await fetch("/api/meta/leads", {
+        method: "POST",
+        headers: { "x-meimi-admin-key": adminSyncKey },
+      });
+      const detailsPayload = await detailsResponse.json().catch(() => ({})) as { message?: string; fetched?: number };
+      if (!detailsResponse.ok) throw new Error(detailsPayload.message || "Meta 线索读取失败");
+      const importResponse = await fetch("/api/meta/import", {
+        method: "POST",
+        headers: { "x-meimi-admin-key": adminSyncKey },
+      });
+      const importPayload = await importResponse.json().catch(() => ({})) as { message?: string; imported?: unknown[]; importedCount?: number; skipped?: number; missingFields?: number };
+      if (!importResponse.ok) throw new Error(importPayload.message || "Meta 线索导入失败");
+      const imported = (importPayload.imported ?? []).map(normalizeCustomerOwnerRecord).filter((record): record is CustomerOwnerRecord => Boolean(record));
+      if (imported.length) {
+        setCustomerOwners((current) => {
+          const next = dedupeCustomerOwnerRecords([...imported, ...current]);
+          localStorage.setItem(CUSTOMER_OWNER_STORAGE_KEY, JSON.stringify(next));
+          return next;
+        });
+      }
+      setStatus(`Meta 线索同步完成：读取 ${detailsPayload.fetched ?? 0} 条，导入 ${importPayload.importedCount ?? 0} 条，重复 ${importPayload.skipped ?? 0} 条${importPayload.missingFields ? `，${importPayload.missingFields} 条待补国家或电话` : ""}`);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Meta 线索同步失败，请检查配置");
+    } finally {
+      setIsSyncingMetaLeads(false);
+    }
+  }
+
   function save() {
     try {
       const savedAt = persistLocalData();
@@ -3539,6 +3573,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               <span><b>03</b>用 Meta Lead Ads Testing Tool 发一条测试线索，确认客户池收到 Meta 来源记录</span>
             </div>
             <small className="meta-integration-note">当前页面只显示接入准备状态；未完成 Meta 授权前，不会把普通客户标记为广告线索。</small>
+            <button type="button" className="meta-integration-sync" onClick={() => void syncMetaLeads()} disabled={!isOnline || isSyncingMetaLeads} aria-busy={isSyncingMetaLeads} title={!isOnline ? "联网后才能同步 Meta 线索" : "读取 Meta 线索并导入客户池"}>
+              <CloudUpload size={15} />{isSyncingMetaLeads ? "同步中..." : "同步并导入 Meta 线索"}
+            </button>
           </section>
           <section className="pdf-import-panel" aria-label="PDF产品图册导入">
             <div className="admin-section-heading">
