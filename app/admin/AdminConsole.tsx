@@ -4552,6 +4552,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                 <small>{quote.factoryStatement}</small>
               </div>
               <div className="generated-customer-output">
+                {quote.lines.length > 17 ? <div className="quote-export-limit-warning" role="alert">Excel 模板最多支持 17 个产品，当前有 {quote.lines.length} 个。客户版仍可复制，请拆分后再导出 Excel。</div> : null}
                 <div className="generated-customer-preview">
                   <div>
                     <span>客户版报价预览</span>

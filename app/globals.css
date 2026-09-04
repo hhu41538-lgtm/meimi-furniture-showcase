@@ -5735,6 +5735,15 @@ body:has(.admin-shell) {
   padding-top: 14px;
 }
 
+.quote-export-limit-warning {
+  border: 1px solid #e7b6ae;
+  background: #fff7f5;
+  color: #a33a2c;
+  padding: 11px 13px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .generated-customer-output .generated-customer-preview {
   border-color: #b8d9c4;
   background: #f5fbf7;
