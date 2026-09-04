@@ -61,6 +61,11 @@ export async function POST(request: Request) {
         record.ownerAccountId = identity.id;
         record.owner = identity.name;
       }
+      const existingRows = await sql`SELECT record FROM meimi_customer_owners WHERE owner_key = ${body.ownerKey} LIMIT 1`;
+      const existingRecord = existingRows[0]?.record as Record<string, unknown> | undefined;
+      if (identity.role === "sales" && existingRecord?.ownerAccountId && existingRecord.ownerAccountId !== identity.id) {
+        return errorResponse(`该客户已被销售“${String(existingRecord.owner || "其他销售")}”录入`, 409, "OWNER_CONFLICT");
+      }
       await sql`INSERT INTO meimi_customer_owners (owner_key, record) VALUES (${body.ownerKey}, ${JSON.stringify(record)}::jsonb) ON CONFLICT (owner_key) DO UPDATE SET record = EXCLUDED.record, updated_at = NOW()`;
       return NextResponse.json({ ok: true });
     }
