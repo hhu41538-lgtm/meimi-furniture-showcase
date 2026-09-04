@@ -186,6 +186,7 @@ type ActiveModule = "home" | "customers" | "quote" | "products" | "search" | "lo
 
 type CustomerTier = "A" | "B" | "C";
 type CustomerFollowStatus = "new" | "following" | "quoted" | "won" | "paused";
+type CustomerLeadSource = "manual" | "meta" | "website" | "referral" | "other";
 
 type CustomerOwnerRecord = {
   id: string;
@@ -200,6 +201,7 @@ type CustomerOwnerRecord = {
   updatedAt: string;
   tier: CustomerTier;
   followStatus: CustomerFollowStatus;
+  leadSource: CustomerLeadSource;
   note: string;
   privateNote: string;
   nextFollowUpDate: string;
@@ -283,6 +285,13 @@ const customerFollowStatusLabels: Record<CustomerFollowStatus, string> = {
   quoted: "已报价",
   won: "已成交",
   paused: "暂停",
+};
+const customerLeadSourceLabels: Record<CustomerLeadSource, string> = {
+  manual: "手动录入",
+  meta: "Meta 广告",
+  website: "独立站",
+  referral: "客户转介绍",
+  other: "其他来源",
 };
 const categoryLabels: Record<string, string> = {
   sofa: "沙发",
@@ -678,6 +687,10 @@ function normalizeCustomerFollowStatus(value: unknown): CustomerFollowStatus {
   return value === "new" || value === "following" || value === "quoted" || value === "won" || value === "paused" ? value : "following";
 }
 
+function normalizeCustomerLeadSource(value: unknown): CustomerLeadSource {
+  return value === "manual" || value === "meta" || value === "website" || value === "referral" || value === "other" ? value : "manual";
+}
+
 function normalizeCustomerOwnerRecord(value: unknown): CustomerOwnerRecord | null {
   if (!value || typeof value !== "object") return null;
   const record = value as Partial<CustomerOwnerRecord>;
@@ -707,6 +720,7 @@ function normalizeCustomerOwnerRecord(value: unknown): CustomerOwnerRecord | nul
     updatedAt: typeof record.updatedAt === "string" ? record.updatedAt : record.createdAt,
     tier: normalizeCustomerTier(record.tier),
     followStatus: normalizeCustomerFollowStatus(record.followStatus),
+    leadSource: normalizeCustomerLeadSource(record.leadSource),
     note: record.note,
     privateNote: typeof record.privateNote === "string" ? record.privateNote : "",
     nextFollowUpDate: typeof record.nextFollowUpDate === "string" ? record.nextFollowUpDate : "",
@@ -1416,6 +1430,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [customerFollowFilter, setCustomerFollowFilter] = useState<"all" | "due">("all");
   const [customerStatusFilter, setCustomerStatusFilter] = useState<"all" | CustomerFollowStatus>("all");
   const [newCustomerTier, setNewCustomerTier] = useState<CustomerTier>("B");
+  const [newCustomerLeadSource, setNewCustomerLeadSource] = useState<CustomerLeadSource>("manual");
   const [expandedCustomerId, setExpandedCustomerId] = useState("");
   const [showAllCustomers, setShowAllCustomers] = useState(false);
   const [quoteHistoryQuery, setQuoteHistoryQuery] = useState("");
@@ -2651,6 +2666,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       updatedAt: new Date().toISOString(),
       tier: newCustomerTier,
       followStatus: "new",
+      leadSource: newCustomerLeadSource,
       note: quote.customerDemand.trim(),
       privateNote: "",
       nextFollowUpDate: "",
@@ -2700,6 +2716,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   function clearCustomerEntry() {
     setOwnerLookup({ country: "", phone: "" });
     setNewCustomerTier("B");
+    setNewCustomerLeadSource("manual");
     setExpandedCustomerId("");
     setQuote((current) => ({
       ...current,
@@ -2718,7 +2735,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
 
   function updateCustomerOwner(
     id: string,
-    field: "tier" | "followStatus" | "privateNote" | "note" | "client" | "clientContact" | "nextFollowUpDate",
+    field: "tier" | "followStatus" | "leadSource" | "privateNote" | "note" | "client" | "clientContact" | "nextFollowUpDate",
     value: string,
   ) {
     const record = customerOwners.find((item) => item.id === id);
@@ -2730,7 +2747,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       setStatus("只能维护自己的客户资源；管理员可查看和维护全部客户");
       return;
     }
-    const nextValue = field === "tier" ? normalizeCustomerTier(value) : field === "followStatus" ? normalizeCustomerFollowStatus(value) : value;
+    const nextValue = field === "tier" ? normalizeCustomerTier(value) : field === "followStatus" ? normalizeCustomerFollowStatus(value) : field === "leadSource" ? normalizeCustomerLeadSource(value) : value;
     setCustomerOwners((current) => {
       const next = current.map((item) => (item.id === id ? { ...item, [field]: nextValue, updatedAt: new Date().toISOString() } : item));
       localStorage.setItem(CUSTOMER_OWNER_STORAGE_KEY, JSON.stringify(next));
@@ -2741,6 +2758,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
         ? `已更新客户等级：${nextValue}类`
         : field === "followStatus"
           ? `已更新客户状态：${customerFollowStatusLabels[nextValue as CustomerFollowStatus]}`
+          : field === "leadSource"
+            ? `已更新客户来源：${customerLeadSourceLabels[nextValue as CustomerLeadSource]}`
           : field === "nextFollowUpDate"
             ? `已更新下次跟进：${nextValue || "未设置"}`
             : "已更新客户资源备注",
@@ -3495,6 +3514,12 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               <option value="C">C类 普通 / 观察</option>
             </select>
           </label>
+          <label>
+            线索来源
+            <select value={newCustomerLeadSource} onChange={(event) => setNewCustomerLeadSource(normalizeCustomerLeadSource(event.target.value))}>
+              {(Object.keys(customerLeadSourceLabels) as CustomerLeadSource[]).map((source) => <option key={source} value={source}>{customerLeadSourceLabels[source]}</option>)}
+            </select>
+          </label>
         </div>
         <div className={`customer-owner-status${customerOwnerConflict ? " is-conflict" : ""}${customerOwnerRecord && !customerOwnerConflict ? " is-confirmed" : ""}`} aria-live="polite">
           <span>{effectiveOwnerLookup.country || "未填国家"} / {effectiveOwnerLookup.phone || "未填电话"}</span>
@@ -3586,7 +3611,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                   }}
                 >
                   <span><b>{record.tier}类</b> <b>{customerFollowStatusLabels[record.followStatus]}</b> {record.country} / {record.phone}</span>
-                  <small>{record.owner} · {record.client || "未填客户"} · {record.clientContact || "未填联系人"} · 更新 {shortDateTime(record.updatedAt)}</small>
+                  <small>{record.owner} · {record.client || "未填客户"} · {record.clientContact || "未填联系人"} · {customerLeadSourceLabels[record.leadSource]} · 更新 {shortDateTime(record.updatedAt)}</small>
                   <small>{ownerIdentityLabel(record.country, record.phone)}</small>
                   <small>{customerFollowUpLabel(record)}</small>
                   <small>
@@ -3621,6 +3646,12 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                       <option value="quoted">已报价</option>
                       <option value="won">已成交</option>
                       <option value="paused">暂停</option>
+                    </select>
+                  </label>
+                  <label>
+                    线索来源
+                    <select value={record.leadSource} onChange={(event) => updateCustomerOwner(record.id, "leadSource", event.target.value)}>
+                      {(Object.keys(customerLeadSourceLabels) as CustomerLeadSource[]).map((source) => <option key={source} value={source}>{customerLeadSourceLabels[source]}</option>)}
                     </select>
                   </label>
                   <label>客户名称<input value={record.client} onChange={(event) => updateCustomerOwner(record.id, "client", event.target.value)} placeholder="客户或公司名称" /></label>
