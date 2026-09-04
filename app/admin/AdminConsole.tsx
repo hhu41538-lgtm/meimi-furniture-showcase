@@ -3107,6 +3107,11 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
 
   async function exportQuoteTemplate() {
     if (!ensureFormalCustomerOutputReady()) return;
+    const templateLineLimit = 17;
+    if (quote.lines.length > templateLineLimit) {
+      setStatus(`当前模板最多支持 ${templateLineLimit} 个产品，请拆分报价后再导出，避免明细被截断`);
+      return;
+    }
     try {
       await downloadQuotationTemplate(quote, totals);
       setStatus("已按 XX furniture 报价模板导出 Excel 报价单");
