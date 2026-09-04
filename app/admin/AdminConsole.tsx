@@ -3205,9 +3205,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
         headers: { "Content-Type": "application/json", "x-meimi-staff-key": adminSyncKey },
         body: JSON.stringify({ action: "assign-pending", salesAccountId: metaAssignmentSalesId, quantity }),
       });
-      const payload = await response.json().catch(() => ({})) as { message?: string; assigned?: number; salesAccountName?: string };
+      const payload = await response.json().catch(() => ({})) as { message?: string; assigned?: number; remaining?: number; salesAccountName?: string };
       if (!response.ok) throw new Error(payload.message || "Meta 线索分配失败");
-      setStatus(`已将 ${payload.assigned ?? 0} 条待分配线索分配给 ${payload.salesAccountName || "销售"}`);
+      setStatus(`已将 ${payload.assigned ?? 0} 条待分配线索分配给 ${payload.salesAccountName || "销售"}，队列还剩 ${payload.remaining ?? 0} 条`);
       setPendingCustomerOwnerVersion((current) => current + 1);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Meta 线索分配失败");

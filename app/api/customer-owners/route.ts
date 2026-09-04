@@ -93,7 +93,9 @@ export async function POST(request: Request) {
         const updated = await sql`UPDATE meimi_customer_owners SET record = ${JSON.stringify(record)}::jsonb, updated_at = NOW() WHERE owner_key = ${lead.owner_key} AND COALESCE(record->>'ownerAccountId', '') = '' RETURNING owner_key`;
         if (updated.length) assigned += 1;
       }
-      return NextResponse.json({ ok: true, assigned, requested: quantity, salesAccountId, salesAccountName: String(accountRows[0].name) });
+      const remainingRows = await sql`SELECT COUNT(*)::int AS count FROM meimi_customer_owners WHERE COALESCE(record->>'ownerAccountId', '') = ''`;
+      const remaining = Number((remainingRows[0] as { count?: unknown } | undefined)?.count) || 0;
+      return NextResponse.json({ ok: true, assigned, requested: quantity, remaining, salesAccountId, salesAccountName: String(accountRows[0].name) });
     }
     if (body.action === "replace" && identity.role === "admin" && Array.isArray(body.records) && body.records.length <= 500) {
       for (const item of body.records) {
