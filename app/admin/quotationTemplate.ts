@@ -142,8 +142,9 @@ export async function downloadQuotationTemplate(quote: TemplateQuote, totals: Te
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
   const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
+  const objectUrl = URL.createObjectURL(blob);
+  link.href = objectUrl;
   link.download = `${quote.quoteNo || "meimih-quotation"}.xlsx`;
   link.click();
-  URL.revokeObjectURL(link.href);
+  window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
 }
