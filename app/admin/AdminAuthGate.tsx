@@ -19,6 +19,7 @@ type SalesAction = "login" | "register";
 type CloudAccount = Omit<StaffAccount, "loginKey"> & { loginKeyLast4: string };
 const FIXED_ADMIN_KEY = "2675982129";
 const STAFF_SYNC_KEY_SESSION_STORAGE_KEY = "meimih-staff-sync-key-session-v1";
+const STAFF_SYNC_ACCOUNT_SESSION_STORAGE_KEY = "meimih-staff-sync-account-session-v1";
 
 function cloudAccountToStaff(account: CloudAccount): StaffAccount {
   return { ...account, loginKey: `••••${account.loginKeyLast4}` };
@@ -62,13 +63,20 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
         }
       }
       const storedSession = localStorage.getItem(AUTH_SESSION_STORAGE_KEY);
-      setStaffSyncKey(sessionStorage.getItem(STAFF_SYNC_KEY_SESSION_STORAGE_KEY) ?? "");
       if (storedSession) {
         const parsedSession = JSON.parse(storedSession) as Partial<AuthSession>;
         if (parsedSession.role === "sales" && typeof parsedSession.accountId === "string") {
           const restoredAccounts: StaffAccount[] = (JSON.parse(storedAccounts ?? "[]") as unknown[]).map(normalizeStaffAccount).filter((item: StaffAccount | null): item is StaffAccount => item !== null);
           const account = restoredAccounts.find((item) => item.id === parsedSession.accountId && item.active);
-          if (account) setSession(accountToSession(account));
+          const storedSyncAccountId = sessionStorage.getItem(STAFF_SYNC_ACCOUNT_SESSION_STORAGE_KEY);
+          if (account) {
+            setSession(accountToSession(account));
+            if (storedSyncAccountId === account.id) setStaffSyncKey(sessionStorage.getItem(STAFF_SYNC_KEY_SESSION_STORAGE_KEY) ?? "");
+            else {
+              sessionStorage.removeItem(STAFF_SYNC_KEY_SESSION_STORAGE_KEY);
+              sessionStorage.removeItem(STAFF_SYNC_ACCOUNT_SESSION_STORAGE_KEY);
+            }
+          }
         }
       }
     } catch {
@@ -144,6 +152,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
       if (!account.active) { setStatus("这个销售账号已被管理员停用，请联系管理员"); return; }
       setStaffSyncKey(loginKey.trim());
       sessionStorage.setItem(STAFF_SYNC_KEY_SESSION_STORAGE_KEY, loginKey.trim());
+      sessionStorage.setItem(STAFF_SYNC_ACCOUNT_SESSION_STORAGE_KEY, account.id);
       saveAccounts(accounts.some((item) => item.id === account.id) ? accounts.map((item) => item.id === account.id ? account : item) : [account, ...accounts]);
       enterSession(accountToSession(account));
     } catch { setStatus("云端账号服务暂时不可用，请检查数据库配置"); }
@@ -176,6 +185,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
       const account = cloudAccountToStaff(payload.account);
       setStaffSyncKey(trimmedKey);
       sessionStorage.setItem(STAFF_SYNC_KEY_SESSION_STORAGE_KEY, trimmedKey);
+      sessionStorage.setItem(STAFF_SYNC_ACCOUNT_SESSION_STORAGE_KEY, account.id);
       saveAccounts([account, ...accounts.filter((item) => item.id !== account.id)]);
       enterSession(accountToSession(account));
     } catch { setStatus("云端账号服务暂时不可用，账号未注册"); }
@@ -201,6 +211,7 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
     setAdminSyncKey("");
     setStaffSyncKey("");
     sessionStorage.removeItem(STAFF_SYNC_KEY_SESSION_STORAGE_KEY);
+    sessionStorage.removeItem(STAFF_SYNC_ACCOUNT_SESSION_STORAGE_KEY);
     setLoginKey("");
     setConfirmKey("");
     setStatus("已退出当前账号");
