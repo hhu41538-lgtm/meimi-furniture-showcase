@@ -3363,6 +3363,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
             {customerOwnerConflict ? "已被销售录入" : customerOwnerRecord ? "已录入客户" : "录入客户"}
           </button>
           <button className="customer-clear-button" type="button" onClick={clearCustomerEntry} title="清空本次客户录入内容，不删除客户池历史记录">
+            <RotateCcw size={15} />
             一键清空
           </button>
         </div>
