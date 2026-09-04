@@ -76,6 +76,9 @@ export default function AdminAuthGate({ initialEntries }: { initialEntries: Mana
               sessionStorage.removeItem(STAFF_SYNC_KEY_SESSION_STORAGE_KEY);
               sessionStorage.removeItem(STAFF_SYNC_ACCOUNT_SESSION_STORAGE_KEY);
             }
+          } else {
+            sessionStorage.removeItem(STAFF_SYNC_KEY_SESSION_STORAGE_KEY);
+            sessionStorage.removeItem(STAFF_SYNC_ACCOUNT_SESSION_STORAGE_KEY);
           }
         }
       }
