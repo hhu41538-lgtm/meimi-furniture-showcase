@@ -24,6 +24,19 @@ async function hashLoginKey(value: string) {
 
 async function ensureTables(sql: SqlClient) {
   await sql`
+    CREATE TABLE IF NOT EXISTS meimi_staff_accounts (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      login_key_hash TEXT NOT NULL UNIQUE,
+      login_key_last4 TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'sales',
+      permissions JSONB NOT NULL DEFAULT '["customers","quote","products","search","logistics"]'::jsonb,
+      active BOOLEAN NOT NULL DEFAULT TRUE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`
     CREATE TABLE IF NOT EXISTS meimi_customer_owners (
       owner_key TEXT PRIMARY KEY,
       record JSONB NOT NULL,
