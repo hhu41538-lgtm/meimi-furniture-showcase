@@ -32,7 +32,7 @@ import {
   X,
 } from "lucide-react";
 import { productCodePrefix } from "@/lib/productCodes";
-import { deleteSharedCustomerOwner, fetchSharedCustomerOwners, publishCustomerOwner, replaceCustomerOwners } from "@/lib/customerOwnerSync";
+import { customerOwnerConflictMessage, deleteSharedCustomerOwner, fetchSharedCustomerOwners, isCustomerOwnerConflict, publishCustomerOwner, replaceCustomerOwners } from "@/lib/customerOwnerSync";
 import { SALES_PERMISSION_OPTIONS, type AuthSession, type PermissionKey, type StaffAccount } from "./auth";
 import { downloadQuotationTemplate } from "./quotationTemplate";
 import { fetchSharedWorkspaceState, publishSharedWorkspaceState, type CloudWorkspaceState } from "@/lib/workspaceSync";
@@ -1598,10 +1598,17 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     let cancelled = false;
     void Promise.allSettled(pending.map((record) => publishCustomerOwner(staffSyncKey, normalizeOwnerKey(record.country, record.phone), record))).then((results) => {
       if (cancelled) return;
-      const failed = pending.filter((_, index) => results[index]?.status === "rejected");
+      const conflicts = results
+        .filter((result): result is PromiseRejectedResult => result.status === "rejected" && isCustomerOwnerConflict(result.reason))
+        .map((result) => customerOwnerConflictMessage(result.reason));
+      const failed = pending.filter((_, index) => {
+        const result = results[index];
+        return result?.status === "rejected" && !isCustomerOwnerConflict(result.reason);
+      });
       if (failed.length) localStorage.setItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY, JSON.stringify(failed));
       else localStorage.removeItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY);
-      setStatus(failed.length ? `还有 ${failed.length} 条客户归属等待同步` : `已补同步 ${pending.length} 条客户归属`);
+      if (conflicts.length) setStatus(conflicts[0]);
+      else setStatus(failed.length ? `还有 ${failed.length} 条客户归属等待同步` : `已补同步 ${pending.length} 条客户归属`);
     });
     return () => { cancelled = true; };
   }, [adminUnlocked, isOnline, pendingCustomerOwnerVersion, staffSyncKey]);

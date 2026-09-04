@@ -20,6 +20,16 @@ export async function publishCustomerOwner(authKey: string, ownerKey: string, re
   if (!response.ok) throw new Error(`${payload.code || "SYNC_FAILED"}:${payload.message || "客户归属云端保存失败"}`);
 }
 
+export function isCustomerOwnerConflict(error: unknown): boolean {
+  return error instanceof Error && error.message.startsWith("OWNER_CONFLICT:");
+}
+
+export function customerOwnerConflictMessage(error: unknown): string {
+  return error instanceof Error && error.message.startsWith("OWNER_CONFLICT:")
+    ? error.message.slice("OWNER_CONFLICT:".length)
+    : "客户归属已被其他销售录入";
+}
+
 export async function replaceCustomerOwners(authKey: string, records: unknown[]) {
   const response = await fetch("/api/customer-owners", {
     method: "POST",
