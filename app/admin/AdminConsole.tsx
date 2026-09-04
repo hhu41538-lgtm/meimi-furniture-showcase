@@ -3300,7 +3300,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
           <p className="eyebrow">MEIMI&H / INTERNAL SALES APP</p>
           <h1>产品编号报价系统</h1>
           <p className="admin-status" role="status" aria-live="polite" aria-atomic="true">{status}</p>
-          <p className="admin-save-state">
+          <p className="admin-save-state" role="status" aria-live="polite" aria-atomic="true">
             {autoSaveStatus}
             {lastSavedAt ? ` · 最近保存 ${shortDateTime(lastSavedAt)}` : ""}
             {` · ${isOnline ? (cloudSyncConflict ? "云端版本冲突，需先刷新" : cloudSyncPending ? "等待云端重试" : cloudSyncStatus) : "当前离线，本地资料仍会保存"}`}
