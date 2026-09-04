@@ -3165,7 +3165,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     setIsCheckingMetaConfig(true);
     try {
       const response = await fetch("/api/meta/status", { headers: { "x-meimi-admin-key": adminSyncKey }, cache: "no-store" });
-      const payload = await response.json().catch(() => ({})) as { message?: string; config?: Record<string, boolean>; pending?: number; needsMapping?: number; imported?: number; readyForRetrieval?: boolean };
+      const payload = await response.json().catch(() => ({})) as { message?: string; config?: Record<string, boolean>; pending?: number; needsMapping?: number; imported?: number; readyForRetrieval?: boolean; latestReceivedAt?: string | null };
       if (!response.ok || !payload.config) throw new Error(payload.message || "Meta 配置检查失败");
       const missing = Object.entries({
         数据库: payload.config.database,
@@ -3173,7 +3173,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
         AppSecret: payload.config.appSecret,
         PageAccessToken: payload.config.pageAccessToken,
       }).filter(([, ready]) => !ready).map(([label]) => label);
-      const summary = " · 待处理 " + (payload.pending ?? 0) + " 条 · 待补字段 " + (payload.needsMapping ?? 0) + " 条 · 已导入 " + (payload.imported ?? 0) + " 条";
+      const summary = " · 待处理 " + (payload.pending ?? 0) + " 条 · 待补字段 " + (payload.needsMapping ?? 0) + " 条 · 已导入 " + (payload.imported ?? 0) + " 条 · 最近收到 " + (payload.latestReceivedAt ? shortDateTime(payload.latestReceivedAt) : "未收到");
       setMetaConfigStatus((missing.length ? "待配置：" + missing.join("、") : "配置齐全") + summary);
       setStatus(payload.readyForRetrieval ? "Meta 接入配置检查通过，可以同步线索" : "Meta 接入配置尚未完成，请按提示补齐环境变量");
     } catch (error) {

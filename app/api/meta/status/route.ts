@@ -30,10 +30,13 @@ export async function GET(request: Request) {
   let pending = 0;
   let imported = 0;
   let needsMapping = 0;
+  let latestReceivedAt: string | null = null;
   if (url) {
     try {
       const sql = neon<false, false>(url);
       const rows = await sql`SELECT status, COUNT(*)::int AS count FROM meimi_meta_leads GROUP BY status`;
+      const latestRows = await sql`SELECT MAX(received_at)::text AS latest_received_at FROM meimi_meta_leads`;
+      latestReceivedAt = (latestRows[0] as { latest_received_at?: unknown } | undefined)?.latest_received_at as string || null;
       for (const row of rows as Array<{ status?: unknown; count?: unknown }>) {
         if (row.status === "imported" || row.status === "imported_duplicate") imported += Number(row.count) || 0;
         else {
@@ -45,5 +48,5 @@ export async function GET(request: Request) {
       // The webhook creates this table lazily; configuration status remains useful before first delivery.
     }
   }
-  return NextResponse.json({ ok: true, config, readyForWebhook: config.database && config.webhookVerifyToken, readyForRetrieval: config.database && config.pageAccessToken, pending, needsMapping, imported });
+  return NextResponse.json({ ok: true, config, readyForWebhook: config.database && config.webhookVerifyToken, readyForRetrieval: config.database && config.pageAccessToken, pending, needsMapping, imported, latestReceivedAt });
 }
