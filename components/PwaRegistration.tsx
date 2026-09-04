@@ -12,7 +12,8 @@ export default function PwaRegistration() {
       return;
     }
 
-    navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+    const isInternalWorkbench = window.location.pathname.startsWith("/admin");
+    navigator.serviceWorker.register(isInternalWorkbench ? "/admin/sw.js" : "/sw.js").catch(() => undefined);
   }, []);
 
   return null;

@@ -7,6 +7,7 @@ import { type ManagedEntry } from "./AdminConsole";
 
 export const metadata: Metadata = {
   title: "产品资料工作台",
+  manifest: "/admin/manifest.webmanifest",
   robots: { index: false, follow: false },
 };
 
