@@ -15,6 +15,8 @@ type WorkspaceApiResponse = {
   state?: CloudWorkspaceState;
 };
 
+const SYNC_REQUEST_TIMEOUT_MS = 12_000;
+
 export type WorkspaceReadResult =
   | { kind: "ready"; state: CloudWorkspaceState }
   | { kind: "unconfigured"; message: string };
@@ -45,8 +47,10 @@ async function responsePayload(response: Response) {
 }
 
 export async function fetchSharedWorkspaceState(): Promise<WorkspaceReadResult> {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), SYNC_REQUEST_TIMEOUT_MS);
   try {
-    const response = await fetch("/api/workspace-state", { cache: "no-store" });
+    const response = await fetch("/api/workspace-state", { cache: "no-store", signal: controller.signal });
     const payload = await responsePayload(response);
     if (response.status === 503 && (payload.code === "DATABASE_NOT_CONFIGURED" || payload.code === "SYNC_KEY_NOT_CONFIGURED")) {
       return { kind: "unconfigured", message: "云端数据库尚未配置，当前使用本地资料" };
@@ -56,7 +60,12 @@ export async function fetchSharedWorkspaceState(): Promise<WorkspaceReadResult> 
     if (!state) throw new Error("云端资料格式不正确");
     return { kind: "ready", state };
   } catch (error) {
-    return { kind: "unconfigured", message: error instanceof Error ? error.message : "云端资料不可用，当前使用本地资料" };
+    const message = error instanceof Error && error.name === "AbortError"
+      ? "云端资料请求超时，当前使用本地资料"
+      : error instanceof Error ? error.message : "云端资料不可用，当前使用本地资料";
+    return { kind: "unconfigured", message };
+  } finally {
+    window.clearTimeout(timeoutId);
   }
 }
 
@@ -75,11 +84,14 @@ export async function publishSharedWorkspaceState({
   updatedBy: string;
   adminKey: string;
 }): Promise<WorkspaceWriteResult> {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), SYNC_REQUEST_TIMEOUT_MS);
   try {
     const response = await fetch("/api/workspace-state", {
       method: "PUT",
       headers: { "content-type": "application/json", "x-meimi-admin-key": adminKey },
       body: JSON.stringify({ entries, pricingRules, workflowPricingRuleId, version, updatedBy }),
+      signal: controller.signal,
     });
     const payload = await responsePayload(response);
     if (response.status === 503 && (payload.code === "DATABASE_NOT_CONFIGURED" || payload.code === "SYNC_KEY_NOT_CONFIGURED")) {
@@ -91,6 +103,11 @@ export async function publishSharedWorkspaceState({
     if (!state) return { kind: "failed", message: "云端返回资料格式不正确，已保存到本地" };
     return { kind: "saved", state };
   } catch (error) {
-    return { kind: "failed", message: error instanceof Error ? error.message : "云端保存失败，已保存到本地" };
+    const message = error instanceof Error && error.name === "AbortError"
+      ? "云端保存超时，已保存到本地，稍后自动重试"
+      : error instanceof Error ? error.message : "云端保存失败，已保存到本地";
+    return { kind: "failed", message };
+  } finally {
+    window.clearTimeout(timeoutId);
   }
 }
