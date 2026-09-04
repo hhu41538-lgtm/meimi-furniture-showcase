@@ -207,7 +207,7 @@ type CustomerOwnerRecord = {
   lastQuoteTotal: number;
 };
 
-type CurrencyCode = "USD" | "EUR" | "GBP" | "AUD" | "AED" | "SAR";
+type CurrencyCode = "USD" | "EUR" | "GBP" | "AUD" | "AED" | "SAR" | "INR";
 type ConverterCurrency = "CNY" | CurrencyCode;
 
 type ExchangeRates = Record<CurrencyCode, number>;
@@ -303,6 +303,7 @@ const fallbackExchangeRates: ExchangeRates = {
   AUD: 0.2068,
   AED: 0.5451,
   SAR: 0.5566,
+  INR: 12.35,
 };
 const currencyLabels: Record<CurrencyCode, string> = {
   USD: "美元 USD",
@@ -311,8 +312,9 @@ const currencyLabels: Record<CurrencyCode, string> = {
   AUD: "澳元 AUD",
   AED: "阿联酋迪拉姆 AED",
   SAR: "沙特里亚尔 SAR",
+  INR: "印度卢比 INR",
 };
-const currencyCodes: CurrencyCode[] = ["USD", "EUR", "GBP", "AUD", "AED", "SAR"];
+const currencyCodes: CurrencyCode[] = ["USD", "EUR", "GBP", "AUD", "AED", "SAR", "INR"];
 const converterCurrencies: ConverterCurrency[] = ["CNY", ...currencyCodes];
 const converterCurrencyLabels: Record<ConverterCurrency, string> = {
   CNY: "人民币 CNY",
@@ -1416,6 +1418,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
   const [status, setStatus] = useState(`已进入${session.role === "admin" ? "管理员" : "销售"}版：${session.name}`);
   const canAccessModule = useCallback((module: ActiveModule) => {
     if (module === "home" || module === "admin") return module === "home" || adminUnlocked;
+    if (module === "products") {
+      return adminUnlocked || session.permissions.includes("products") || session.permissions.includes("search");
+    }
     return adminUnlocked || session.permissions.includes(module as PermissionKey);
   }, [adminUnlocked, session.permissions]);
 
@@ -1423,7 +1428,11 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
     const validModules: ActiveModule[] = ["home", "customers", "quote", "products", "search", "logistics", "admin"];
     const readHash = () => {
       const hash = window.location.hash.replace(/^#/, "") as ActiveModule;
-      if (validModules.includes(hash) && (hash === "home" || canAccessModule(hash))) setActiveModule(hash);
+      const requestedModule = hash === "search" ? "products" : hash;
+      if (validModules.includes(hash) && (requestedModule === "home" || canAccessModule(requestedModule))) {
+        setActiveModule(requestedModule);
+        if (hash === "search") window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#products`);
+      }
       else {
         setActiveModule("home");
         if (hash) window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
@@ -1983,7 +1992,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
     customers: "客户池",
     quote: "报价流程",
     products: "产品仓库",
-    search: "产品搜索",
+    search: "产品仓库",
     logistics: "汇率物流",
     admin: "管理员维护",
   }[activeModule];
@@ -2027,7 +2036,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
       "quote-lines": "quote",
       "quote-sheet": "quote",
       "product-search": "products",
-      "search-center": "search",
+      "search-center": "products",
       "product-warehouse": "products",
       "exchange-logistics": "logistics",
       "admin-access": "admin",
@@ -2039,15 +2048,16 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
   }
 
   function navigateToModule(module: ActiveModule) {
-    if (!canAccessModule(module)) {
+    const targetModule = module === "search" ? "products" : module;
+    if (!canAccessModule(targetModule)) {
       setStatus("当前账号没有这个板块的权限，请联系管理员分配");
       return;
     }
-    setActiveModule(module);
-    if (module === "home") {
+    setActiveModule(targetModule);
+    if (targetModule === "home") {
       window.history.pushState(null, "", `${window.location.pathname}${window.location.search}`);
     } else {
-      window.location.hash = module;
+      window.location.hash = targetModule;
     }
   }
 
@@ -3039,7 +3049,6 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
             ["customers", "客户池", <UsersRound key="customers" size={17} strokeWidth={1.8} />],
             ["quote", "报价流程", <Calculator key="quote" size={17} strokeWidth={1.8} />],
             ["products", "产品仓库", <Boxes key="products" size={17} strokeWidth={1.8} />],
-            ["search", "产品搜索", <Search key="search" size={17} strokeWidth={1.8} />],
             ["logistics", "汇率物流", <Globe2 key="logistics" size={17} strokeWidth={1.8} />],
           ] as [ActiveModule, string, ReactNode][]).filter(([module]) => canAccessModule(module)).map(([module, label, icon]) => (
             <button key={module} className={activeModule === module ? "is-active" : ""} type="button" onClick={() => openModule(module)} title={module === "quote" && quote.lines.length ? `报价流程，${quote.lines.length} 项明细` : label} aria-current={activeModule === module ? "page" : undefined}>
@@ -3130,25 +3139,15 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
             <button className="sales-cockpit-card-hit" type="button" onClick={() => openModule("products")} aria-label="进入产品仓库">
               <span className="sales-cockpit-card-number" aria-hidden="true">03</span>
               <span className="sales-cockpit-card-icon" aria-hidden="true"><Boxes size={24} strokeWidth={1.8} /></span>
-              <span className="sales-cockpit-card-copy"><strong>产品仓库</strong><small>只看已上架产品，点击图片再查看规格和价格。</small></span>
-              <span className="sales-cockpit-card-links" aria-hidden="true"><span>产品列表</span><span>已上架</span><span>现货状态</span></span>
+              <span className="sales-cockpit-card-copy"><strong>产品仓库</strong><small>浏览、模糊搜索并加入报价，点击图片再查看规格和价格。</small></span>
+              <span className="sales-cockpit-card-links" aria-hidden="true"><span>编号搜索</span><span>品类筛选</span><span>已上架</span></span>
               <span className="sales-cockpit-card-stats" aria-hidden="true"><b>{warehouseStats.total}</b><small>产品总数</small><b>{warehouseStats.visible}</b><small>已上架</small></span>
-              <span className="sales-cockpit-card-arrow" aria-hidden="true"><ArrowUpRight size={19} /></span>
-            </button>
-          </article> : null}
-          {canAccessModule("search") ? <article className="sales-cockpit-card">
-            <button className="sales-cockpit-card-hit" type="button" onClick={() => openModule("search")} aria-label="进入产品搜索">
-              <span className="sales-cockpit-card-number" aria-hidden="true">04</span>
-              <span className="sales-cockpit-card-icon" aria-hidden="true"><Search size={24} strokeWidth={1.8} /></span>
-              <span className="sales-cockpit-card-copy"><strong>产品搜索</strong><small>编号、尾号、中文名、英文名和大类小类都能搜。</small></span>
-              <span className="sales-cockpit-card-links" aria-hidden="true"><span>编号搜索</span><span>品类筛选</span><span>搜索记录</span></span>
-              <span className="sales-cockpit-card-stats" aria-hidden="true"><b>{productSearchMatches.length}</b><small>当前匹配</small><b>{warehouseStats.visible}</b><small>可检索</small></span>
               <span className="sales-cockpit-card-arrow" aria-hidden="true"><ArrowUpRight size={19} /></span>
             </button>
           </article> : null}
           {canAccessModule("logistics") ? <article className="sales-cockpit-card">
             <button className="sales-cockpit-card-hit" type="button" onClick={() => openModule("logistics")} aria-label="进入汇率物流">
-              <span className="sales-cockpit-card-number" aria-hidden="true">05</span>
+              <span className="sales-cockpit-card-number" aria-hidden="true">04</span>
               <span className="sales-cockpit-card-icon" aria-hidden="true"><Globe2 size={24} strokeWidth={1.8} /></span>
               <span className="sales-cockpit-card-copy"><strong>汇率物流</strong><small>查当天汇率，并按 CBM、重量和柜型估算物流。</small></span>
               <span className="sales-cockpit-card-links" aria-hidden="true"><span>汇率查询</span><span>物流方式</span><span>货柜估算</span></span>
@@ -3158,7 +3157,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
           </article> : null}
           {adminUnlocked ? <article className="sales-cockpit-card">
             <button className="sales-cockpit-card-hit" type="button" onClick={() => openModule("admin")} aria-label="进入管理员维护">
-              <span className="sales-cockpit-card-number" aria-hidden="true">06</span>
+              <span className="sales-cockpit-card-number" aria-hidden="true">05</span>
               <span className="sales-cockpit-card-icon" aria-hidden="true"><Settings2 size={24} strokeWidth={1.8} /></span>
               <span className="sales-cockpit-card-copy"><strong>管理员维护</strong><small>维护产品、统一价格、报价公式和销售权限。</small></span>
               <span className="sales-cockpit-card-links" aria-hidden="true"><span>用户管理</span><span>价格公式</span><span>产品维护</span></span>
@@ -3460,8 +3459,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
       </section>
       ) : null}
 
-      {activeModule === "products" || activeModule === "search" ? (
-      <section id={activeModule === "search" ? "search-center" : "product-search"} className="quick-quote" aria-label="产品编号快速报价">
+      {activeModule === "products" ? (
+      <section id="product-search" className="quick-quote" aria-label="产品仓库搜索">
         <div>
           <p className="eyebrow">Quick quote</p>
           <h2>输入编号、尾号、品类或中英文名查找产品</h2>
@@ -3612,7 +3611,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
             <div>
               <p className="eyebrow">Step 02</p>
               <h2>上架仓库选品</h2>
-              <p className="quote-step-note">请从产品仓库或产品搜索中加入产品。每加入一项，系统会自动回到这张报价流程单。</p>
+              <p className="quote-step-note">请在产品仓库中搜索并加入产品。每加入一项，系统会自动回到这张报价流程单。</p>
             </div>
             <div className="prepared-quote quote-step-summary">
               <div>
@@ -3621,9 +3620,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
                 <small>固定报价模式：{workflowPricingRule?.name ?? "未选择"}</small>
               </div>
               <div className="quote-flow-actions">
-                <button onClick={() => openModule("products")}>进入产品仓库</button>
-                <button onClick={() => openModule("search")}>进入产品搜索</button>
-                <button onClick={confirmSelectedProducts} disabled={!quote.lines.length} title={!quote.lines.length ? "请先从产品仓库或产品搜索加入产品" : undefined}>确认产品，生成报价单</button>
+                <button onClick={() => openModule("products")}>进入产品仓库搜索</button>
+                <button onClick={confirmSelectedProducts} disabled={!quote.lines.length} title={!quote.lines.length ? "请先从产品仓库搜索并加入产品" : undefined}>确认产品，生成报价单</button>
               </div>
             </div>
             {quote.lines.length ? (
@@ -3649,7 +3647,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
                 {quote.lines.length > 10 ? <small className="quote-selection-more">另有 {quote.lines.length - 10} 项将在下方报价明细中显示。</small> : null}
               </div>
             ) : (
-              <div className="quote-selection-empty">还没有产品。进入产品仓库或产品搜索，点击产品上的“加入预备报价单”。</div>
+              <div className="quote-selection-empty">还没有产品。进入产品仓库，搜索后点击产品上的“加入预备报价单”。</div>
             )}
           </>
           ) : (
@@ -4077,8 +4075,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
               <div className="quote-empty">
                 <span>输入产品编号，系统会自动带出产品图片、产品编号、工厂型号、报价公式和变量。</span>
                 <div className="quote-empty-actions">
-                  <button type="button" onClick={() => openModule("products")}>进入产品仓库</button>
-                  <button type="button" onClick={() => openModule("search")}>进入产品搜索</button>
+                  <button type="button" onClick={() => openModule("products")}>进入产品仓库搜索</button>
                 </div>
               </div>
             )}

@@ -25,8 +25,7 @@ export const AUTH_SESSION_STORAGE_KEY = "meimih-workbench-session-v1";
 export const SALES_PERMISSION_OPTIONS: Array<{ key: PermissionKey; label: string; detail: string }> = [
   { key: "customers", label: "客户池", detail: "查询归属、维护自己的客户资源" },
   { key: "quote", label: "报价流程", detail: "选择公式、选品并生成报价单" },
-  { key: "products", label: "产品仓库", detail: "浏览已上架产品和产品详情" },
-  { key: "search", label: "产品搜索", detail: "按编号、品类或名称搜索产品" },
+  { key: "products", label: "产品仓库", detail: "浏览、搜索已上架产品并加入报价" },
   { key: "logistics", label: "汇率物流", detail: "换算货币和粗估物流" },
 ];
 
@@ -47,7 +46,7 @@ export function normalizeStaffAccount(value: unknown): StaffAccount | null {
   if (typeof account.id !== "string" || typeof account.name !== "string" || typeof account.loginKey !== "string") return null;
   if (account.role !== "sales" || typeof account.active !== "boolean") return null;
   const permissions = Array.isArray(account.permissions)
-    ? account.permissions.filter((permission): permission is PermissionKey => DEFAULT_SALES_PERMISSIONS.includes(permission as PermissionKey))
+    ? account.permissions.filter((permission): permission is PermissionKey => DEFAULT_SALES_PERMISSIONS.includes(permission as PermissionKey) || permission === "search")
     : [];
   return {
     id: account.id,
@@ -61,5 +60,5 @@ export function normalizeStaffAccount(value: unknown): StaffAccount | null {
 }
 
 export function isPermissionKey(value: string): value is PermissionKey {
-  return DEFAULT_SALES_PERMISSIONS.includes(value as PermissionKey);
+  return DEFAULT_SALES_PERMISSIONS.includes(value as PermissionKey) || value === "search";
 }
