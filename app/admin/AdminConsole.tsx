@@ -3897,6 +3897,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                   <label>下次跟进<input type="date" value={record.nextFollowUpDate} onChange={(event) => updateCustomerOwner(record.id, "nextFollowUpDate", event.target.value)} /></label>
                   <label className="customer-resource-note">客户情况<textarea value={record.note} rows={2} onChange={(event) => updateCustomerOwner(record.id, "note", event.target.value)} placeholder="公共情况：项目、需求、预算、阶段" /></label>
                   <label className="customer-resource-note">员工私有备注<textarea value={record.privateNote} rows={2} onChange={(event) => updateCustomerOwner(record.id, "privateNote", event.target.value)} placeholder="仅归属员工和管理员可见" /></label>
+                  {record.leadSource === "meta" && (record.metaLeadId || record.metaFormId || record.metaAdId || record.metaCampaignId) ? <small className="customer-meta-attribution">
+                    Meta 归因：{record.metaLeadId ? `Lead ${record.metaLeadId}` : ""}{record.metaFormId ? ` · 表单 ${record.metaFormId}` : ""}{record.metaAdId ? ` · 广告 ${record.metaAdId}` : ""}{record.metaCampaignId ? ` · 广告系列 ${record.metaCampaignId}` : ""}
+                  </small> : null}
                 </div> : null}
                 {adminUnlocked ? (
                   <button className="danger" onClick={() => deleteCustomerOwner(record.id)}>删除</button>

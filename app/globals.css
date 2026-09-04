@@ -1551,6 +1551,15 @@ body:has(.admin-shell) {
   grid-column: span 2;
 }
 
+.customer-meta-attribution {
+  grid-column: 1 / -1;
+  color: #536985;
+  padding: 8px 10px;
+  border-left: 2px solid #1f5ec4;
+  background: #f5f8fc;
+  overflow-wrap: anywhere;
+}
+
 .customer-owner-recent .danger {
   border-color: #9f2f2f;
   background: #9f2f2f;
