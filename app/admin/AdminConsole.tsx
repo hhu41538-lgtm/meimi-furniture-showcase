@@ -247,6 +247,16 @@ function readPendingCustomerOwnerCount(): number {
     return 0;
   }
 }
+
+function dedupeCustomerOwnerRecords(records: CustomerOwnerRecord[]): CustomerOwnerRecord[] {
+  const seen = new Set<string>();
+  return records.filter((record) => {
+    const key = normalizeOwnerKey(record.country, record.phone);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
 const PRICING_STORAGE_KEY = "meimih-pricing-rules-v1";
 const WORKFLOW_PRICING_STORAGE_KEY = "meimih-workflow-pricing-rule-v1";
 const WORKFLOW_STAGE_STORAGE_KEY = "meimih-workflow-stage-v1";
@@ -1605,7 +1615,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     try {
       const stored = localStorage.getItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY);
       const parsed = stored ? JSON.parse(stored) as unknown : [];
-      if (Array.isArray(parsed)) pending = parsed.map(normalizeCustomerOwnerRecord).filter((record): record is CustomerOwnerRecord => Boolean(record));
+      if (Array.isArray(parsed)) pending = dedupeCustomerOwnerRecords(parsed.map(normalizeCustomerOwnerRecord).filter((record): record is CustomerOwnerRecord => Boolean(record)));
     } catch { return undefined; }
     if (!pending.length) return undefined;
     let cancelled = false;
@@ -2666,7 +2676,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             try {
               const stored = localStorage.getItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY);
               const pending = stored ? JSON.parse(stored) as unknown : [];
-              const next = Array.isArray(pending) ? [record, ...pending].slice(0, 100) : [record];
+              const queued = Array.isArray(pending) ? pending.map(normalizeCustomerOwnerRecord).filter((item): item is CustomerOwnerRecord => Boolean(item)) : [];
+              const next = dedupeCustomerOwnerRecords([record, ...queued]).slice(0, 100);
               localStorage.setItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY, JSON.stringify(next));
               setPendingCustomerOwnerCount(next.length);
             } catch { /* Keep the local record even if the retry queue cannot be written. */ }
