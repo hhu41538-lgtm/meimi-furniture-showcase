@@ -2015,6 +2015,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             record.metaFormId,
             record.metaAdId,
             record.metaCampaignId,
+            ...Object.values(record.metaFields ?? {}),
             record.note,
             record.privateNote,
             record.lastQuoteNo,
