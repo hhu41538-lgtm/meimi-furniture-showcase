@@ -2064,6 +2064,10 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     () => visibleCustomerOwners.filter((record) => record.leadSource === "meta" && !record.ownerAccountId).length,
     [visibleCustomerOwners],
   );
+  const metaAssignedCountBySales = useMemo(() => visibleCustomerOwners.reduce<Record<string, number>>((counts, record) => {
+    if (record.leadSource === "meta" && record.ownerAccountId) counts[record.ownerAccountId] = (counts[record.ownerAccountId] ?? 0) + 1;
+    return counts;
+  }, {}), [visibleCustomerOwners]);
   const dueFollowUpCount = useMemo(() => visibleCustomerOwners.filter(customerNeedsFollowUp).length, [visibleCustomerOwners]);
   const categoryOptions = useMemo(() => {
     return Array.from(new Set(entries.map((entry) => entry.category).filter(Boolean))).sort((left, right) => left.localeCompare(right));
@@ -3631,7 +3635,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                     <div className="account-permission-head">
                       <div>
                         <strong>{account.name}</strong>
-                        <small>销售密钥末四位 · {account.loginKey.slice(-4)} · 注册于 {shortDateTime(account.createdAt)}</small>
+                        <small>销售密钥末四位 · {account.loginKey.slice(-4)} · Meta客户 {metaAssignedCountBySales[account.id] ?? 0} 条 · 注册于 {shortDateTime(account.createdAt)}</small>
                       </div>
                       <div className="account-permission-actions">
                         <button type="button" className={account.active ? "account-active" : "account-inactive"} onClick={() => onUpdateSalesAccount(account.id, { active: !account.active })}>
