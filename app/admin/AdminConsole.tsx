@@ -1634,6 +1634,12 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
   }, [adminUnlocked, cloudSyncPending, isOnline, sharedSyncReady, storageReady, syncSharedWorkspaceState]);
 
   useEffect(() => {
+    if (!isOnline || !storageReady || !sharedSyncReady || !adminUnlocked || !cloudSyncPending) return undefined;
+    const timer = window.setInterval(() => { void syncSharedWorkspaceState(); }, 10000);
+    return () => window.clearInterval(timer);
+  }, [adminUnlocked, cloudSyncPending, isOnline, sharedSyncReady, storageReady, syncSharedWorkspaceState]);
+
+  useEffect(() => {
     if (!storageReady || !sharedSyncReady || session.role !== "sales") return undefined;
     const refresh = async () => {
       const result = await fetchSharedWorkspaceState();
@@ -2839,7 +2845,9 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
     try {
       const savedAt = persistLocalData();
       setAutoSaveStatus(`已手动保存 ${shortDateTime(savedAt)}`);
-      setStatus(`已保存 ${entries.length} 条资料、${pricingRules.length} 个公式和 ${quote.lines.length} 条报价明细`);
+      setStatus(isOnline
+        ? `已保存 ${entries.length} 条资料、${pricingRules.length} 个公式和 ${quote.lines.length} 条报价明细`
+        : "已保存到本机，联网后会自动同步云端");
       void syncSharedWorkspaceState();
     } catch {
       setStatus("保存失败：请检查浏览器是否允许本地存储");
