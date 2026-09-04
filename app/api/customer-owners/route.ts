@@ -86,11 +86,13 @@ export async function POST(request: Request) {
       const accountRows = await sql`SELECT id, name FROM meimi_staff_accounts WHERE id = ${salesAccountId} AND role = 'sales' AND active = TRUE LIMIT 1`;
       if (!accountRows[0]) return errorResponse("销售账号不存在或已停用", 404, "SALES_ACCOUNT_NOT_FOUND");
       const leads = await sql`SELECT owner_key, record FROM meimi_customer_owners WHERE record->>'leadSource' = 'meta' AND COALESCE(record->>'ownerAccountId', '') = '' ORDER BY updated_at ASC LIMIT ${quantity}`;
+      let assigned = 0;
       for (const lead of leads as Array<{ owner_key: string; record: Record<string, unknown> }>) {
         const record = { ...lead.record, ownerAccountId: String(accountRows[0].id), owner: String(accountRows[0].name), updatedAt: new Date().toISOString() };
-        await sql`UPDATE meimi_customer_owners SET record = ${JSON.stringify(record)}::jsonb, updated_at = NOW() WHERE owner_key = ${lead.owner_key} AND COALESCE(record->>'ownerAccountId', '') = ''`;
+        const updated = await sql`UPDATE meimi_customer_owners SET record = ${JSON.stringify(record)}::jsonb, updated_at = NOW() WHERE owner_key = ${lead.owner_key} AND COALESCE(record->>'ownerAccountId', '') = '' RETURNING owner_key`;
+        if (updated.length) assigned += 1;
       }
-      return NextResponse.json({ ok: true, assigned: leads.length, requested: quantity, salesAccountId, salesAccountName: String(accountRows[0].name) });
+      return NextResponse.json({ ok: true, assigned, requested: quantity, salesAccountId, salesAccountName: String(accountRows[0].name) });
     }
     if (body.action === "replace" && identity.role === "admin" && Array.isArray(body.records) && body.records.length <= 500) {
       for (const item of body.records) {
