@@ -1407,6 +1407,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
   const [sharedSyncReady, setSharedSyncReady] = useState(false);
   const [cloudSyncStatus, setCloudSyncStatus] = useState("正在连接云端资料");
   const [isOnline, setIsOnline] = useState(true);
+  const [cloudSyncPending, setCloudSyncPending] = useState(false);
   const cloudVersionRef = useRef<number | null>(null);
   const [pdfDropActive, setPdfDropActive] = useState(false);
   const [pdfImportState, setPdfImportState] = useState<PdfImportState>({ phase: "idle", fileName: "", message: "等待导入产品图册", importedCount: 0 });
@@ -1597,8 +1598,10 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
     });
     if (result.kind === "saved") {
       applySharedWorkspaceState(result.state);
+      setCloudSyncPending(false);
       setStatus(`云端已同步 ${entries.length} 条资料和 ${pricingRules.length} 个报价公式`);
     } else {
+      setCloudSyncPending(true);
       setCloudSyncStatus(result.message);
       if (result.kind === "conflict") setStatus("云端已有其他管理员更新，请刷新后再保存");
     }
@@ -1623,6 +1626,12 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
     const timer = window.setTimeout(() => { void syncSharedWorkspaceState(); }, 900);
     return () => window.clearTimeout(timer);
   }, [adminUnlocked, entries, pricingRules, sharedSyncReady, storageReady, syncSharedWorkspaceState, workflowPricingRuleId]);
+
+  useEffect(() => {
+    if (!isOnline || !storageReady || !sharedSyncReady || !adminUnlocked || !cloudSyncPending) return undefined;
+    const timer = window.setTimeout(() => { void syncSharedWorkspaceState(); }, 400);
+    return () => window.clearTimeout(timer);
+  }, [adminUnlocked, cloudSyncPending, isOnline, sharedSyncReady, storageReady, syncSharedWorkspaceState]);
 
   useEffect(() => {
     if (!storageReady || !sharedSyncReady || session.role !== "sales") return undefined;
@@ -3043,7 +3052,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
           <p className="admin-save-state">
             {autoSaveStatus}
             {lastSavedAt ? ` · 最近保存 ${shortDateTime(lastSavedAt)}` : ""}
-            {` · ${isOnline ? cloudSyncStatus : "当前离线，本地资料仍会保存"}`}
+            {` · ${isOnline ? (cloudSyncPending ? "等待云端重试" : cloudSyncStatus) : "当前离线，本地资料仍会保存"}`}
           </p>
         </div>
         <div className="admin-header-actions">
