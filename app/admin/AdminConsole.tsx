@@ -1409,6 +1409,7 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
   const [isOnline, setIsOnline] = useState(true);
   const [cloudSyncPending, setCloudSyncPending] = useState(false);
   const cloudVersionRef = useRef<number | null>(null);
+  const cloudSyncInFlightRef = useRef(false);
   const [pdfDropActive, setPdfDropActive] = useState(false);
   const [pdfImportState, setPdfImportState] = useState<PdfImportState>({ phase: "idle", fileName: "", message: "等待导入产品图册", importedCount: 0 });
   const [status, setStatus] = useState(`已进入${session.role === "admin" ? "管理员" : "销售"}版：${session.name}`);
@@ -1586,24 +1587,29 @@ export default function AdminConsole({ initialEntries, session, salesAccounts, o
   }, [applySharedWorkspaceState, storageReady]);
 
   const syncSharedWorkspaceState = useCallback(async () => {
-    if (!adminUnlocked || !sharedSyncReady || cloudVersionRef.current === null) return;
+    if (!adminUnlocked || !sharedSyncReady || cloudVersionRef.current === null || cloudSyncInFlightRef.current) return;
+    cloudSyncInFlightRef.current = true;
     setCloudSyncStatus("正在发布产品与报价公式");
-    const result = await publishSharedWorkspaceState({
-      entries,
-      pricingRules,
-      workflowPricingRuleId,
-      version: cloudVersionRef.current,
-      updatedBy: session.name,
-      adminKey: ADMIN_LOGIN_KEY,
-    });
-    if (result.kind === "saved") {
-      applySharedWorkspaceState(result.state);
-      setCloudSyncPending(false);
-      setStatus(`云端已同步 ${entries.length} 条资料和 ${pricingRules.length} 个报价公式`);
-    } else {
-      setCloudSyncPending(true);
-      setCloudSyncStatus(result.message);
-      if (result.kind === "conflict") setStatus("云端已有其他管理员更新，请刷新后再保存");
+    try {
+      const result = await publishSharedWorkspaceState({
+        entries,
+        pricingRules,
+        workflowPricingRuleId,
+        version: cloudVersionRef.current,
+        updatedBy: session.name,
+        adminKey: ADMIN_LOGIN_KEY,
+      });
+      if (result.kind === "saved") {
+        applySharedWorkspaceState(result.state);
+        setCloudSyncPending(false);
+        setStatus(`云端已同步 ${entries.length} 条资料和 ${pricingRules.length} 个报价公式`);
+      } else {
+        setCloudSyncPending(true);
+        setCloudSyncStatus(result.message);
+        if (result.kind === "conflict") setStatus("云端已有其他管理员更新，请刷新后再保存");
+      }
+    } finally {
+      cloudSyncInFlightRef.current = false;
     }
   }, [adminUnlocked, applySharedWorkspaceState, entries, pricingRules, session.name, sharedSyncReady, workflowPricingRuleId]);
 
