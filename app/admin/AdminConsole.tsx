@@ -4567,7 +4567,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                 <div className="generated-customer-copy">
                   <span>客户版报价输出</span>
                   <button onClick={copyCustomerQuoteText}>复制客户版报价单</button>
-                  <button onClick={exportQuoteTemplate} disabled={isExportingQuote}><FileDown size={15} />{isExportingQuote ? "正在导出..." : "导出 Excel 报价单"}</button>
+                  <button onClick={exportQuoteTemplate} disabled={isExportingQuote} aria-busy={isExportingQuote} title={isExportingQuote ? "正在生成报价文件，请稍候" : "导出 Excel 报价单"}><FileDown size={15} />{isExportingQuote ? "正在导出..." : "导出 Excel 报价单"}</button>
                 </div>
               </div>
             </div>
