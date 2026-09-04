@@ -88,7 +88,8 @@ export async function POST(request: Request) {
       const leads = await sql`SELECT owner_key, record FROM meimi_customer_owners WHERE record->>'leadSource' = 'meta' AND COALESCE(record->>'ownerAccountId', '') = '' ORDER BY updated_at ASC LIMIT ${quantity}`;
       let assigned = 0;
       for (const lead of leads as Array<{ owner_key: string; record: Record<string, unknown> }>) {
-        const record = { ...lead.record, ownerAccountId: String(accountRows[0].id), owner: String(accountRows[0].name), updatedAt: new Date().toISOString() };
+        const assignedAt = new Date().toISOString();
+        const record = { ...lead.record, ownerAccountId: String(accountRows[0].id), owner: String(accountRows[0].name), assignedAt, assignedBy: "管理员", updatedAt: assignedAt };
         const updated = await sql`UPDATE meimi_customer_owners SET record = ${JSON.stringify(record)}::jsonb, updated_at = NOW() WHERE owner_key = ${lead.owner_key} AND COALESCE(record->>'ownerAccountId', '') = '' RETURNING owner_key`;
         if (updated.length) assigned += 1;
       }

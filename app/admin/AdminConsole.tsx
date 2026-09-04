@@ -198,6 +198,8 @@ type CustomerOwnerRecord = {
   ownerAccountId?: string;
   owner: string;
   ownerContact: string;
+  assignedAt?: string;
+  assignedBy?: string;
   createdAt: string;
   updatedAt: string;
   tier: CustomerTier;
@@ -725,6 +727,8 @@ function normalizeCustomerOwnerRecord(value: unknown): CustomerOwnerRecord | nul
     ownerAccountId: typeof record.ownerAccountId === "string" ? record.ownerAccountId : "",
     owner: record.owner,
     ownerContact: record.ownerContact,
+    assignedAt: typeof record.assignedAt === "string" ? record.assignedAt : "",
+    assignedBy: typeof record.assignedBy === "string" ? record.assignedBy : "",
     createdAt: record.createdAt,
     updatedAt: typeof record.updatedAt === "string" ? record.updatedAt : record.createdAt,
     tier: normalizeCustomerTier(record.tier),
@@ -3900,7 +3904,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                   }}
                 >
                   <span><b>{record.tier}类</b> <b>{customerFollowStatusLabels[record.followStatus]}</b> {record.country} / {record.phone}</span>
-                  <small>{record.owner} · {record.client || "未填客户"} · {record.clientContact || "未填联系人"} · {customerLeadSourceLabels[record.leadSource]}{record.metaCampaignId ? ` · 广告系列 ${record.metaCampaignId}` : ""} · 更新 {shortDateTime(record.updatedAt)}</small>
+                  <small>{record.owner} · {record.client || "未填客户"} · {record.clientContact || "未填联系人"} · {customerLeadSourceLabels[record.leadSource]}{record.metaCampaignId ? ` · 广告系列 ${record.metaCampaignId}` : ""}{record.assignedAt ? ` · 分配于 ${shortDateTime(record.assignedAt)}` : ""} · 更新 {shortDateTime(record.updatedAt)}</small>
                   <small>{ownerIdentityLabel(record.country, record.phone)}</small>
                   <small>{customerFollowUpLabel(record)}</small>
                   <small>
