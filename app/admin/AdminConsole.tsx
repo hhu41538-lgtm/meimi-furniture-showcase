@@ -1704,7 +1704,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     localStorage.setItem(PRICING_STORAGE_KEY, JSON.stringify(normalizedRules));
     if (state.workflowPricingRuleId) localStorage.setItem(workflowPricingStorageKey, state.workflowPricingRuleId);
     setSelectedEntryId((current) => normalizedEntries.some((entry) => entry.id === current) ? current : normalizedEntries[0]?.id ?? "");
-    setCloudSyncStatus(`已同步云端 V${state.version} · ${shortDateTime(state.updatedAt)}`);
+    setCloudSyncStatus(`已同步云端 V${state.version} · ${shortDateTime(state.updatedAt)} · ${state.updatedBy || "系统"}发布`);
   }, [workflowPricingStorageKey]);
 
   const refreshSharedWorkspaceState = useCallback(async (announce = false) => {
