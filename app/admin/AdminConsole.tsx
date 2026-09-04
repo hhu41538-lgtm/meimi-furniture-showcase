@@ -1666,7 +1666,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       if (!cancelled) setStatus("客户归属云端暂时无法读取，当前继续使用本机资料");
     });
     return () => { cancelled = true; };
-  }, [adminUnlocked, customerOwnerSyncKey, isOnline, session.accountId, storageReady]);
+  }, [adminUnlocked, customerOwnerSyncKey, isOnline, pendingCustomerOwnerVersion, session.accountId, storageReady]);
 
   useEffect(() => {
     if (adminUnlocked || !isOnline || !staffSyncKey) return undefined;
