@@ -20,8 +20,33 @@ function text(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+const countryAliases: Record<string, string> = {
+  china: "cn", 中国: "cn", 中国大陆: "cn", 内地: "cn", 大陆: "cn",
+  america: "us", usa: "us", 美国: "us", unitedstates: "us",
+  india: "in", 印度: "in", unitedkingdom: "gb", 英国: "gb",
+  australia: "au", 澳大利亚: "au", singapore: "sg", 新加坡: "sg",
+  hongkong: "hk", 香港: "hk", uae: "ae", 阿联酋: "ae", 迪拜: "ae",
+  saudiarabia: "sa", 沙特: "sa",
+};
+const dialingCodes: Record<string, string> = { cn: "86", us: "1", gb: "44", in: "91", au: "61", sg: "65", hk: "852", ae: "971", sa: "966" };
+
+function normalizeCountry(country: string) {
+  const value = country.trim().toLowerCase().replace(/[\s._-]+/g, "");
+  return countryAliases[value] ?? value;
+}
+
+function normalizePhone(country: string, phone: string) {
+  let digits = phone.replace(/\D/g, "");
+  if (digits.startsWith("00")) digits = digits.slice(2);
+  const code = dialingCodes[normalizeCountry(country)];
+  if (code && digits.startsWith(code) && digits.length > code.length + 6) digits = digits.slice(code.length);
+  return digits.replace(/^0+(?=\d{7,}$)/, "");
+}
+
 function normalizeOwnerKey(country: string, phone: string) {
-  return `${country.trim().toLowerCase().replace(/\s+/g, " ")}::${phone.replace(/\D/g, "") || phone.trim().toLowerCase()}`;
+  const normalizedCountry = normalizeCountry(country);
+  const normalizedPhone = normalizePhone(country, phone);
+  return normalizedCountry && normalizedPhone ? `${normalizedCountry}:${normalizedPhone}` : "";
 }
 
 type MetaLeadRow = { leadgen_id: string; raw_payload: Record<string, unknown> };
@@ -42,8 +67,10 @@ export async function POST(request: Request) {
     let missingFields = 0;
     for (const row of rows) {
       const details = row.raw_payload?.details as MetaLeadDetails | undefined;
-      const country = text(details?.country);
-      const phone = text(details?.phone);
+      const rawCountry = text(details?.country);
+      const rawPhone = text(details?.phone);
+      const country = normalizeCountry(rawCountry);
+      const phone = normalizePhone(rawCountry, rawPhone);
       if (!country || !phone) {
         missingFields += 1;
         continue;
@@ -58,8 +85,8 @@ export async function POST(request: Request) {
       const now = new Date().toISOString();
       const record = {
         id: `${ownerKey}:meta:${row.leadgen_id}`,
-        country,
-        phone,
+        country: rawCountry,
+        phone: rawPhone,
         client: text(details?.name),
         clientContact: text(details?.company) || text(details?.email),
         ownerAccountId: "",
