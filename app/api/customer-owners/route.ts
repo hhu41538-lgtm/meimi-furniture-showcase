@@ -19,7 +19,11 @@ function errorResponse(message: string, status: number, code: string) {
 }
 
 function normalizeCustomerOwnerRecord(value: Record<string, unknown>) {
-  const leadSource = typeof value.leadSource === "string" && CUSTOMER_LEAD_SOURCES.has(value.leadSource) ? value.leadSource : "other";
+  const leadSource = value.leadSource === undefined
+    ? "manual"
+    : typeof value.leadSource === "string" && CUSTOMER_LEAD_SOURCES.has(value.leadSource)
+      ? value.leadSource
+      : "other";
   return { ...value, leadSource };
 }
 
