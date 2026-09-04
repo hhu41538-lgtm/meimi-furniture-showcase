@@ -3330,7 +3330,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             <button className="sales-cockpit-card-hit" type="button" onClick={() => openModule("customers")} aria-label="进入客户池">
               <span className="sales-cockpit-card-number" aria-hidden="true">01</span>
               <span className="sales-cockpit-card-icon" aria-hidden="true"><UsersRound size={24} strokeWidth={1.8} /></span>
-              <span className="sales-cockpit-card-copy"><strong>客户池</strong><small>先用国家 + 电话查归属，再录入和跟进。Meta 线索 {customerLeadSourceCounts.meta} 条。</small></span>
+              <span className="sales-cockpit-card-copy"><strong>客户池</strong><small>国家 + 电话查归属 · Meta 线索 {customerLeadSourceCounts.meta} 条{pendingCustomerOwnerCount ? ` · 待同步 ${pendingCustomerOwnerCount} 条` : ""}</small></span>
               <span className="sales-cockpit-card-links" aria-hidden="true"><span>客户列表</span><span>待跟进</span><span>A 类客户</span></span>
               <span className="sales-cockpit-card-stats" aria-hidden="true"><b>{visibleCustomerOwners.length}</b><small>客户总数</small><b>{dueFollowUpCount}</b><small>待跟进</small></span>
               <span className="sales-cockpit-card-arrow" aria-hidden="true"><ArrowUpRight size={19} /></span>

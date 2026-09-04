@@ -59,10 +59,7 @@ function formatGeneratedAt(value: string) {
 }
 
 function formatDimension(line: TemplateQuoteLine) {
-  return line.spec || Object.entries(line.variables)
-    .filter(([, value]) => Number.isFinite(value) && value > 0)
-    .map(([key, value]) => `${key}: ${value}`)
-    .join(" / ");
+  return line.spec.trim();
 }
 
 async function imageBuffer(url: string) {
