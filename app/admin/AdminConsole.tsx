@@ -1634,7 +1634,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
         const parsedOwners = JSON.parse(storedCustomerOwners) as unknown;
         if (Array.isArray(parsedOwners)) {
           const normalizedOwners = parsedOwners.map(normalizeCustomerOwnerRecord).filter((record): record is CustomerOwnerRecord => Boolean(record));
-          if (normalizedOwners.length) setCustomerOwners(normalizedOwners);
+          const accessibleOwners = session.role === "admin" ? normalizedOwners : normalizedOwners.filter((record) => record.ownerAccountId === session.accountId);
+          if (accessibleOwners.length) setCustomerOwners(accessibleOwners);
         }
       }
     } catch {
@@ -1644,7 +1645,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       setPendingCustomerOwnerCount(readPendingCustomerOwnerCount());
       setAutoSaveStatus("本地资料已读取，后续修改会自动保存");
     }
-  }, [legacyQuoteStorageKey, quoteHistoryStorageKey, quoteStorageKey, session.name, session.role, workflowPricingStorageKey, workflowStageStorageKey]);
+  }, [legacyQuoteStorageKey, quoteHistoryStorageKey, quoteStorageKey, session.accountId, session.name, session.role, workflowPricingStorageKey, workflowStageStorageKey]);
 
   useEffect(() => {
     if (!storageReady || !isOnline || !customerOwnerSyncKey) return undefined;
@@ -1652,19 +1653,20 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     void fetchSharedCustomerOwners(customerOwnerSyncKey).then((records) => {
       if (cancelled) return;
       const normalized = records.map(normalizeCustomerOwnerRecord).filter((record): record is CustomerOwnerRecord => Boolean(record));
-      const pending = adminUnlocked ? [] : readPendingCustomerOwners();
-      const merged = dedupeCustomerOwnerRecords([...normalized, ...pending]);
+      const accessible = adminUnlocked ? normalized : normalized.filter((record) => record.ownerAccountId === session.accountId);
+      const pending = adminUnlocked ? [] : readPendingCustomerOwners().filter((record) => record.ownerAccountId === session.accountId);
+      const merged = dedupeCustomerOwnerRecords([...accessible, ...pending]);
       setCustomerOwners((current) => merged.map((record) => ({
         ...record,
         privateNote: current.find((item) => item.id === record.id)?.privateNote ?? record.privateNote,
       })));
       setCustomerOwnerCloudReady(true);
-      setStatus(`已读取 ${normalized.length} 条云端客户归属${pending.length ? `，保留 ${pending.length} 条待同步客户` : ""}`);
+      setStatus(`已读取 ${accessible.length} 条云端客户归属${pending.length ? `，保留 ${pending.length} 条待同步客户` : ""}`);
     }).catch(() => {
       if (!cancelled) setStatus("客户归属云端暂时无法读取，当前继续使用本机资料");
     });
     return () => { cancelled = true; };
-  }, [adminUnlocked, customerOwnerSyncKey, isOnline, storageReady]);
+  }, [adminUnlocked, customerOwnerSyncKey, isOnline, session.accountId, storageReady]);
 
   useEffect(() => {
     if (adminUnlocked || !isOnline || !staffSyncKey) return undefined;
@@ -2054,6 +2056,10 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       { manual: 0, meta: 0, website: 0, referral: 0, other: 0 },
     );
   }, [visibleCustomerOwners]);
+  const metaUnassignedCount = useMemo(
+    () => visibleCustomerOwners.filter((record) => record.leadSource === "meta" && !record.ownerAccountId).length,
+    [visibleCustomerOwners],
+  );
   const dueFollowUpCount = useMemo(() => visibleCustomerOwners.filter(customerNeedsFollowUp).length, [visibleCustomerOwners]);
   const categoryOptions = useMemo(() => {
     return Array.from(new Set(entries.map((entry) => entry.category).filter(Boolean))).sort((left, right) => left.localeCompare(right));
@@ -3533,7 +3539,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             <button className="sales-cockpit-card-hit" type="button" onClick={() => openModule("customers")} aria-label="进入客户池">
               <span className="sales-cockpit-card-number" aria-hidden="true">01</span>
               <span className="sales-cockpit-card-icon" aria-hidden="true"><UsersRound size={24} strokeWidth={1.8} /></span>
-              <span className="sales-cockpit-card-copy"><strong>客户池</strong><small>国家 + 电话查归属 · Meta 线索 {customerLeadSourceCounts.meta} 条{pendingCustomerOwnerCount ? ` · 待同步 ${pendingCustomerOwnerCount} 条` : ""}</small></span>
+              <span className="sales-cockpit-card-copy"><strong>客户池</strong><small>国家 + 电话查归属 · Meta 线索 {customerLeadSourceCounts.meta} 条{adminUnlocked && metaUnassignedCount ? ` · 待分配 ${metaUnassignedCount} 条` : ""}{pendingCustomerOwnerCount ? ` · 待同步 ${pendingCustomerOwnerCount} 条` : ""}</small></span>
               <span className="sales-cockpit-card-links" aria-hidden="true"><span>客户列表</span><span>待跟进</span><span>A 类客户</span></span>
               <span className="sales-cockpit-card-stats" aria-hidden="true"><b>{visibleCustomerOwners.length}</b><small>客户总数</small><b>{dueFollowUpCount}</b><small>待跟进</small></span>
               <span className="sales-cockpit-card-arrow" aria-hidden="true"><ArrowUpRight size={19} /></span>
@@ -3686,7 +3692,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               <CloudUpload size={15} />{isSyncingMetaLeads ? "同步中..." : "同步并导入 Meta 线索"}
             </button>
             <div className="meta-assignment-controls">
-              <strong>管理员分配 Meta 线索</strong>
+              <strong>管理员分配 Meta 线索{metaUnassignedCount ? ` · 待分配 ${metaUnassignedCount} 条` : " · 当前没有待分配线索"}</strong>
               <select aria-label="选择接收 Meta 线索的销售" value={metaAssignmentSalesId} onChange={(event) => setMetaAssignmentSalesId(event.target.value)}>
                 <option value="">选择已注册销售</option>
                 {salesAccounts.filter((account) => account.active).map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
