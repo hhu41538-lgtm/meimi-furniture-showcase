@@ -60,6 +60,10 @@ function formatGeneratedAt(value: string) {
     : new Intl.DateTimeFormat("zh-CN", { dateStyle: "short", timeStyle: "short" }).format(date);
 }
 
+function safeFilenamePart(value: string) {
+  return value.trim().replace(/[<>:"/\\|?*\u0000-\u001f]/g, "-").slice(0, 60);
+}
+
 function formatDimension(line: TemplateQuoteLine) {
   const spec = typeof line.spec === "string" ? line.spec.trim() : "";
   return /^(basePrice|unitPrice|sizeUpgrade|materialUpgrade|customOption)\s*:/i.test(spec) ? "" : spec;
@@ -146,7 +150,8 @@ export async function downloadQuotationTemplate(quote: TemplateQuote, totals: Te
   const link = document.createElement("a");
   const objectUrl = URL.createObjectURL(blob);
   link.href = objectUrl;
-  link.download = `${quote.quoteNo || "meimih-quotation"}.xlsx`;
+  const filename = [quote.quoteNo, quote.client, quote.quoteDate].map(safeFilenamePart).filter(Boolean).join("-") || "meimih-quotation";
+  link.download = `${filename}.xlsx`;
   link.click();
   window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
 }
