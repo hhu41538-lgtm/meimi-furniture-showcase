@@ -3581,7 +3581,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                     setStatus("已清空客户搜索");
                   }
                 }}
-                placeholder="搜索国家、电话、客户、联系人、销售、等级或备注"
+                placeholder="搜索国家、电话、客户、联系人、销售、来源、等级或备注"
                 aria-label="搜索客户资源"
               />
               <button className="customer-owner-search-clear" type="button" onClick={() => { setOwnerSearchQuery(""); setStatus("已清空客户搜索"); }} disabled={!ownerSearchQuery} aria-label="清空客户搜索" title="清空搜索"><X size={14} /></button>
