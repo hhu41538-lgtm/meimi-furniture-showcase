@@ -1598,15 +1598,26 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     let cancelled = false;
     void Promise.allSettled(pending.map((record) => publishCustomerOwner(staffSyncKey, normalizeOwnerKey(record.country, record.phone), record))).then((results) => {
       if (cancelled) return;
+      const conflictedKeys = new Set<string>();
       const conflicts = results
         .filter((result): result is PromiseRejectedResult => result.status === "rejected" && isCustomerOwnerConflict(result.reason))
-        .map((result) => customerOwnerConflictMessage(result.reason));
+        .map((result, index) => {
+          conflictedKeys.add(normalizeOwnerKey(pending[index].country, pending[index].phone));
+          return customerOwnerConflictMessage(result.reason);
+        });
       const failed = pending.filter((_, index) => {
         const result = results[index];
         return result?.status === "rejected" && !isCustomerOwnerConflict(result.reason);
       });
       if (failed.length) localStorage.setItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY, JSON.stringify(failed));
       else localStorage.removeItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY);
+      if (conflictedKeys.size) {
+        setCustomerOwners((current) => {
+          const next = current.filter((record) => !conflictedKeys.has(normalizeOwnerKey(record.country, record.phone)));
+          localStorage.setItem(CUSTOMER_OWNER_STORAGE_KEY, JSON.stringify(next));
+          return next;
+        });
+      }
       if (conflicts.length) setStatus(conflicts[0]);
       else setStatus(failed.length ? `还有 ${failed.length} 条客户归属等待同步` : `已补同步 ${pending.length} 条客户归属`);
     });
