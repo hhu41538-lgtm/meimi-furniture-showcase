@@ -347,6 +347,17 @@ body:has(.admin-shell) {
   margin-top: 14px;
 }
 
+.meta-integration-check {
+  margin: 10px 0 0 8px;
+}
+
+.meta-integration-result {
+  display: block;
+  margin-top: 10px;
+  color: #557241;
+  line-height: 1.5;
+}
+
 .admin-main-content {
   min-width: 0;
   padding: 42px clamp(18px, 4vw, 64px) 72px;

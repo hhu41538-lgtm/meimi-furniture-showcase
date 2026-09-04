@@ -1466,6 +1466,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [isRefreshingSharedWorkspace, setIsRefreshingSharedWorkspace] = useState(false);
   const [metaWebhookCopied, setMetaWebhookCopied] = useState(false);
   const [isSyncingMetaLeads, setIsSyncingMetaLeads] = useState(false);
+  const [metaConfigStatus, setMetaConfigStatus] = useState("");
+  const [isCheckingMetaConfig, setIsCheckingMetaConfig] = useState(false);
   const cloudVersionRef = useRef<number | null>(null);
   const cloudSyncInFlightRef = useRef(false);
   const sharedWorkspaceRefreshInFlightRef = useRef(false);
@@ -3143,6 +3145,29 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     }
   }
 
+  async function checkMetaConfig() {
+    if (!adminUnlocked || isCheckingMetaConfig) return;
+    setIsCheckingMetaConfig(true);
+    try {
+      const response = await fetch("/api/meta/status", { headers: { "x-meimi-admin-key": adminSyncKey }, cache: "no-store" });
+      const payload = await response.json().catch(() => ({})) as { message?: string; config?: Record<string, boolean>; pending?: number; imported?: number; readyForRetrieval?: boolean };
+      if (!response.ok || !payload.config) throw new Error(payload.message || "Meta 配置检查失败");
+      const missing = Object.entries({
+        数据库: payload.config.database,
+        Webhook验证令牌: payload.config.webhookVerifyToken,
+        AppSecret: payload.config.appSecret,
+        PageAccessToken: payload.config.pageAccessToken,
+      }).filter(([, ready]) => !ready).map(([label]) => label);
+      const summary = " · 待处理 " + (payload.pending ?? 0) + " 条 · 已导入 " + (payload.imported ?? 0) + " 条";
+      setMetaConfigStatus((missing.length ? "待配置：" + missing.join("、") : "配置齐全") + summary);
+      setStatus(payload.readyForRetrieval ? "Meta 接入配置检查通过，可以同步线索" : "Meta 接入配置尚未完成，请按提示补齐环境变量");
+    } catch (error) {
+      setMetaConfigStatus(error instanceof Error ? error.message : "Meta 配置检查失败");
+    } finally {
+      setIsCheckingMetaConfig(false);
+    }
+  }
+
   function save() {
     try {
       const savedAt = persistLocalData();
@@ -3576,6 +3601,10 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             <button type="button" className="meta-integration-sync" onClick={() => void syncMetaLeads()} disabled={!isOnline || isSyncingMetaLeads} aria-busy={isSyncingMetaLeads} title={!isOnline ? "联网后才能同步 Meta 线索" : "读取 Meta 线索并导入客户池"}>
               <CloudUpload size={15} />{isSyncingMetaLeads ? "同步中..." : "同步并导入 Meta 线索"}
             </button>
+            <button type="button" className="meta-integration-check" onClick={() => void checkMetaConfig()} disabled={isCheckingMetaConfig} aria-busy={isCheckingMetaConfig} title="检查云端和 Meta 环境变量是否齐全">
+              <Settings2 size={15} />{isCheckingMetaConfig ? "检查中..." : "检查接入配置"}
+            </button>
+            {metaConfigStatus ? <small className="meta-integration-result" role="status" aria-live="polite">{metaConfigStatus}</small> : null}
           </section>
           <section className="pdf-import-panel" aria-label="PDF产品图册导入">
             <div className="admin-section-heading">
