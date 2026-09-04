@@ -29,17 +29,21 @@ export async function GET(request: Request) {
   };
   let pending = 0;
   let imported = 0;
+  let needsMapping = 0;
   if (url) {
     try {
       const sql = neon<false, false>(url);
       const rows = await sql`SELECT status, COUNT(*)::int AS count FROM meimi_meta_leads GROUP BY status`;
       for (const row of rows as Array<{ status?: unknown; count?: unknown }>) {
         if (row.status === "imported" || row.status === "imported_duplicate") imported += Number(row.count) || 0;
-        else pending += Number(row.count) || 0;
+        else {
+          pending += Number(row.count) || 0;
+          if (row.status === "needs_mapping") needsMapping += Number(row.count) || 0;
+        }
       }
     } catch {
       // The webhook creates this table lazily; configuration status remains useful before first delivery.
     }
   }
-  return NextResponse.json({ ok: true, config, readyForWebhook: config.database && config.webhookVerifyToken, readyForRetrieval: config.database && config.pageAccessToken, pending, imported });
+  return NextResponse.json({ ok: true, config, readyForWebhook: config.database && config.webhookVerifyToken, readyForRetrieval: config.database && config.pageAccessToken, pending, needsMapping, imported });
 }
