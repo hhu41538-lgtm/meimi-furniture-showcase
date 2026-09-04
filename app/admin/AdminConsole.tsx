@@ -2007,7 +2007,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       ? tierMatches
       : tierMatches.filter((record) => record.leadSource === customerLeadSourceFilter);
     const assignmentMatches = customerAssignmentFilter === "unassigned"
-      ? sourceMatches.filter((record) => record.leadSource === "meta" && !record.ownerAccountId)
+      ? sourceMatches.filter((record) => !record.ownerAccountId)
       : sourceMatches;
     const matches = normalized
       ? assignmentMatches.filter((record) =>
@@ -3872,7 +3872,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             </label>
             <div className="customer-tier-summary" role="group" aria-label="客户资源筛选">
               <button className={customerTierFilter === "all" && customerFollowFilter === "all" && customerStatusFilter === "all" && customerLeadSourceFilter === "all" && customerAssignmentFilter === "all" ? "active" : ""} aria-pressed={customerTierFilter === "all" && customerFollowFilter === "all" && customerStatusFilter === "all" && customerLeadSourceFilter === "all" && customerAssignmentFilter === "all"} onClick={() => { setCustomerTierFilter("all"); setCustomerFollowFilter("all"); setCustomerStatusFilter("all"); setCustomerLeadSourceFilter("all"); setCustomerAssignmentFilter("all"); setStatus("已显示全部客户"); }}>全部 {visibleCustomerOwners.length}</button>
-              {adminUnlocked ? <button className={customerAssignmentFilter === "unassigned" ? "active" : ""} aria-pressed={customerAssignmentFilter === "unassigned"} onClick={() => { const next = customerAssignmentFilter === "unassigned" ? "all" : "unassigned"; setCustomerAssignmentFilter(next); setStatus(next === "unassigned" ? "已筛选待分配 Meta 线索" : "已取消待分配筛选"); }}>待分配 {metaUnassignedCount}</button> : null}
+              {adminUnlocked ? <button className={customerAssignmentFilter === "unassigned" ? "active" : ""} aria-pressed={customerAssignmentFilter === "unassigned"} onClick={() => { const next = customerAssignmentFilter === "unassigned" ? "all" : "unassigned"; setCustomerAssignmentFilter(next); setStatus(next === "unassigned" ? "已筛选待分配线索" : "已取消待分配筛选"); }}>待分配 {unassignedLeadCount}</button> : null}
               <button className={customerFollowFilter === "due" ? "active" : ""} aria-pressed={customerFollowFilter === "due"} onClick={() => setCustomerFollowFilter((current) => { const next = current === "due" ? "all" : "due"; setStatus(next === "due" ? "已筛选待跟进客户" : "已取消待跟进筛选"); return next; })}>待跟进 {dueFollowUpCount}</button>
               <button className={customerLeadSourceFilter === "meta" ? "active" : ""} aria-pressed={customerLeadSourceFilter === "meta"} onClick={() => { setCustomerLeadSourceFilter("meta"); setStatus("已筛选 Meta 广告客户"); }}>Meta {customerLeadSourceCounts.meta}</button>
               <button className={customerLeadSourceFilter === "website" ? "active" : ""} aria-pressed={customerLeadSourceFilter === "website"} onClick={() => { setCustomerLeadSourceFilter("website"); setStatus("已筛选独立站客户"); }}>独立站 {customerLeadSourceCounts.website}</button>
