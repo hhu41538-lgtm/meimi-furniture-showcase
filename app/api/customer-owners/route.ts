@@ -101,7 +101,7 @@ export async function POST(request: Request) {
         if (!ownerKey) continue;
         if (!source) continue;
         const record: Record<string, unknown> = { ...normalizeCustomerOwnerRecord(source), privateNote: "" };
-        await sql`INSERT INTO meimi_customer_owners (owner_key, record) VALUES (${ownerKey}, ${JSON.stringify(record)}::jsonb)`;
+        await sql`INSERT INTO meimi_customer_owners (owner_key, record) VALUES (${ownerKey}, ${JSON.stringify(record)}::jsonb) ON CONFLICT (owner_key) DO UPDATE SET record = EXCLUDED.record, updated_at = NOW()`;
       }
       return NextResponse.json({ ok: true });
     }
