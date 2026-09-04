@@ -11,6 +11,7 @@ import {
   Calculator,
   CheckCircle2,
   Copy,
+  CloudUpload,
   ExternalLink,
   FileDown,
   FileText,
@@ -3243,6 +3244,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
           </div>
           {session.role === "sales" ? <button type="button" onClick={() => void refreshSharedWorkspaceState(true)} disabled={isRefreshingSharedWorkspace} aria-busy={isRefreshingSharedWorkspace} title="立即读取管理员发布的产品和报价公式">
             <RotateCcw size={15} />{isRefreshingSharedWorkspace ? "刷新中" : "刷新云端目录"}
+          </button> : null}
+          {session.role === "sales" && pendingCustomerOwnerCount ? <button type="button" onClick={() => { setPendingCustomerOwnerVersion((current) => current + 1); setStatus("正在重试同步待上传客户"); }} disabled={!isOnline} title={isOnline ? "立即重试上传待同步客户" : "联网后才能同步客户"}>
+            <CloudUpload size={15} />立即同步客户
           </button> : null}
           <button onClick={save}>
             <Save size={15} />
