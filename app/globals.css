@@ -902,6 +902,7 @@ body:has(.admin-shell) {
 }
 
 .admin-toolbar button:disabled,
+.admin-header-actions button:disabled,
 .quick-quote button:disabled,
 .admin-button.is-disabled,
 .admin-card button:disabled,
