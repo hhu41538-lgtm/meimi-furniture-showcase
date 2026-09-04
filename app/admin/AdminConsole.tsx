@@ -1456,7 +1456,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [autoSaveStatus, setAutoSaveStatus] = useState("正在读取本地资料");
   const [sharedSyncReady, setSharedSyncReady] = useState(false);
   const [cloudSyncStatus, setCloudSyncStatus] = useState("正在连接云端资料");
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine);
   const [cloudSyncPending, setCloudSyncPending] = useState(false);
   const [cloudSyncConflict, setCloudSyncConflict] = useState(false);
   const [customerOwnerCloudReady, setCustomerOwnerCloudReady] = useState(false);
@@ -1466,7 +1466,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const cloudVersionRef = useRef<number | null>(null);
   const cloudSyncInFlightRef = useRef(false);
   const sharedWorkspaceRefreshInFlightRef = useRef(false);
-  const wasOnlineRef = useRef(true);
+  const wasOnlineRef = useRef(isOnline);
   const [pdfDropActive, setPdfDropActive] = useState(false);
   const [pdfImportState, setPdfImportState] = useState<PdfImportState>({ phase: "idle", fileName: "", message: "等待导入产品图册", importedCount: 0 });
   const [status, setStatus] = useState(`已进入${session.role === "admin" ? "管理员" : "销售"}版：${session.name}`);
