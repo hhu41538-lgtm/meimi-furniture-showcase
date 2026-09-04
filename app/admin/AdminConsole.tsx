@@ -3539,7 +3539,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
           <small>
             {customerOwnerRecord
               ? adminUnlocked || employeeOwnsCustomer(customerOwnerRecord, quote.employee, session.accountId)
-                ? `${customerOwnerRecord.tier}类 · ${customerFollowStatusLabels[customerOwnerRecord.followStatus]} · ${customerOwnerRecord.client || "未填客户"} · ${customerOwnerRecord.clientContact || "未填联系人"} · ${shortDateTime(customerOwnerRecord.createdAt)}`
+                ? `${customerOwnerRecord.tier}类 · ${customerFollowStatusLabels[customerOwnerRecord.followStatus]} · ${customerLeadSourceLabels[customerOwnerRecord.leadSource]} · ${customerOwnerRecord.client || "未填客户"} · ${customerOwnerRecord.clientContact || "未填联系人"} · ${shortDateTime(customerOwnerRecord.createdAt)}`
                 : `${customerOwnerRecord.owner || "其他销售"} 已收录该客户；具体备注仅本人和管理员可见。`
               : "确认无重复后，点击下方“录入客户”即可建立归属。"}
           </small>
