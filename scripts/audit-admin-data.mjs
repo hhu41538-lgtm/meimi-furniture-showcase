@@ -6,6 +6,7 @@ const productsSource = fs.readFileSync(path.join(root, "lib/products.ts"), "utf8
 const studioSource = fs.readFileSync(path.join(root, "lib/catalogueStudio.ts"), "utf8");
 const adminSource = fs.readFileSync(path.join(root, "app/admin/AdminConsole.tsx"), "utf8");
 const authSource = fs.readFileSync(path.join(root, "app/admin/auth.ts"), "utf8");
+const authRouteSource = fs.readFileSync(path.join(root, "app/api/staff-accounts/route.ts"), "utf8");
 const packageSource = fs.readFileSync(path.join(root, "package.json"), "utf8");
 const quotationTemplatePath = path.join(root, "public/templates/XX-furniture-quotation-template.xlsx");
 const quotationExporterPath = path.join(root, "app/admin/quotationTemplate.ts");
@@ -23,7 +24,7 @@ if (!adminSource.includes("PRODUCT_CODE_PATTERN")) failures.push("Shared admin p
 if (!adminSource.includes("normalizeCatalogueCodes")) failures.push("Catalogue code repair helper is missing");
 if (!adminSource.includes("repairProductCodes")) failures.push("Manual product-code repair action is missing");
 if (!adminSource.includes("修复编号")) failures.push("Product-code repair button is missing");
-if (!authSource.includes('ADMIN_LOGIN_KEY = "2675982129"')) failures.push("Fixed admin login key is missing");
+if (!authRouteSource.includes('action === "admin-login"')) failures.push("Server-side admin login validation is missing");
 if (!adminSource.includes("requireAdminAccess")) failures.push("Admin mutation guard is missing");
 if (!adminSource.includes("管理员版已开启")) failures.push("Admin access UI is missing");
 if (!authSource.includes("DEFAULT_SALES_PERMISSIONS")) failures.push("Sales permission defaults are missing");
@@ -153,7 +154,7 @@ if (!adminSource.includes("categoryFilter")) failures.push("Product category men
 if (!adminSource.includes("sales-cockpit")) failures.push("Three-minute sales cockpit is missing");
 if (!adminSource.includes("ActiveModule")) failures.push("Large module navigation state is missing");
 if (!adminSource.includes("admin-module-nav")) failures.push("Large module navigation UI is missing");
-if (!adminSource.includes('search: "产品搜索"')) failures.push("Standalone product search module is missing");
+if (!adminSource.includes('search: "产品仓库"') || !adminSource.includes('"search-center": "products"')) failures.push("Merged product warehouse search module is missing");
 if (!adminSource.includes('activeModule === "home" ? <section className="sales-cockpit"')) failures.push("Home-only module dashboard boundary is missing");
 if (!adminSource.includes("admin-module-nav-copy")) failures.push("Module action feedback is missing");
 if (!adminSource.includes("window.location.hash") || !adminSource.includes("window.history.pushState")) failures.push("Module hash navigation is missing");
