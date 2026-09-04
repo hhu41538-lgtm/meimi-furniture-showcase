@@ -4862,6 +4862,19 @@ body:has(.admin-shell) {
   color: #788396;
 }
 
+.admin-shell .customer-owner-actions .customer-clear-button {
+  min-height: 44px;
+  border-color: #c9d1dd;
+  background: #fff;
+  color: var(--admin-ink);
+  font-weight: 600;
+}
+
+.admin-shell .customer-owner-actions .customer-clear-button:hover {
+  border-color: var(--admin-cobalt);
+  color: var(--admin-cobalt);
+}
+
 .auth-gate-panel {
   width: min(600px, 100%);
   border-radius: 6px;

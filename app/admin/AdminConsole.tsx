@@ -2545,6 +2545,25 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
     return true;
   }
 
+  function clearCustomerEntry() {
+    setOwnerLookup({ country: "", phone: "" });
+    setNewCustomerTier("B");
+    setExpandedCustomerId("");
+    setQuote((current) => ({
+      ...current,
+      client: "",
+      clientContact: "",
+      clientPhone: "",
+      clientEmail: "",
+      country: "",
+      city: "",
+      clientAddress: "",
+      project: "",
+      customerDemand: "",
+    }));
+    setStatus("已清空本次客户录入内容，客户池历史记录未受影响");
+  }
+
   function updateCustomerOwner(
     id: string,
     field: "tier" | "followStatus" | "privateNote" | "note" | "client" | "clientContact" | "nextFollowUpDate",
@@ -3342,6 +3361,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
         <div className="customer-owner-actions">
           <button className="customer-register-button" onClick={registerCustomerOwner} disabled={Boolean(customerOwnerRecord)} title={customerOwnerRecord ? `该客户已被销售 ${customerOwnerRecord.owner || "其他销售"} 录入` : "确认国家和客户电话后录入客户"}>
             {customerOwnerConflict ? "已被销售录入" : customerOwnerRecord ? "已录入客户" : "录入客户"}
+          </button>
+          <button className="customer-clear-button" type="button" onClick={clearCustomerEntry} title="清空本次客户录入内容，不删除客户池历史记录">
+            一键清空
           </button>
         </div>
         <div className="customer-owner-recent">
