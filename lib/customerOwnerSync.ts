@@ -16,6 +16,6 @@ export async function publishCustomerOwner(authKey: string, ownerKey: string, re
     headers: { "content-type": "application/json", "x-meimi-staff-key": authKey },
     body: JSON.stringify({ action: "upsert", ownerKey, record }),
   });
-  const payload = await response.json().catch(() => ({})) as { message?: string };
-  if (!response.ok) throw new Error(payload.message || "客户归属云端保存失败");
+  const payload = await response.json().catch(() => ({})) as { code?: string; message?: string };
+  if (!response.ok) throw new Error(`${payload.code || "SYNC_FAILED"}:${payload.message || "客户归属云端保存失败"}`);
 }

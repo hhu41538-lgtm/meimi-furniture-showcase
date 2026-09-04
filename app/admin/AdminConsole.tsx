@@ -2593,7 +2593,17 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     if (!adminUnlocked && staffSyncKey) {
       void publishCustomerOwner(staffSyncKey, customerOwnerKey, record)
         .then(() => setStatus(`已录入客户并同步云端：${record.country} / ${record.phone}`))
-        .catch(() => setStatus("客户已保存到本机，但云端同步失败；联网后请重新确认录入"));
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : "";
+          if (message.startsWith("OWNER_CONFLICT:")) {
+            setCustomerOwners((current) => {
+              const next = current.filter((item) => item.id !== record.id);
+              localStorage.setItem(CUSTOMER_OWNER_STORAGE_KEY, JSON.stringify(next));
+              return next;
+            });
+            setStatus(message.slice("OWNER_CONFLICT:".length));
+          } else setStatus("客户已保存到本机，但云端同步失败；联网后请重新确认录入");
+        });
     }
     return true;
   }
