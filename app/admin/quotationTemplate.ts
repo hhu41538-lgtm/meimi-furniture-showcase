@@ -59,7 +59,8 @@ function formatGeneratedAt(value: string) {
 }
 
 function formatDimension(line: TemplateQuoteLine) {
-  return line.spec.trim();
+  const spec = line.spec.trim();
+  return /^(basePrice|unitPrice|sizeUpgrade|materialUpgrade|customOption)\s*:/i.test(spec) ? "" : spec;
 }
 
 async function imageBuffer(url: string) {
