@@ -57,7 +57,7 @@ function sourceValue(payload: Record<string, unknown>, key: string) {
 }
 
 type MetaLeadRow = { leadgen_id: string; raw_payload: Record<string, unknown> };
-type MetaLeadDetails = { name?: unknown; phone?: unknown; country?: unknown; email?: unknown; company?: unknown; createdTime?: unknown };
+type MetaLeadDetails = { name?: unknown; phone?: unknown; country?: unknown; email?: unknown; company?: unknown; createdTime?: unknown; fields?: unknown };
 type SalesAccountRow = { id: string; name: string };
 
 export async function POST(request: Request) {
@@ -121,6 +121,7 @@ export async function POST(request: Request) {
         metaFormId: sourceValue(row.raw_payload, "form_id"),
         metaAdId: sourceValue(row.raw_payload, "ad_id"),
         metaCampaignId: sourceValue(row.raw_payload, "campaign_id"),
+        metaFields: details?.fields && typeof details.fields === "object" ? details.fields : {},
       };
       await sql`INSERT INTO meimi_customer_owners (owner_key, record) VALUES (${ownerKey}, ${JSON.stringify(record)}::jsonb)`;
       await sql`UPDATE meimi_meta_leads SET status = 'imported', updated_at = NOW() WHERE leadgen_id = ${row.leadgen_id}`;

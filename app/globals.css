@@ -1560,6 +1560,26 @@ body:has(.admin-shell) {
   overflow-wrap: anywhere;
 }
 
+.customer-meta-fields {
+  grid-column: 1 / -1;
+  color: #536985;
+  font-size: 12px;
+}
+
+.customer-meta-fields summary {
+  cursor: pointer;
+  color: #1f5ec4;
+}
+
+.customer-meta-fields div {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: #f8fafc;
+  overflow-wrap: anywhere;
+}
+
 .customer-owner-recent .danger {
   border-color: #9f2f2f;
   background: #9f2f2f;

@@ -214,6 +214,7 @@ type CustomerOwnerRecord = {
   metaFormId?: string;
   metaAdId?: string;
   metaCampaignId?: string;
+  metaFields?: Record<string, string>;
 };
 
 type CurrencyCode = "USD" | "EUR" | "GBP" | "AUD" | "AED" | "SAR" | "INR";
@@ -699,6 +700,9 @@ function normalizeCustomerLeadSource(value: unknown): CustomerLeadSource {
 function normalizeCustomerOwnerRecord(value: unknown): CustomerOwnerRecord | null {
   if (!value || typeof value !== "object") return null;
   const record = value as Partial<CustomerOwnerRecord>;
+  const metaFields = record.metaFields && typeof record.metaFields === "object"
+    ? Object.fromEntries(Object.entries(record.metaFields).filter(([, item]) => typeof item === "string"))
+    : {};
   if (
     typeof record.id !== "string" ||
     typeof record.country !== "string" ||
@@ -737,6 +741,7 @@ function normalizeCustomerOwnerRecord(value: unknown): CustomerOwnerRecord | nul
     metaFormId: typeof record.metaFormId === "string" ? record.metaFormId : "",
     metaAdId: typeof record.metaAdId === "string" ? record.metaAdId : "",
     metaCampaignId: typeof record.metaCampaignId === "string" ? record.metaCampaignId : "",
+    metaFields,
   };
 }
 
@@ -3900,6 +3905,10 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                   {record.leadSource === "meta" && (record.metaLeadId || record.metaFormId || record.metaAdId || record.metaCampaignId) ? <small className="customer-meta-attribution">
                     Meta 归因：{record.metaLeadId ? `Lead ${record.metaLeadId}` : ""}{record.metaFormId ? ` · 表单 ${record.metaFormId}` : ""}{record.metaAdId ? ` · 广告 ${record.metaAdId}` : ""}{record.metaCampaignId ? ` · 广告系列 ${record.metaCampaignId}` : ""}
                   </small> : null}
+                  {record.leadSource === "meta" && Object.keys(record.metaFields ?? {}).length ? <details className="customer-meta-fields">
+                    <summary>Meta 表单字段（{Object.keys(record.metaFields ?? {}).length}）</summary>
+                    <div>{Object.entries(record.metaFields ?? {}).map(([field, value]) => <span key={field}><b>{field}</b>：{value}</span>)}</div>
+                  </details> : null}
                 </div> : null}
                 {adminUnlocked ? (
                   <button className="danger" onClick={() => deleteCustomerOwner(record.id)}>删除</button>
