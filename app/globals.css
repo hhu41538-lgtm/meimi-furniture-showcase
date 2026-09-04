@@ -280,6 +280,10 @@ body:has(.admin-shell) {
   background: #557241;
 }
 
+.admin-sidebar-dot.is-offline {
+  background: #c2410c;
+}
+
 .admin-main-content {
   min-width: 0;
   padding: 42px clamp(18px, 4vw, 64px) 72px;

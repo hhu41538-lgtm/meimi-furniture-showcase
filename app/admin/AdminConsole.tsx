@@ -3315,9 +3315,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             <span>管理员维护</span>
           </button> : null}
         </nav>
-        <div className="admin-sidebar-footer">
-          <span className="admin-sidebar-dot" />
-          <span>{storageReady ? "本地数据已启用" : "正在读取本地数据"}</span>
+        <div className="admin-sidebar-footer" title={isOnline ? "当前可以读取或同步云端资料" : "当前离线，修改会先保存在本机"}>
+          <span className={`admin-sidebar-dot${isOnline ? "" : " is-offline"}`} />
+          <span>{storageReady ? (isOnline ? "在线 · 本地数据已启用" : "离线 · 本地数据已保存") : "正在读取本地数据"}</span>
         </div>
       </aside>
       {sidebarOpen ? <button className="admin-sidebar-backdrop" type="button" aria-label="关闭主导航" onClick={() => setSidebarOpen(false)} /> : null}
