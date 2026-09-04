@@ -6,6 +6,7 @@ export const runtime = "edge";
 
 const FIXED_ADMIN_KEY = "2675982129";
 type SqlClient = NeonQueryFunction<false, false>;
+const CUSTOMER_LEAD_SOURCES = new Set(["manual", "meta", "website", "referral", "other"]);
 
 const databaseUrl = () => [
   process.env.DATABASE_URL, process.env.POSTGRES_URL, process.env.POSTGRES_PRISMA_URL,
@@ -15,6 +16,11 @@ const databaseUrl = () => [
 
 function errorResponse(message: string, status: number, code: string) {
   return NextResponse.json({ ok: false, code, message }, { status });
+}
+
+function normalizeCustomerOwnerRecord(value: Record<string, unknown>) {
+  const leadSource = typeof value.leadSource === "string" && CUSTOMER_LEAD_SOURCES.has(value.leadSource) ? value.leadSource : "other";
+  return { ...value, leadSource };
 }
 
 async function hashLoginKey(value: string) {
@@ -76,7 +82,7 @@ export async function POST(request: Request) {
         const source = itemData.record && typeof itemData.record === "object" ? itemData.record as Record<string, unknown> : null;
         if (!ownerKey) continue;
         if (!source) continue;
-        const record: Record<string, unknown> = { ...source, privateNote: "" };
+        const record: Record<string, unknown> = { ...normalizeCustomerOwnerRecord(source), privateNote: "" };
         await sql`INSERT INTO meimi_customer_owners (owner_key, record) VALUES (${ownerKey}, ${JSON.stringify(record)}::jsonb)`;
       }
       return NextResponse.json({ ok: true });
@@ -86,7 +92,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true });
     }
     if (body.action === "upsert" && typeof body.ownerKey === "string" && body.ownerKey.length <= 200 && body.record && typeof body.record === "object") {
-      const record: Record<string, unknown> = { ...(body.record as Record<string, unknown>), privateNote: "" };
+      const record: Record<string, unknown> = { ...normalizeCustomerOwnerRecord(body.record as Record<string, unknown>), privateNote: "" };
       if (identity.role === "sales") {
         record.ownerAccountId = identity.id;
         record.owner = identity.name;
