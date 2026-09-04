@@ -235,6 +235,7 @@ const LEGACY_CATALOGUE_STORAGE_KEY = "meimih-admin-catalogue-v1";
 const QUOTE_STORAGE_KEY = "meimih-staff-quote-v2";
 const LEGACY_QUOTE_STORAGE_KEY = "meimih-staff-quote-v1";
 const QUOTE_HISTORY_STORAGE_KEY = "meimih-staff-quote-history-v1";
+const CUSTOMER_OWNER_PENDING_STORAGE_KEY = "meimih-pending-customer-owners-v1";
 const PRICING_STORAGE_KEY = "meimih-pricing-rules-v1";
 const WORKFLOW_PRICING_STORAGE_KEY = "meimih-workflow-pricing-rule-v1";
 const WORKFLOW_STAGE_STORAGE_KEY = "meimih-workflow-stage-v1";
@@ -1414,6 +1415,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [isOnline, setIsOnline] = useState(true);
   const [cloudSyncPending, setCloudSyncPending] = useState(false);
   const [customerOwnerCloudReady, setCustomerOwnerCloudReady] = useState(false);
+  const [pendingCustomerOwnerVersion, setPendingCustomerOwnerVersion] = useState(0);
   const [isRefreshingSharedWorkspace, setIsRefreshingSharedWorkspace] = useState(false);
   const cloudVersionRef = useRef<number | null>(null);
   const cloudSyncInFlightRef = useRef(false);
@@ -1583,6 +1585,26 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     });
     return () => { cancelled = true; };
   }, [customerOwnerSyncKey, storageReady]);
+
+  useEffect(() => {
+    if (adminUnlocked || !isOnline || !staffSyncKey) return undefined;
+    let pending: CustomerOwnerRecord[] = [];
+    try {
+      const stored = localStorage.getItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY);
+      const parsed = stored ? JSON.parse(stored) as unknown : [];
+      if (Array.isArray(parsed)) pending = parsed.map(normalizeCustomerOwnerRecord).filter((record): record is CustomerOwnerRecord => Boolean(record));
+    } catch { return undefined; }
+    if (!pending.length) return undefined;
+    let cancelled = false;
+    void Promise.allSettled(pending.map((record) => publishCustomerOwner(staffSyncKey, normalizeOwnerKey(record.country, record.phone), record))).then((results) => {
+      if (cancelled) return;
+      const failed = pending.filter((_, index) => results[index]?.status === "rejected");
+      if (failed.length) localStorage.setItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY, JSON.stringify(failed));
+      else localStorage.removeItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY);
+      setStatus(failed.length ? `还有 ${failed.length} 条客户归属等待同步` : `已补同步 ${pending.length} 条客户归属`);
+    });
+    return () => { cancelled = true; };
+  }, [adminUnlocked, isOnline, pendingCustomerOwnerVersion, staffSyncKey]);
 
   useEffect(() => {
     if (!adminUnlocked || !customerOwnerCloudReady || !customerOwnerSyncKey) return undefined;
@@ -2608,7 +2630,16 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               return next;
             });
             setStatus(message.slice("OWNER_CONFLICT:".length));
-          } else setStatus("客户已保存到本机，但云端同步失败；联网后请重新确认录入");
+          } else {
+            try {
+              const stored = localStorage.getItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY);
+              const pending = stored ? JSON.parse(stored) as unknown : [];
+              const next = Array.isArray(pending) ? [record, ...pending].slice(0, 100) : [record];
+              localStorage.setItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY, JSON.stringify(next));
+            } catch { /* Keep the local record even if the retry queue cannot be written. */ }
+            setPendingCustomerOwnerVersion((current) => current + 1);
+            setStatus("客户已保存到本机，云端暂不可用，联网后会自动重试");
+          }
         });
     }
     return true;
