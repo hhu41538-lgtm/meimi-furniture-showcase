@@ -44,7 +44,7 @@ export async function POST(request: Request) {
   if (!url) return errorResponse("尚未配置云端数据库", 503, "DATABASE_NOT_CONFIGURED");
   const key = request.headers.get("x-meimi-staff-key")?.trim() ?? "";
   if (!key) return errorResponse("缺少销售账号验证信息", 401, "UNAUTHORIZED");
-  let body: { action?: unknown; ownerKey?: unknown; record?: unknown };
+  let body: { action?: unknown; ownerKey?: unknown; record?: unknown; records?: unknown };
   try { body = await request.json() as typeof body; } catch { return errorResponse("请求格式不正确", 400, "INVALID_JSON"); }
   try {
     const sql = neon<false, false>(url);
@@ -54,6 +54,20 @@ export async function POST(request: Request) {
     if (body.action === "list") {
       const rows = await sql`SELECT record FROM meimi_customer_owners ORDER BY updated_at DESC`;
       return NextResponse.json({ ok: true, records: rows.map((row) => row.record) });
+    }
+    if (body.action === "replace" && identity.role === "admin" && Array.isArray(body.records) && body.records.length <= 500) {
+      await sql`DELETE FROM meimi_customer_owners`;
+      for (const item of body.records) {
+        if (!item || typeof item !== "object") continue;
+        const itemData = item as { ownerKey?: unknown; record?: unknown };
+        const ownerKey = typeof itemData.ownerKey === "string" ? itemData.ownerKey.trim() : "";
+        const source = itemData.record && typeof itemData.record === "object" ? itemData.record as Record<string, unknown> : null;
+        if (!ownerKey) continue;
+        if (!source) continue;
+        const record: Record<string, unknown> = { ...source, privateNote: "" };
+        await sql`INSERT INTO meimi_customer_owners (owner_key, record) VALUES (${ownerKey}, ${JSON.stringify(record)}::jsonb)`;
+      }
+      return NextResponse.json({ ok: true });
     }
     if (body.action === "upsert" && typeof body.ownerKey === "string" && body.ownerKey.length <= 200 && body.record && typeof body.record === "object") {
       const record: Record<string, unknown> = { ...(body.record as Record<string, unknown>), privateNote: "" };

@@ -19,3 +19,12 @@ export async function publishCustomerOwner(authKey: string, ownerKey: string, re
   const payload = await response.json().catch(() => ({})) as { code?: string; message?: string };
   if (!response.ok) throw new Error(`${payload.code || "SYNC_FAILED"}:${payload.message || "客户归属云端保存失败"}`);
 }
+
+export async function replaceCustomerOwners(authKey: string, records: unknown[]) {
+  const response = await fetch("/api/customer-owners", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-meimi-staff-key": authKey },
+    body: JSON.stringify({ action: "replace", records }),
+  });
+  if (!response.ok) throw new Error("客户归属云端更新失败");
+}

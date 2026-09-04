@@ -32,7 +32,7 @@ import {
   X,
 } from "lucide-react";
 import { productCodePrefix } from "@/lib/productCodes";
-import { fetchSharedCustomerOwners, publishCustomerOwner } from "@/lib/customerOwnerSync";
+import { fetchSharedCustomerOwners, publishCustomerOwner, replaceCustomerOwners } from "@/lib/customerOwnerSync";
 import { SALES_PERMISSION_OPTIONS, type AuthSession, type PermissionKey, type StaffAccount } from "./auth";
 import { downloadQuotationTemplate } from "./quotationTemplate";
 import { fetchSharedWorkspaceState, publishSharedWorkspaceState, type CloudWorkspaceState } from "@/lib/workspaceSync";
@@ -1413,6 +1413,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [cloudSyncStatus, setCloudSyncStatus] = useState("正在连接云端资料");
   const [isOnline, setIsOnline] = useState(true);
   const [cloudSyncPending, setCloudSyncPending] = useState(false);
+  const [customerOwnerCloudReady, setCustomerOwnerCloudReady] = useState(false);
   const [isRefreshingSharedWorkspace, setIsRefreshingSharedWorkspace] = useState(false);
   const cloudVersionRef = useRef<number | null>(null);
   const cloudSyncInFlightRef = useRef(false);
@@ -1420,6 +1421,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [pdfDropActive, setPdfDropActive] = useState(false);
   const [pdfImportState, setPdfImportState] = useState<PdfImportState>({ phase: "idle", fileName: "", message: "等待导入产品图册", importedCount: 0 });
   const [status, setStatus] = useState(`已进入${session.role === "admin" ? "管理员" : "销售"}版：${session.name}`);
+  const customerOwnerSyncKey = adminUnlocked ? adminSyncKey : staffSyncKey;
   const canAccessModule = useCallback((module: ActiveModule) => {
     if (module === "home" || module === "admin") return module === "home" || adminUnlocked;
     if (module === "products") {
@@ -1565,21 +1567,35 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   }, [legacyQuoteStorageKey, quoteStorageKey, session.name, session.role, workflowPricingStorageKey, workflowStageStorageKey]);
 
   useEffect(() => {
-    if (!storageReady || adminUnlocked || !staffSyncKey) return undefined;
+    if (!storageReady || !customerOwnerSyncKey) return undefined;
     let cancelled = false;
-    void fetchSharedCustomerOwners(staffSyncKey).then((records) => {
+    void fetchSharedCustomerOwners(customerOwnerSyncKey).then((records) => {
       if (cancelled) return;
       const normalized = records.map(normalizeCustomerOwnerRecord).filter((record): record is CustomerOwnerRecord => Boolean(record));
       setCustomerOwners((current) => normalized.map((record) => ({
         ...record,
         privateNote: current.find((item) => item.id === record.id)?.privateNote ?? record.privateNote,
       })));
+      setCustomerOwnerCloudReady(true);
       setStatus(`已读取 ${normalized.length} 条云端客户归属`);
     }).catch(() => {
       if (!cancelled) setStatus("客户归属云端暂时无法读取，当前继续使用本机资料");
     });
     return () => { cancelled = true; };
-  }, [adminUnlocked, staffSyncKey, storageReady]);
+  }, [customerOwnerSyncKey, storageReady]);
+
+  useEffect(() => {
+    if (!adminUnlocked || !customerOwnerCloudReady || !customerOwnerSyncKey) return undefined;
+    const timer = window.setTimeout(() => {
+      const records = customerOwners.map((record) => {
+        const { privateNote, ...sharedRecord } = record;
+        void privateNote;
+        return { ownerKey: normalizeOwnerKey(record.country, record.phone), record: sharedRecord };
+      });
+      void replaceCustomerOwners(customerOwnerSyncKey, records).catch(() => setStatus("客户归属已保存在本机，但云端更新失败"));
+    }, 700);
+    return () => window.clearTimeout(timer);
+  }, [adminUnlocked, customerOwnerCloudReady, customerOwnerSyncKey, customerOwners]);
 
   const applySharedWorkspaceState = useCallback((state: CloudWorkspaceState) => {
     cloudVersionRef.current = state.version;
@@ -1589,13 +1605,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     }
     const normalizedEntries = state.entries.map(normalizeEntry).filter((entry): entry is ManagedEntry => Boolean(entry));
     const normalizedRules = state.pricingRules.filter(isPricingRule);
-    const normalizedOwners = state.customerOwners.map(normalizeCustomerOwnerRecord).filter((record): record is CustomerOwnerRecord => Boolean(record));
     setEntries(normalizedEntries);
     setPricingRules(normalizedRules);
-    setCustomerOwners((current) => normalizedOwners.map((record) => ({
-      ...record,
-      privateNote: current.find((item) => item.id === record.id)?.privateNote ?? record.privateNote,
-    })));
     if (state.workflowPricingRuleId && normalizedRules.some((rule) => rule.id === state.workflowPricingRuleId)) {
       setWorkflowPricingRuleId(state.workflowPricingRuleId);
     }
@@ -1645,11 +1656,6 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       const result = await publishSharedWorkspaceState({
         entries,
         pricingRules,
-        customerOwners: customerOwners.map((record) => {
-          const { privateNote, ...cloudRecord } = record;
-          void privateNote;
-          return cloudRecord;
-        }),
         workflowPricingRuleId,
         version: cloudVersionRef.current,
         updatedBy: session.name,
@@ -1667,7 +1673,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     } finally {
       cloudSyncInFlightRef.current = false;
     }
-  }, [adminSyncKey, adminUnlocked, applySharedWorkspaceState, customerOwners, entries, isOnline, pricingRules, session.name, sharedSyncReady, workflowPricingRuleId]);
+  }, [adminSyncKey, adminUnlocked, applySharedWorkspaceState, entries, isOnline, pricingRules, session.name, sharedSyncReady, workflowPricingRuleId]);
 
   useEffect(() => {
     if (!storageReady || !sharedSyncReady) return undefined;

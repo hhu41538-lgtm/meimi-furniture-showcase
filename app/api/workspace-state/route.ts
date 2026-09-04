@@ -8,7 +8,6 @@ type WorkspaceStateRow = {
   id: string;
   entries: unknown;
   pricingRules: unknown;
-  customerOwners: unknown;
   workflowPricingRuleId: string;
   initialized: boolean;
   version: number;
@@ -19,7 +18,6 @@ type WorkspaceStateRow = {
 type WorkspaceStateInput = {
   entries: unknown[];
   pricingRules: unknown[];
-  customerOwners: unknown[];
   workflowPricingRuleId: string;
   version: number;
   updatedBy: string;
@@ -53,17 +51,12 @@ async function ensureTable(sql: SqlClient) {
       id TEXT PRIMARY KEY,
       entries JSONB NOT NULL DEFAULT '[]'::jsonb,
       pricing_rules JSONB NOT NULL DEFAULT '[]'::jsonb,
-      customer_owners JSONB NOT NULL DEFAULT '[]'::jsonb,
       workflow_pricing_rule_id TEXT NOT NULL DEFAULT '',
       initialized BOOLEAN NOT NULL DEFAULT FALSE,
       version INTEGER NOT NULL DEFAULT 1,
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_by TEXT NOT NULL DEFAULT 'system'
     )
-  `;
-  await sql`
-    ALTER TABLE meimi_workspace_state
-    ADD COLUMN IF NOT EXISTS customer_owners JSONB NOT NULL DEFAULT '[]'::jsonb
   `;
   await sql`
     INSERT INTO meimi_workspace_state (id)
@@ -77,7 +70,6 @@ function rowToState(row: Record<string, unknown>): WorkspaceStateRow {
     id: String(row.id ?? "main"),
     entries: Array.isArray(row.entries) ? row.entries : [],
     pricingRules: Array.isArray(row.pricingRules) ? row.pricingRules : [],
-    customerOwners: Array.isArray(row.customerOwners) ? row.customerOwners : [],
     workflowPricingRuleId: typeof row.workflowPricingRuleId === "string" ? row.workflowPricingRuleId : "",
     initialized: row.initialized === true,
     version: Number(row.version) || 1,
@@ -92,7 +84,6 @@ async function readState(sql: SqlClient) {
       id,
       entries,
       pricing_rules AS "pricingRules",
-      customer_owners AS "customerOwners",
       workflow_pricing_rule_id AS "workflowPricingRuleId",
       initialized,
       version,
@@ -112,8 +103,6 @@ function validInput(value: unknown): value is WorkspaceStateInput {
     && input.entries.length <= 500
     && Array.isArray(input.pricingRules)
     && input.pricingRules.length <= 100
-    && Array.isArray(input.customerOwners)
-    && input.customerOwners.length <= 500
     && typeof input.workflowPricingRuleId === "string"
     && input.workflowPricingRuleId.length <= 120
     && Number.isInteger(input.version)
@@ -162,7 +151,6 @@ export async function PUT(request: Request) {
       SET
         entries = ${JSON.stringify(input.entries)}::jsonb,
         pricing_rules = ${JSON.stringify(input.pricingRules)}::jsonb,
-        customer_owners = ${JSON.stringify(input.customerOwners)}::jsonb,
         workflow_pricing_rule_id = ${input.workflowPricingRuleId},
         initialized = TRUE,
         version = version + 1,
@@ -173,7 +161,6 @@ export async function PUT(request: Request) {
         id,
         entries,
         pricing_rules AS "pricingRules",
-        customer_owners AS "customerOwners",
         workflow_pricing_rule_id AS "workflowPricingRuleId",
         initialized,
         version,
