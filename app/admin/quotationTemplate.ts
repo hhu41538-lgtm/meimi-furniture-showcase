@@ -46,6 +46,8 @@ type TemplateTotals = {
   balance: number;
 };
 
+export const QUOTATION_TEMPLATE_LINE_LIMIT = 17;
+
 function formatMoney(value: number) {
   return Number.isFinite(value) ? Math.round(value) : 0;
 }
@@ -98,7 +100,7 @@ export async function downloadQuotationTemplate(quote: TemplateQuote, totals: Te
   for (let row = firstLineRow; row <= lastLineRow; row += 1) {
     for (let col = 1; col <= 11; col += 1) sheet.getRow(row).getCell(col).value = null;
   }
-  const lines = quote.lines.slice(0, lastLineRow - firstLineRow + 1);
+  const lines = quote.lines.slice(0, QUOTATION_TEMPLATE_LINE_LIMIT);
   const imageResults = await Promise.all(lines.map((line) => imageBuffer(line.image)));
   lines.forEach((line, index) => {
     const rowNumber = firstLineRow + index;

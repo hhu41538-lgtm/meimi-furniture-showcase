@@ -35,7 +35,7 @@ import {
 import { productCodePrefix } from "@/lib/productCodes";
 import { customerOwnerConflictMessage, deleteSharedCustomerOwner, fetchSharedCustomerOwners, isCustomerOwnerConflict, publishCustomerOwner, replaceCustomerOwners } from "@/lib/customerOwnerSync";
 import { SALES_PERMISSION_OPTIONS, type AuthSession, type PermissionKey, type StaffAccount } from "./auth";
-import { downloadQuotationTemplate } from "./quotationTemplate";
+import { downloadQuotationTemplate, QUOTATION_TEMPLATE_LINE_LIMIT } from "./quotationTemplate";
 import { fetchSharedWorkspaceState, publishSharedWorkspaceState, type CloudWorkspaceState } from "@/lib/workspaceSync";
 
 export type ManagedEntry = {
@@ -3107,9 +3107,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
 
   async function exportQuoteTemplate() {
     if (!ensureFormalCustomerOutputReady()) return;
-    const templateLineLimit = 17;
-    if (quote.lines.length > templateLineLimit) {
-      setStatus(`当前模板最多支持 ${templateLineLimit} 个产品，请拆分报价后再导出，避免明细被截断`);
+    if (quote.lines.length > QUOTATION_TEMPLATE_LINE_LIMIT) {
+      setStatus(`当前模板最多支持 ${QUOTATION_TEMPLATE_LINE_LIMIT} 个产品，请拆分报价后再导出，避免明细被截断`);
       return;
     }
     try {
@@ -4552,7 +4551,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                 <small>{quote.factoryStatement}</small>
               </div>
               <div className="generated-customer-output">
-                {quote.lines.length > 17 ? <div className="quote-export-limit-warning" role="alert">Excel 模板最多支持 17 个产品，当前有 {quote.lines.length} 个。客户版仍可复制，请拆分后再导出 Excel。</div> : null}
+                {quote.lines.length > QUOTATION_TEMPLATE_LINE_LIMIT ? <div className="quote-export-limit-warning" role="alert">Excel 模板最多支持 {QUOTATION_TEMPLATE_LINE_LIMIT} 个产品，当前有 {quote.lines.length} 个。客户版仍可复制，请拆分后再导出 Excel。</div> : null}
                 <div className="generated-customer-preview">
                   <div>
                     <span>客户版报价预览</span>
