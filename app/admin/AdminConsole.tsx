@@ -3497,7 +3497,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
               if (event.key === "Enter") findEntryByCode();
               if (event.key === "Escape") {
                 setProductCodeInput("");
-                setStatus("已清空产品搜索");
+                setStatus("已清空产品仓库搜索");
               }
             }}
             placeholder="例如 001 / MH-SF-001 / sofa / 沙发 / 餐桌 / 柜"
@@ -3520,7 +3520,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
               <span>匹配 {productSearchMatches.length} 个产品</span>
               {selectedSearchEntry ? <strong>已选：{selectedSearchEntry.productCode} / {selectedSearchEntry.name}</strong> : null}
             </div>
-            <div className="product-search-suggestions" role="radiogroup" aria-label="产品搜索结果">
+            <div className="product-search-suggestions" role="radiogroup" aria-label="产品仓库搜索结果">
             {productSearchMatches.map((entry) => (
               <button
                 className={selectedEntryId === entry.id ? "is-selected" : ""}
@@ -3542,7 +3542,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
         {productCodeInput.trim() && !productSearchMatches.length ? (
           <div className="product-search-empty">
             <span>没有匹配产品，请尝试编号尾号、中文名、英文名或品类。</span>
-            <button type="button" onClick={() => { setProductCodeInput(""); setStatus("已清空产品搜索"); }}>清空搜索</button>
+            <button type="button" onClick={() => { setProductCodeInput(""); setStatus("已清空产品仓库搜索"); }}>清空搜索</button>
           </div>
         ) : null}
       </section>
