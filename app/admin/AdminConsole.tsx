@@ -1408,6 +1408,7 @@ type PdfImportState = {
 export default function AdminConsole({ initialEntries, session, adminSyncKey, staffSyncKey, salesAccounts, onUpdateSalesAccount, onDeleteSalesAccount, onLogout }: AdminConsoleProps) {
   const adminUnlocked = session.role === "admin";
   const quoteStorageKey = `${QUOTE_STORAGE_KEY}:${session.accountId}`;
+  const quoteHistoryStorageKey = session.role === "sales" ? `${QUOTE_HISTORY_STORAGE_KEY}:${session.accountId}` : QUOTE_HISTORY_STORAGE_KEY;
   const legacyQuoteStorageKey = session.role === "admin" ? LEGACY_QUOTE_STORAGE_KEY : "";
   const workflowPricingStorageKey = `${WORKFLOW_PRICING_STORAGE_KEY}:${session.accountId}`;
   const workflowStageStorageKey = `${WORKFLOW_STAGE_STORAGE_KEY}:${session.accountId}`;
@@ -1542,18 +1543,18 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     localStorage.setItem(workflowPricingStorageKey, workflowPricingRuleId);
     localStorage.setItem(workflowStageStorageKey, quoteWorkflowStage);
     localStorage.setItem(quoteStorageKey, JSON.stringify(quote));
-    localStorage.setItem(QUOTE_HISTORY_STORAGE_KEY, JSON.stringify(quoteHistory));
+    localStorage.setItem(quoteHistoryStorageKey, JSON.stringify(quoteHistory));
     localStorage.setItem(CUSTOMER_OWNER_STORAGE_KEY, JSON.stringify(customerOwners));
     const savedAt = new Date().toISOString();
     setLastSavedAt(savedAt);
     return savedAt;
-  }, [customerOwners, entries, pricingRules, quote, quoteHistory, quoteStorageKey, quoteWorkflowStage, workflowPricingStorageKey, workflowPricingRuleId, workflowStageStorageKey]);
+  }, [customerOwners, entries, pricingRules, quote, quoteHistory, quoteHistoryStorageKey, quoteStorageKey, quoteWorkflowStage, workflowPricingStorageKey, workflowPricingRuleId, workflowStageStorageKey]);
 
   useEffect(() => {
     try {
       const storedEntries = localStorage.getItem(CATALOGUE_STORAGE_KEY) ?? localStorage.getItem(LEGACY_CATALOGUE_STORAGE_KEY);
       const storedQuote = localStorage.getItem(quoteStorageKey) ?? (session.role === "admin" ? localStorage.getItem(QUOTE_STORAGE_KEY) : null) ?? (legacyQuoteStorageKey ? localStorage.getItem(legacyQuoteStorageKey) : null);
-      const storedHistory = localStorage.getItem(QUOTE_HISTORY_STORAGE_KEY);
+      const storedHistory = localStorage.getItem(quoteHistoryStorageKey) ?? (session.role === "sales" ? localStorage.getItem(QUOTE_HISTORY_STORAGE_KEY) : null);
       const storedRules = localStorage.getItem(PRICING_STORAGE_KEY);
       const storedWorkflowPricingRuleId = localStorage.getItem(workflowPricingStorageKey) ?? (session.role === "admin" ? localStorage.getItem(WORKFLOW_PRICING_STORAGE_KEY) : null);
       const storedWorkflowStage = localStorage.getItem(workflowStageStorageKey) ?? (session.role === "admin" ? localStorage.getItem(WORKFLOW_STAGE_STORAGE_KEY) : null);
@@ -1597,7 +1598,13 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
         const parsedHistory = JSON.parse(storedHistory) as unknown;
         if (Array.isArray(parsedHistory)) {
           const normalizedHistory = parsedHistory.map(normalizeQuoteSnapshot).filter((snapshot): snapshot is QuoteSnapshot => Boolean(snapshot));
-          if (normalizedHistory.length) setQuoteHistory(normalizedHistory);
+          const scopedHistory = session.role === "sales"
+            ? normalizedHistory.filter((snapshot) => snapshot.quote.employee.trim().toLowerCase() === session.name.trim().toLowerCase())
+            : normalizedHistory;
+          if (scopedHistory.length) {
+            setQuoteHistory(scopedHistory);
+            if (session.role === "sales") localStorage.setItem(quoteHistoryStorageKey, JSON.stringify(scopedHistory));
+          }
         }
       }
       if (storedCustomerOwners) {
@@ -1614,7 +1621,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       setPendingCustomerOwnerCount(readPendingCustomerOwnerCount());
       setAutoSaveStatus("本地资料已读取，后续修改会自动保存");
     }
-  }, [legacyQuoteStorageKey, quoteStorageKey, session.name, session.role, workflowPricingStorageKey, workflowStageStorageKey]);
+  }, [legacyQuoteStorageKey, quoteHistoryStorageKey, quoteStorageKey, session.name, session.role, workflowPricingStorageKey, workflowStageStorageKey]);
 
   useEffect(() => {
     if (!storageReady || !isOnline || !customerOwnerSyncKey) return undefined;
@@ -3047,7 +3054,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     }
     setQuoteHistory((current) => {
       const next = [snapshot, ...current].slice(0, 20);
-      localStorage.setItem(QUOTE_HISTORY_STORAGE_KEY, JSON.stringify(next));
+      localStorage.setItem(quoteHistoryStorageKey, JSON.stringify(next));
       return next;
     });
     setStatus(message);
@@ -3084,7 +3091,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     if (!snapshot || !window.confirm(`确定删除报价“${snapshot.quote.quoteNo || "未编号报价"} / V${snapshot.quote.version}”吗？此操作无法撤销。`)) return;
     setQuoteHistory((current) => {
       const next = current.filter((snapshot) => snapshot.id !== id);
-      localStorage.setItem(QUOTE_HISTORY_STORAGE_KEY, JSON.stringify(next));
+      localStorage.setItem(quoteHistoryStorageKey, JSON.stringify(next));
       return next;
     });
     setStatus("已删除一条报价留档");
@@ -3096,8 +3103,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       ? []
       : quoteHistory.filter((snapshot) => snapshot.quote.employee.trim().toLowerCase() !== session.name.trim().toLowerCase());
     setQuoteHistory(next);
-    if (next.length) localStorage.setItem(QUOTE_HISTORY_STORAGE_KEY, JSON.stringify(next));
-    else localStorage.removeItem(QUOTE_HISTORY_STORAGE_KEY);
+    if (next.length) localStorage.setItem(quoteHistoryStorageKey, JSON.stringify(next));
+    else localStorage.removeItem(quoteHistoryStorageKey);
     setStatus(adminUnlocked ? "已清空全部本地报价留档" : "已清空自己的本地报价留档");
   }
 
@@ -3127,7 +3134,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     localStorage.removeItem(workflowStageStorageKey);
     localStorage.removeItem(quoteStorageKey);
     if (legacyQuoteStorageKey) localStorage.removeItem(legacyQuoteStorageKey);
-    localStorage.removeItem(QUOTE_HISTORY_STORAGE_KEY);
+    localStorage.removeItem(quoteHistoryStorageKey);
     localStorage.removeItem(CUSTOMER_OWNER_STORAGE_KEY);
     setEntries(initialEntries);
     setPricingRules(defaultPricingRules);
