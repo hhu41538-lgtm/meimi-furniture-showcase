@@ -238,14 +238,20 @@ const LEGACY_QUOTE_STORAGE_KEY = "meimih-staff-quote-v1";
 const QUOTE_HISTORY_STORAGE_KEY = "meimih-staff-quote-history-v1";
 const CUSTOMER_OWNER_PENDING_STORAGE_KEY = "meimih-pending-customer-owners-v1";
 
-function readPendingCustomerOwnerCount(): number {
+function readPendingCustomerOwners(): CustomerOwnerRecord[] {
   try {
     const stored = localStorage.getItem(CUSTOMER_OWNER_PENDING_STORAGE_KEY);
     const parsed = stored ? JSON.parse(stored) as unknown : [];
-    return Array.isArray(parsed) ? parsed.length : 0;
+    return Array.isArray(parsed)
+      ? dedupeCustomerOwnerRecords(parsed.map(normalizeCustomerOwnerRecord).filter((record): record is CustomerOwnerRecord => Boolean(record)))
+      : [];
   } catch {
-    return 0;
+    return [];
   }
+}
+
+function readPendingCustomerOwnerCount(): number {
+  return readPendingCustomerOwners().length;
 }
 
 function dedupeCustomerOwnerRecords(records: CustomerOwnerRecord[]): CustomerOwnerRecord[] {
@@ -1597,17 +1603,19 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     void fetchSharedCustomerOwners(customerOwnerSyncKey).then((records) => {
       if (cancelled) return;
       const normalized = records.map(normalizeCustomerOwnerRecord).filter((record): record is CustomerOwnerRecord => Boolean(record));
-      setCustomerOwners((current) => normalized.map((record) => ({
+      const pending = adminUnlocked ? [] : readPendingCustomerOwners();
+      const merged = dedupeCustomerOwnerRecords([...normalized, ...pending]);
+      setCustomerOwners((current) => merged.map((record) => ({
         ...record,
         privateNote: current.find((item) => item.id === record.id)?.privateNote ?? record.privateNote,
       })));
       setCustomerOwnerCloudReady(true);
-      setStatus(`已读取 ${normalized.length} 条云端客户归属`);
+      setStatus(`已读取 ${normalized.length} 条云端客户归属${pending.length ? `，保留 ${pending.length} 条待同步客户` : ""}`);
     }).catch(() => {
       if (!cancelled) setStatus("客户归属云端暂时无法读取，当前继续使用本机资料");
     });
     return () => { cancelled = true; };
-  }, [customerOwnerSyncKey, isOnline, storageReady]);
+  }, [adminUnlocked, customerOwnerSyncKey, isOnline, storageReady]);
 
   useEffect(() => {
     if (adminUnlocked || !isOnline || !staffSyncKey) return undefined;
