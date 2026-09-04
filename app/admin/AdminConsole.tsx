@@ -1411,8 +1411,10 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
   const [cloudSyncStatus, setCloudSyncStatus] = useState("正在连接云端资料");
   const [isOnline, setIsOnline] = useState(true);
   const [cloudSyncPending, setCloudSyncPending] = useState(false);
+  const [isRefreshingSharedWorkspace, setIsRefreshingSharedWorkspace] = useState(false);
   const cloudVersionRef = useRef<number | null>(null);
   const cloudSyncInFlightRef = useRef(false);
+  const sharedWorkspaceRefreshInFlightRef = useRef(false);
   const [pdfDropActive, setPdfDropActive] = useState(false);
   const [pdfImportState, setPdfImportState] = useState<PdfImportState>({ phase: "idle", fileName: "", message: "等待导入产品图册", importedCount: 0 });
   const [status, setStatus] = useState(`已进入${session.role === "admin" ? "管理员" : "销售"}版：${session.name}`);
@@ -1581,15 +1583,23 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
   }, [workflowPricingStorageKey]);
 
   const refreshSharedWorkspaceState = useCallback(async (announce = false) => {
+    if (sharedWorkspaceRefreshInFlightRef.current) return;
+    sharedWorkspaceRefreshInFlightRef.current = true;
+    setIsRefreshingSharedWorkspace(true);
     setCloudSyncStatus("正在读取云端产品与报价公式");
-    const result = await fetchSharedWorkspaceState();
-    if (result.kind === "ready") {
-      applySharedWorkspaceState(result.state);
-      if (announce) setStatus(`已刷新云端目录 V${result.state.version}`);
-    } else {
-      cloudVersionRef.current = null;
-      setCloudSyncStatus(result.message);
-      if (announce) setStatus(result.message);
+    try {
+      const result = await fetchSharedWorkspaceState();
+      if (result.kind === "ready") {
+        applySharedWorkspaceState(result.state);
+        if (announce) setStatus(`已刷新云端目录 V${result.state.version}`);
+      } else {
+        cloudVersionRef.current = null;
+        setCloudSyncStatus(result.message);
+        if (announce) setStatus(result.message);
+      }
+    } finally {
+      sharedWorkspaceRefreshInFlightRef.current = false;
+      setIsRefreshingSharedWorkspace(false);
     }
   }, [applySharedWorkspaceState]);
 
@@ -3114,8 +3124,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, sa
             <strong>{session.name}</strong>
             <span>{session.role === "admin" ? "管理员版" : "销售版"}</span>
           </div>
-          {session.role === "sales" ? <button type="button" onClick={() => void refreshSharedWorkspaceState(true)} title="立即读取管理员发布的产品和报价公式">
-            <RotateCcw size={15} />刷新云端目录
+          {session.role === "sales" ? <button type="button" onClick={() => void refreshSharedWorkspaceState(true)} disabled={isRefreshingSharedWorkspace} title="立即读取管理员发布的产品和报价公式">
+            <RotateCcw size={15} />{isRefreshingSharedWorkspace ? "刷新中" : "刷新云端目录"}
           </button> : null}
           <button onClick={save}>
             <Save size={15} />
