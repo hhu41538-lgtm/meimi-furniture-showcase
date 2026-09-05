@@ -184,6 +184,7 @@ type QuoteSnapshot = {
 
 type QuoteWorkflowStage = "demand" | "warehouse" | "generated";
 type ActiveModule = "home" | "customers" | "quote" | "products" | "search" | "logistics" | "admin";
+type AdminPanelView = "team" | "leads" | "catalogue" | "system";
 
 type CustomerTier = "A" | "B" | "C";
 type CustomerFollowStatus = "new" | "following" | "quoted" | "won" | "paused";
@@ -1440,6 +1441,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [quoteWorkflowStage, setQuoteWorkflowStage] = useState<QuoteWorkflowStage>("demand");
   const [quoteWorkspaceView, setQuoteWorkspaceView] = useState<"customer" | "archive">("customer");
   const [activeModule, setActiveModule] = useState<ActiveModule>("home");
+  const [adminPanelView, setAdminPanelView] = useState<AdminPanelView>("team");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [quoteDetailsOpen, setQuoteDetailsOpen] = useState(false);
@@ -3647,7 +3649,19 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             </div>
             <button className="admin-logout-button" type="button" onClick={onLogout}><LogOut size={15} />退出登录</button>
           </section>
-          <section className="account-permission-panel" aria-label="销售账号权限">
+          <nav className="admin-section-tabs" aria-label="管理员维护分区">
+            {([
+              ["team", "账号与权限", `${salesAccounts.length} 个销售账号`],
+              ["leads", "广告线索", `${metaUnassignedCount} 条待分配`],
+              ["catalogue", "产品与价格", `${entries.length} 条产品资料`],
+              ["system", "系统状态", isOnline ? "在线" : "离线"],
+            ] as [AdminPanelView, string, string][]).map(([view, label, detail]) => (
+              <button key={view} type="button" className={adminPanelView === view ? "is-active" : ""} onClick={() => setAdminPanelView(view)} aria-current={adminPanelView === view ? "page" : undefined}>
+                <strong>{label}</strong><small>{detail}</small>
+              </button>
+            ))}
+          </nav>
+          {adminPanelView === "team" ? <section className="account-permission-panel" aria-label="销售账号权限">
             <div className="admin-section-heading">
               <div>
                 <p>Staff accounts</p>
@@ -3693,8 +3707,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             ) : (
               <div className="account-permission-empty"><UsersRound size={18} /><span>还没有销售账号。销售在登录页注册后，会出现在这里，默认拥有销售端基础板块。</span></div>
             )}
-          </section>
-          <section className="account-permission-panel meta-integration-panel" aria-label="Meta广告线索接入">
+          </section> : null}
+          {adminPanelView === "leads" ? <section className="account-permission-panel meta-integration-panel" aria-label="Meta广告线索接入">
             <div className="admin-section-heading">
               <div>
                 <p>Meta Lead Ads</p>
@@ -3769,8 +3783,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                 <button type="button" onClick={() => void saveMetaPendingLead(lead)} disabled={!isOnline || Boolean(savingMetaLeadId)} aria-busy={savingMetaLeadId === lead.leadgenId}><Save size={14} />{savingMetaLeadId === lead.leadgenId ? "保存中..." : "保存并入库"}</button>
               </div>)}
             </div> : null}
-          </section>
-          <section className="pdf-import-panel" aria-label="PDF产品图册导入">
+          </section> : null}
+          {adminPanelView === "catalogue" ? <section className="pdf-import-panel" aria-label="PDF产品图册导入">
             <div className="admin-section-heading">
               <div>
                 <p>Catalogue import</p>
@@ -3802,7 +3816,20 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               {pdfImportState.phase === "done" ? <small>新产品默认隐藏且价格为 0，请打开产品详情核对后再上架。</small> : null}
               {pdfImportState.phase === "idle" ? <small>支持电脑中的 .pdf 文件；识别结果保存在当前浏览器的内部资料库。</small> : null}
             </div>
-          </section>
+          </section> : null}
+          {adminPanelView === "system" ? <section className="admin-system-panel" aria-label="系统状态">
+            <div className="admin-section-heading">
+              <div><p>System status</p><h2>系统状态</h2></div>
+              <span>{isOnline ? "在线" : "离线"} · 本地存储已启用</span>
+            </div>
+            <div className="admin-system-grid">
+              <div><strong>{isOnline ? "在线" : "离线"}</strong><small>网络状态</small></div>
+              <div><strong>{cloudSyncPending ? "待同步" : "已同步"}</strong><small>产品与报价云端状态</small></div>
+              <div><strong>{entries.length}</strong><small>产品资料</small></div>
+              <div><strong>{visibleQuoteHistory.length}</strong><small>报价留档</small></div>
+            </div>
+            <p className="admin-system-note">管理员修改产品、价格和报价公式后，点击顶部“保存并同步”；销售端刷新云端目录后读取最新版本。Meta 授权配置在“广告线索”分区完成。</p>
+          </section> : null}
         </>
       ) : null}
 
@@ -4280,7 +4307,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       </section>
       ) : null}
 
-      {activeModule === "products" || activeModule === "admin" ? (
+      {activeModule === "products" || (activeModule === "admin" && adminPanelView === "catalogue") ? (
       <>
       <section className="admin-toolbar" aria-label="资料筛选与操作">
         <label className="admin-search">
@@ -4365,7 +4392,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
       </>
       ) : null}
 
-      {activeModule !== "home" && activeModule !== "customers" && !(activeModule === "quote" && quoteWorkspaceView === "archive") ? (
+      {((activeModule !== "home" && activeModule !== "customers" && activeModule !== "admin" && !(activeModule === "quote" && quoteWorkspaceView === "archive")) || (activeModule === "admin" && adminPanelView === "catalogue")) ? (
       <div className={`admin-workspace admin-workspace-${activeModule}${activeModule === "quote" ? ` admin-workspace-quote-${quoteWorkflowStage}` : ""}`}>
         <section id="product-warehouse" className="admin-library" aria-label="产品资料库">
           <div className="admin-section-heading">
