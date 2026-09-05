@@ -3819,7 +3819,12 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             </div>
             <div className="meta-integration-summary">
               <div>
-                <strong>Webhook 回调地址</strong>
+                <div className="meta-integration-summary-heading">
+                  <strong>Webhook 回调地址</strong>
+                  <span className={`meta-connection-badge${metaConfig ? (metaConfig.readyForWebhook ? " is-ready" : " is-missing") : " is-unchecked"}`}>
+                    {metaConfig ? (metaConfig.readyForWebhook ? "自动接收已就绪" : "等待配置") : "状态未检查"}
+                  </span>
+                </div>
                 <code>{typeof window === "undefined" ? "/api/meta/webhook" : `${window.location.origin}/api/meta/webhook`}</code>
               </div>
               <button type="button" onClick={() => {
