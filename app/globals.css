@@ -9,6 +9,57 @@
   --ease-lux: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.admin-lead-routing-note {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: -2px 0 2px;
+  border: 1px solid #c8d9f7;
+  background: #f6f9ff;
+  padding: 11px 13px;
+}
+
+.admin-lead-routing-note > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.admin-lead-routing-note strong {
+  color: var(--admin-cobalt-deep);
+  font-size: 13px;
+}
+
+.admin-lead-routing-note span {
+  color: #667085;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.admin-lead-routing-note button {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 6px;
+  border: 1px solid var(--admin-cobalt);
+  background: var(--admin-cobalt);
+  color: #fff;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .admin-lead-routing-note {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-lead-routing-note button {
+    justify-content: center;
+  }
+}
+
 body {
   color: var(--foreground);
   background: var(--background);

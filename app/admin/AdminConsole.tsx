@@ -3910,6 +3910,10 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
 
       {activeModule === "customers" ? (
       <section id="customer-pool" className={`customer-owner-panel${customerOwnerRecord && !customerOwnershipIssue ? " has-owner" : ""}${customerOwnerConflict ? " has-conflict" : ""}`} aria-label="客户归属确认">
+        {adminUnlocked ? <div className="admin-lead-routing-note" role="status">
+          <div><strong>管理员线索池</strong><span>Meta 表单线索会先进入这里，管理员分配后销售端才会看到对应客户。</span></div>
+          <button type="button" onClick={() => { setAdminPanelView("leads"); openModule("admin"); }}><CloudUpload size={14} />管理线索分配</button>
+        </div> : null}
         <div>
           <h2>录入客户</h2>
           <small>国家 + 客户电话是唯一识别依据，输入后自动检查是否已有销售录入。</small>
