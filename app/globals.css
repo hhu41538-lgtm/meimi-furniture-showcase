@@ -4046,6 +4046,67 @@ body:has(.admin-shell) {
   white-space: nowrap;
 }
 
+.admin-cockpit-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-cockpit-grid button {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 112px;
+  padding: 16px;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--admin-ink);
+  text-align: left;
+}
+
+.admin-cockpit-grid button:hover {
+  border-color: var(--admin-cobalt);
+  background: #f6f9ff;
+}
+
+.admin-cockpit-grid button > span:nth-child(3) {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.admin-cockpit-grid strong {
+  color: var(--admin-cobalt-deep);
+  font-size: 14px;
+}
+
+.admin-cockpit-grid small {
+  overflow: hidden;
+  color: #667085;
+  font-size: 11px;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+}
+
+.admin-cockpit-number {
+  color: var(--admin-cobalt);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.admin-cockpit-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #c8d9f7;
+  color: var(--admin-cobalt);
+  background: #eef4ff;
+}
+
 .admin-system-note {
   margin: 16px 0 0;
 }
@@ -4053,8 +4114,15 @@ body:has(.admin-shell) {
 @media (max-width: 720px) {
   .admin-section-tabs,
   .admin-system-grid,
-  .admin-system-actions {
+  .admin-system-actions,
+  .admin-cockpit-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-cockpit-grid {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -3599,7 +3599,28 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             <p className="sales-next-action">下一步：{adminUnlocked ? adminNextAction : nextSalesAction}</p>
           </div>
         </div>
-        <div className="sales-cockpit-grid">
+        {adminUnlocked ? <div className="admin-cockpit-grid" aria-label="管理员管理入口">
+          <button type="button" onClick={() => { setAdminPanelView("leads"); openModule("admin"); }}>
+            <span className="admin-cockpit-number">01</span><span className="admin-cockpit-icon" aria-hidden="true"><CloudUpload size={22} /></span>
+            <span><strong>线索分配</strong><small>{metaUnassignedCount ? `${metaUnassignedCount} 条待分配 Meta 线索` : "查看 Meta 接入与分配状态"}</small></span><ArrowUpRight size={17} aria-hidden="true" />
+          </button>
+          <button type="button" onClick={() => { setAdminPanelView("team"); openModule("admin"); }}>
+            <span className="admin-cockpit-number">02</span><span className="admin-cockpit-icon" aria-hidden="true"><UsersRound size={22} /></span>
+            <span><strong>账号与权限</strong><small>{salesAccounts.length} 个销售账号需要维护</small></span><ArrowUpRight size={17} aria-hidden="true" />
+          </button>
+          <button type="button" onClick={() => { setAdminPanelView("catalogue"); openModule("admin"); }}>
+            <span className="admin-cockpit-number">03</span><span className="admin-cockpit-icon" aria-hidden="true"><Boxes size={22} /></span>
+            <span><strong>产品与价格</strong><small>{entries.length} 条产品资料，统一维护销售端价格</small></span><ArrowUpRight size={17} aria-hidden="true" />
+          </button>
+          <button type="button" onClick={() => { setAdminPanelView("system"); openModule("admin"); }}>
+            <span className="admin-cockpit-number">04</span><span className="admin-cockpit-icon" aria-hidden="true"><Activity size={22} /></span>
+            <span><strong>系统状态</strong><small>{cloudSyncPending ? "产品与报价等待同步" : isOnline ? "网络在线，资料已保存" : "当前离线，本地资料可用"}</small></span><ArrowUpRight size={17} aria-hidden="true" />
+          </button>
+          <button type="button" onClick={() => { setQuoteWorkspaceView("archive"); openModule("quote"); }}>
+            <span className="admin-cockpit-number">05</span><span className="admin-cockpit-icon" aria-hidden="true"><Archive size={22} /></span>
+            <span><strong>报价留档</strong><small>{visibleQuoteHistory.length} 条销售过往报价</small></span><ArrowUpRight size={17} aria-hidden="true" />
+          </button>
+        </div> : <div className="sales-cockpit-grid">
           {canAccessModule("customers") ? <article className="sales-cockpit-card">
             <button className="sales-cockpit-card-hit" type="button" onClick={() => openModule("customers")} aria-label="进入客户池">
               <span className="sales-cockpit-card-number" aria-hidden="true">01</span>
@@ -3650,7 +3671,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               <span className="sales-cockpit-card-arrow" aria-hidden="true"><ArrowUpRight size={19} /></span>
             </button>
           </article> : null}
-        </div>
+        </div>}
       </section> : null}
 
       {activeModule !== "home" ? (
