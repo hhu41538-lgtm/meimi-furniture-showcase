@@ -3520,7 +3520,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               <span className="admin-sidebar-icon" aria-hidden="true"><House size={17} strokeWidth={1.8} /></span><span>工作台</span>
             </button>
             <button className={activeModule === "customers" ? "is-active" : ""} type="button" onClick={() => openModule("customers")} title="客户线索" aria-current={activeModule === "customers" ? "page" : undefined}>
-              <span className="admin-sidebar-icon" aria-hidden="true"><UsersRound size={17} strokeWidth={1.8} /></span><span>客户线索</span>
+              <span className="admin-sidebar-icon" aria-hidden="true"><UsersRound size={17} strokeWidth={1.8} /></span><span>客户线索</span>{metaUnassignedCount ? <span className="admin-sidebar-badge" aria-label={`${metaUnassignedCount} 条待分配`}>{metaUnassignedCount}</span> : null}
             </button>
             <button className={activeModule === "quote" && quoteWorkspaceView === "archive" ? "is-active" : ""} type="button" onClick={() => { setQuoteWorkspaceView("archive"); openModule("quote"); }} title="报价留档" aria-current={activeModule === "quote" && quoteWorkspaceView === "archive" ? "page" : undefined}>
               <span className="admin-sidebar-icon" aria-hidden="true"><Archive size={17} strokeWidth={1.8} /></span><span>报价留档</span>
@@ -3529,7 +3529,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               <span className="admin-sidebar-icon" aria-hidden="true"><Boxes size={17} strokeWidth={1.8} /></span><span>产品与价格</span>
             </button>
             <button className={activeModule === "admin" && adminPanelView === "system" ? "is-active" : ""} type="button" onClick={() => { setAdminPanelView("system"); openModule("admin"); }} title="系统状态" aria-current={activeModule === "admin" && adminPanelView === "system" ? "page" : undefined}>
-              <span className="admin-sidebar-icon" aria-hidden="true"><Activity size={17} strokeWidth={1.8} /></span><span>系统状态</span>
+              <span className="admin-sidebar-icon" aria-hidden="true"><Activity size={17} strokeWidth={1.8} /></span><span>系统状态</span>{cloudSyncPending ? <span className="admin-sidebar-badge is-warning" aria-label="有资料待同步">待同步</span> : null}
             </button>
           </> : ([
             ["home", "工作台", <House key="home" size={17} strokeWidth={1.8} />],
