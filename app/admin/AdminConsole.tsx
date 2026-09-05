@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { type ChangeEvent, type DragEvent, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  Activity,
   AlertTriangle,
   Archive,
   ArrowRight,
@@ -3502,7 +3503,23 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
         </div>
         <nav className="admin-sidebar-nav">
           <span className="admin-sidebar-label">工作区</span>
-          {([
+          {adminUnlocked ? <>
+            <button className={activeModule === "home" ? "is-active" : ""} type="button" onClick={() => openModule("home")} title="管理员工作台" aria-current={activeModule === "home" ? "page" : undefined}>
+              <span className="admin-sidebar-icon" aria-hidden="true"><House size={17} strokeWidth={1.8} /></span><span>工作台</span>
+            </button>
+            <button className={activeModule === "customers" ? "is-active" : ""} type="button" onClick={() => openModule("customers")} title="客户线索" aria-current={activeModule === "customers" ? "page" : undefined}>
+              <span className="admin-sidebar-icon" aria-hidden="true"><UsersRound size={17} strokeWidth={1.8} /></span><span>客户线索</span>
+            </button>
+            <button className={activeModule === "quote" && quoteWorkspaceView === "archive" ? "is-active" : ""} type="button" onClick={() => { setQuoteWorkspaceView("archive"); openModule("quote"); }} title="报价留档" aria-current={activeModule === "quote" && quoteWorkspaceView === "archive" ? "page" : undefined}>
+              <span className="admin-sidebar-icon" aria-hidden="true"><Archive size={17} strokeWidth={1.8} /></span><span>报价留档</span>
+            </button>
+            <button className={activeModule === "admin" && adminPanelView === "catalogue" ? "is-active" : ""} type="button" onClick={() => { setAdminPanelView("catalogue"); openModule("admin"); }} title="产品与价格" aria-current={activeModule === "admin" && adminPanelView === "catalogue" ? "page" : undefined}>
+              <span className="admin-sidebar-icon" aria-hidden="true"><Boxes size={17} strokeWidth={1.8} /></span><span>产品与价格</span>
+            </button>
+            <button className={activeModule === "admin" && adminPanelView === "system" ? "is-active" : ""} type="button" onClick={() => { setAdminPanelView("system"); openModule("admin"); }} title="系统状态" aria-current={activeModule === "admin" && adminPanelView === "system" ? "page" : undefined}>
+              <span className="admin-sidebar-icon" aria-hidden="true"><Activity size={17} strokeWidth={1.8} /></span><span>系统状态</span>
+            </button>
+          </> : ([
             ["home", "工作台", <House key="home" size={17} strokeWidth={1.8} />],
             ["customers", "客户池", <UsersRound key="customers" size={17} strokeWidth={1.8} />],
             ["quote", "报价流程", <Calculator key="quote" size={17} strokeWidth={1.8} />],
@@ -3515,9 +3532,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             </button>
           ))}
           <span className="admin-sidebar-label admin-sidebar-label-settings">设置</span>
-          {adminUnlocked ? <button className={activeModule === "admin" ? "is-active" : ""} type="button" onClick={() => openModule("admin")} title="管理员维护" aria-current={activeModule === "admin" ? "page" : undefined}>
+          {adminUnlocked ? <button className={activeModule === "admin" && adminPanelView === "team" ? "is-active" : ""} type="button" onClick={() => { setAdminPanelView("team"); openModule("admin"); }} title="账号与权限" aria-current={activeModule === "admin" && adminPanelView === "team" ? "page" : undefined}>
             <span className="admin-sidebar-icon" aria-hidden="true"><Settings2 size={17} strokeWidth={1.8} /></span>
-            <span>管理员维护</span>
+            <span>{adminUnlocked ? "账号与权限" : "管理员维护"}</span>
           </button> : null}
         </nav>
         <div className="admin-sidebar-footer" title={isOnline ? "当前可以读取或同步云端资料" : "当前离线，修改会先保存在本机"}>
