@@ -3514,7 +3514,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
           <button className="admin-sidebar-mobile-close" type="button" onClick={() => setSidebarOpen(false)} aria-label="关闭主导航" title="关闭主导航"><X size={18} /></button>
         </div>
         <nav className="admin-sidebar-nav">
-          <span className="admin-sidebar-label">工作区</span>
+          <span className="admin-sidebar-label">{adminUnlocked ? "管理工作区" : "工作区"}</span>
           {adminUnlocked ? <>
             <button className={activeModule === "home" ? "is-active" : ""} type="button" onClick={() => openModule("home")} title="管理员工作台" aria-current={activeModule === "home" ? "page" : undefined}>
               <span className="admin-sidebar-icon" aria-hidden="true"><House size={17} strokeWidth={1.8} /></span><span>工作台</span>
@@ -3543,7 +3543,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               <span>{module === "quote" && quote.lines.length ? `${label} · ${quote.lines.length}` : label}</span>
             </button>
           ))}
-          <span className="admin-sidebar-label admin-sidebar-label-settings">设置</span>
+          <span className="admin-sidebar-label admin-sidebar-label-settings">{adminUnlocked ? "访问控制" : "设置"}</span>
           {adminUnlocked ? <button className={activeModule === "admin" && adminPanelView === "team" ? "is-active" : ""} type="button" onClick={() => { setAdminPanelView("team"); openModule("admin"); }} title="账号与权限" aria-current={activeModule === "admin" && adminPanelView === "team" ? "page" : undefined}>
             <span className="admin-sidebar-icon" aria-hidden="true"><Settings2 size={17} strokeWidth={1.8} /></span>
             <span>{adminUnlocked ? "账号与权限" : "管理员维护"}</span>
@@ -3595,7 +3595,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
         </div>
       </header>
 
-      {activeModule === "home" ? <section className="sales-cockpit" aria-label="销售三分钟工作台">
+      {activeModule === "home" ? <section className="sales-cockpit" aria-label={adminUnlocked ? "管理员管理工作台" : "销售三分钟工作台"}>
         <div className="sales-cockpit-status" role="status" aria-live="polite">
           <span className="sales-cockpit-status-main"><CheckCircle2 size={15} />{storageReady ? "已保存最新内容" : "正在读取本地资料"}</span>
           <span>{lastSavedAt ? `最近保存 ${shortDateTime(lastSavedAt)}` : autoSaveStatus}</span>
