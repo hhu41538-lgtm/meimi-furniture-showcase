@@ -2243,6 +2243,12 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     logistics: "汇率物流",
     admin: "管理员维护",
   }[activeModule];
+  const adminPanelGuidance = {
+    team: "管理销售账号、启用状态和可用权限",
+    leads: "接收 Meta 线索，审核后按数量分配给销售",
+    catalogue: "维护产品资料、统一价格和报价公式",
+    system: "查看网络、同步、产品和报价留档状态",
+  }[adminPanelView];
   const deliveryChecklist = [
     {
       label: "客户版报价",
@@ -3630,7 +3636,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
           <button onClick={() => openModule("home")}>返回首页</button>
           <strong>{activeModuleTitle}</strong>
           <div className="admin-module-nav-copy">
-            <span>{nextSalesAction !== status ? `${nextSalesAction} · ` : ""}报价完成度 {quoteProgress}%</span>
+            <span>{activeModule === "admin" ? adminPanelGuidance : `${nextSalesAction !== status ? `${nextSalesAction} · ` : ""}报价完成度 ${quoteProgress}%`}</span>
           </div>
         </nav>
       ) : null}
