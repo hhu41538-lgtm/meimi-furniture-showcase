@@ -658,6 +658,27 @@ body:has(.admin-shell) {
   font-weight: 500;
 }
 
+.meta-setup-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding-top: 2px;
+}
+
+.meta-setup-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--admin-cobalt);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.meta-setup-links a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .meta-assignment-controls {
   display: flex;
   flex-wrap: wrap;

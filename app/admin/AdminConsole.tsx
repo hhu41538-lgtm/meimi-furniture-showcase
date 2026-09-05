@@ -3874,6 +3874,11 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                 <li><span>03</span><b>在 Meta 应用订阅 Page 的 leadgen 事件</b></li>
                 <li><span>04</span><b>发送一条测试表单，再回到这里检查和分配</b></li>
               </ol>
+              <div className="meta-setup-links" aria-label="Meta 接入管理入口">
+                <a href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer"><ExternalLink size={13} />Meta 开发者</a>
+                <a href="https://vercel.com/meimi/meimi-internal-quote-workspace/settings/environment-variables" target="_blank" rel="noreferrer"><ExternalLink size={13} />Vercel 环境变量</a>
+                <a href="https://business.facebook.com/latest/instant_forms/crm_setup/?asset_id=1166881256506899&business_id=1166913053170386" target="_blank" rel="noreferrer"><ExternalLink size={13} />Meta 表单设置</a>
+              </div>
             </div>
             <div className="meta-assignment-controls">
               <strong>管理员分配待处理线索{unassignedLeadCount ? ` · 待分配 ${unassignedLeadCount} 条` : " · 当前没有待分配线索"}</strong>
