@@ -541,6 +541,36 @@ body:has(.admin-shell) {
   width: 82px;
 }
 
+.meta-assignment-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  border-top: 1px solid var(--admin-line);
+  padding-top: 10px;
+}
+
+.meta-assignment-summary > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 108px;
+  padding: 7px 9px;
+  border: 1px solid var(--admin-line);
+  background: #fff;
+}
+
+.meta-assignment-summary small {
+  color: #667085;
+  font-size: 11px;
+}
+
+.meta-assignment-summary strong {
+  margin-left: auto;
+  color: var(--admin-cobalt-deep);
+  font-size: 14px;
+}
+
 .meta-pending-list {
   display: grid;
   gap: 8px;

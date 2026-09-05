@@ -3836,6 +3836,12 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                 <UsersRound size={15} />{isAssigningMetaLeads ? "分配中..." : "按数量分配"}
               </button>
             </div>
+            <div className="meta-assignment-summary" aria-label="销售 Meta 线索数量">
+              {salesAccounts.filter((account) => account.active).map((account) => (
+                <span key={account.id}><small>{account.name}</small><strong>{metaAssignedCountBySales[account.id] ?? 0}</strong></span>
+              ))}
+              {!salesAccounts.some((account) => account.active) ? <small>暂无可接收线索的销售账号</small> : null}
+            </div>
             {metaPendingLeads.length ? <div className="meta-pending-list">
               {metaPendingLeads.map((lead) => <div className="meta-pending-row" key={lead.leadgenId}>
                 <div><strong>{lead.name || "未填姓名"}</strong><small>{lead.company || lead.email || lead.leadgenId}</small></div>
