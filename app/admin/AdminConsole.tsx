@@ -3244,6 +3244,13 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     }
   }
 
+  useEffect(() => {
+    if (!adminUnlocked || !isOnline || activeModule !== "admin" || metaConfigStatus) return;
+    void checkMetaConfig();
+    // checkMetaConfig is intentionally called once when the admin maintenance view opens.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeModule, adminUnlocked, isOnline, metaConfigStatus]);
+
   async function loadMetaPendingLeads() {
     if (!adminUnlocked || isLoadingMetaPending) return;
     setIsLoadingMetaPending(true);
