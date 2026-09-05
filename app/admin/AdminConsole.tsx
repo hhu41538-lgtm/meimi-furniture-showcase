@@ -5,6 +5,7 @@ import { type ChangeEvent, type DragEvent, type ReactNode, useCallback, useEffec
 import {
   AlertTriangle,
   Archive,
+  ArrowRight,
   ArrowLeftRight,
   ArrowUpRight,
   Boxes,
@@ -1486,6 +1487,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [metaWebhookCopied, setMetaWebhookCopied] = useState(false);
   const [isSyncingMetaLeads, setIsSyncingMetaLeads] = useState(false);
   const [metaConfigStatus, setMetaConfigStatus] = useState("");
+  const [savingMetaLeadId, setSavingMetaLeadId] = useState("");
   const [isCheckingMetaConfig, setIsCheckingMetaConfig] = useState(false);
   const [metaPendingLeads, setMetaPendingLeads] = useState<MetaPendingLead[]>([]);
   const [isLoadingMetaPending, setIsLoadingMetaPending] = useState(false);
@@ -3221,7 +3223,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     setIsCheckingMetaConfig(true);
     try {
       const response = await fetch("/api/meta/status", { headers: { "x-meimi-admin-key": adminSyncKey }, cache: "no-store" });
-      const payload = await response.json().catch(() => ({})) as { message?: string; config?: Record<string, boolean>; pending?: number; needsMapping?: number; imported?: number; readyForRetrieval?: boolean; latestReceivedAt?: string | null };
+      const payload = await response.json().catch(() => ({})) as { message?: string; config?: Record<string, boolean>; databaseReachable?: boolean; pending?: number; needsMapping?: number; readFailed?: number; duplicates?: number; imported?: number; readyForWebhook?: boolean; latestReceivedAt?: string | null };
       if (!response.ok || !payload.config) throw new Error(payload.message || "Meta 配置检查失败");
       const missing = Object.entries({
         数据库: payload.config.database,
@@ -3229,9 +3231,12 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
         AppSecret: payload.config.appSecret,
         PageAccessToken: payload.config.pageAccessToken,
       }).filter(([, ready]) => !ready).map(([label]) => label);
-      const summary = " · 待处理 " + (payload.pending ?? 0) + " 条 · 待补字段 " + (payload.needsMapping ?? 0) + " 条 · 已导入 " + (payload.imported ?? 0) + " 条 · 最近收到 " + (payload.latestReceivedAt ? shortDateTime(payload.latestReceivedAt) : "未收到");
-      setMetaConfigStatus((missing.length ? "待配置：" + missing.join("、") : "配置齐全") + summary);
-      setStatus(payload.readyForRetrieval ? "Meta 接入配置检查通过，可以同步线索" : "Meta 接入配置尚未完成，请按提示补齐环境变量");
+      const summary = `待处理 ${payload.pending ?? 0} 条 · 读取失败 ${payload.readFailed ?? 0} 条 · 待补字段 ${payload.needsMapping ?? 0} 条 · 已入库 ${payload.imported ?? 0} 条 · 重复留资 ${payload.duplicates ?? 0} 条`;
+      const connection = missing.length ? "待配置：" + missing.join("、")
+        : !payload.databaseReachable ? "数据库连接失败"
+        : payload.latestReceivedAt ? `最近收到表单：${shortDateTime(payload.latestReceivedAt)}` : "配置齐全，尚未收到测试表单";
+      setMetaConfigStatus(`${connection}。${summary}`);
+      setStatus(payload.readyForWebhook ? connection : "Meta 自动接入尚未就绪，请检查配置和数据库连接");
     } catch (error) {
       setMetaConfigStatus(error instanceof Error ? error.message : "Meta 配置检查失败");
     } finally {
@@ -3256,22 +3261,29 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   }
 
   async function saveMetaPendingLead(lead: MetaPendingLead) {
+    if (!adminUnlocked || !isOnline || savingMetaLeadId) return;
     if (!lead.country.trim() || !lead.phone.trim()) {
       setStatus("请先补充国家和电话");
       return;
     }
-    const response = await fetch("/api/meta/pending", {
+    setSavingMetaLeadId(lead.leadgenId);
+    try {
+      const response = await fetch("/api/meta/pending", {
       method: "PATCH",
       headers: { "content-type": "application/json", "x-meimi-admin-key": adminSyncKey },
       body: JSON.stringify({ leadgenId: lead.leadgenId, country: lead.country, phone: lead.phone }),
     });
-    const payload = await response.json().catch(() => ({})) as { message?: string };
-    if (!response.ok) {
-      setStatus(payload.message || "Meta 线索字段保存失败");
-      return;
+      const payload = await response.json().catch(() => ({})) as { message?: string; skipped?: number; missingFields?: number };
+      if (!response.ok) throw new Error(payload.message || "Meta 线索字段保存失败");
+      if (payload.missingFields) throw new Error("国家或电话仍不完整，请检查后重试");
+      setMetaPendingLeads((current) => current.filter((item) => item.leadgenId !== lead.leadgenId));
+      setPendingCustomerOwnerVersion((current) => current + 1);
+      setStatus(payload.skipped ? "该客户已存在，保留原销售归属" : "字段已补全，客户已进入管理员待分配池");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "保存失败，请检查网络后重试");
+    } finally {
+      setSavingMetaLeadId("");
     }
-    setMetaPendingLeads((current) => current.filter((item) => item.leadgenId !== lead.leadgenId));
-    setStatus(`已补全 Meta 线索 ${lead.leadgenId}，请点击同步并导入`);
   }
 
   function save() {
@@ -3681,7 +3693,28 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                 <p>Meta Lead Ads</p>
                 <h2>广告线索接入</h2>
               </div>
-              <span>第一阶段：Webhook 已就绪</span>
+              <span>Meta 即时表单</span>
+            </div>
+            <div className="meta-lead-route" aria-label="Meta 广告线索流转流程">
+              <div>
+                <FileText size={18} aria-hidden="true" />
+                <span><strong>广告表单提交</strong></span>
+              </div>
+              <ArrowRight className="meta-lead-route-arrow" size={17} aria-hidden="true" />
+              <div>
+                <CloudUpload size={18} aria-hidden="true" />
+                <span><strong>管理员待分配池</strong></span>
+              </div>
+              <ArrowRight className="meta-lead-route-arrow" size={17} aria-hidden="true" />
+              <div>
+                <UsersRound size={18} aria-hidden="true" />
+                <span><strong>管理员按数量分配</strong></span>
+              </div>
+              <ArrowRight className="meta-lead-route-arrow" size={17} aria-hidden="true" />
+              <div>
+                <CheckCircle2 size={18} aria-hidden="true" />
+                <span><strong>销售跟进和报价</strong></span>
+              </div>
             </div>
             <div className="meta-integration-summary">
               <div>
@@ -3693,44 +3726,40 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
                 void navigator.clipboard?.writeText(value).then(() => {
                   setMetaWebhookCopied(true);
                   window.setTimeout(() => setMetaWebhookCopied(false), 1800);
-                });
+                }).catch(() => setStatus("复制失败，请检查浏览器剪贴板权限"));
               }} title="复制 Meta Webhook 回调地址">
                 <Copy size={14} />{metaWebhookCopied ? "已复制" : "复制地址"}
               </button>
             </div>
-            <div className="meta-integration-steps">
-              <span><b>01</b>在 Meta 开发者后台添加 Webhooks，并订阅 Page 的 <code>leadgen</code> 事件</span>
-              <span><b>02</b>在 Vercel 配置验证令牌、App Secret 和 Page Access Token</span>
-              <span><b>03</b>用 Meta Lead Ads Testing Tool 发一条测试线索，确认客户池收到 Meta 来源记录</span>
-            </div>
-            <small className="meta-integration-note">当前页面只显示接入准备状态；未完成 Meta 授权前，不会把普通客户标记为广告线索。</small>
+            <div className="meta-integration-actions">
             <button type="button" className="meta-integration-sync" onClick={() => void syncMetaLeads()} disabled={!isOnline || isSyncingMetaLeads} aria-busy={isSyncingMetaLeads} title={!isOnline ? "联网后才能同步 Meta 线索" : "读取 Meta 线索并导入客户池"}>
-              <CloudUpload size={15} />{isSyncingMetaLeads ? "同步中..." : "同步并导入 Meta 线索"}
+              <CloudUpload size={15} />{isSyncingMetaLeads ? "同步中..." : "重试待处理线索"}
             </button>
+            <button type="button" onClick={() => void checkMetaConfig()} disabled={!isOnline || isCheckingMetaConfig} aria-busy={isCheckingMetaConfig}>
+              <Settings2 size={15} />{isCheckingMetaConfig ? "检查中..." : "检查接入状态"}
+            </button>
+            <button type="button" onClick={() => void loadMetaPendingLeads()} disabled={!isOnline || isLoadingMetaPending} aria-busy={isLoadingMetaPending}>
+              <UsersRound size={15} />{isLoadingMetaPending ? "读取中..." : "待补字段"}
+            </button>
+            </div>
+            <small className="meta-integration-result" role="status" aria-live="polite">{metaConfigStatus || "尚未检查接入状态"}</small>
             <div className="meta-assignment-controls">
               <strong>管理员分配待处理线索{unassignedLeadCount ? ` · 待分配 ${unassignedLeadCount} 条` : " · 当前没有待分配线索"}</strong>
-              <select aria-label="选择接收待分配线索的销售" value={metaAssignmentSalesId} onChange={(event) => setMetaAssignmentSalesId(event.target.value)}>
+              <label>接收销售<select aria-label="选择接收待分配线索的销售" value={metaAssignmentSalesId} onChange={(event) => setMetaAssignmentSalesId(event.target.value)}>
                 <option value="">选择已注册销售</option>
                 {salesAccounts.filter((account) => account.active).map((account) => <option key={account.id} value={account.id}>{account.name}</option>)}
-              </select>
-              <input aria-label="待分配线索分配数量" type="number" min="1" max="500" value={metaAssignmentQuantity} onChange={(event) => setMetaAssignmentQuantity(event.target.value)} />
-              <button type="button" className="meta-integration-check" onClick={() => void assignMetaLeads()} disabled={!metaAssignmentSalesId || isAssigningMetaLeads} aria-busy={isAssigningMetaLeads} title="按数量分配管理员待分配线索">
+              </select></label>
+              <label>分配数量<input aria-label="待分配线索分配数量" type="number" min="1" max="500" value={metaAssignmentQuantity} onChange={(event) => setMetaAssignmentQuantity(event.target.value)} /></label>
+              <button type="button" className="meta-integration-check" onClick={() => void assignMetaLeads()} disabled={!isOnline || !metaAssignmentSalesId || !unassignedLeadCount || !Number.isInteger(Number(metaAssignmentQuantity)) || Number(metaAssignmentQuantity) < 1 || Number(metaAssignmentQuantity) > 500 || isAssigningMetaLeads} aria-busy={isAssigningMetaLeads} title="按数量分配管理员待分配线索">
                 <UsersRound size={15} />{isAssigningMetaLeads ? "分配中..." : "按数量分配"}
               </button>
             </div>
-            <button type="button" className="meta-integration-check" onClick={() => void checkMetaConfig()} disabled={isCheckingMetaConfig} aria-busy={isCheckingMetaConfig} title="检查云端和 Meta 环境变量是否齐全">
-              <Settings2 size={15} />{isCheckingMetaConfig ? "检查中..." : "检查接入配置"}
-            </button>
-            <button type="button" className="meta-integration-check" onClick={() => void loadMetaPendingLeads()} disabled={isLoadingMetaPending} aria-busy={isLoadingMetaPending} title="查看缺少国家或电话的 Meta 线索">
-              <UsersRound size={15} />{isLoadingMetaPending ? "读取中..." : "查看待补字段"}
-            </button>
-            {metaConfigStatus ? <small className="meta-integration-result" role="status" aria-live="polite">{metaConfigStatus}</small> : null}
             {metaPendingLeads.length ? <div className="meta-pending-list">
               {metaPendingLeads.map((lead) => <div className="meta-pending-row" key={lead.leadgenId}>
                 <div><strong>{lead.name || "未填姓名"}</strong><small>{lead.company || lead.email || lead.leadgenId}</small></div>
                 <input aria-label={`Meta 线索 ${lead.leadgenId} 国家`} value={lead.country} onChange={(event) => setMetaPendingLeads((current) => current.map((item) => item.leadgenId === lead.leadgenId ? { ...item, country: event.target.value } : item))} placeholder="国家" />
                 <input aria-label={`Meta 线索 ${lead.leadgenId} 电话`} value={lead.phone} onChange={(event) => setMetaPendingLeads((current) => current.map((item) => item.leadgenId === lead.leadgenId ? { ...item, phone: event.target.value } : item))} placeholder="电话" />
-                <button type="button" onClick={() => void saveMetaPendingLead(lead)}>保存</button>
+                <button type="button" onClick={() => void saveMetaPendingLead(lead)} disabled={!isOnline || Boolean(savingMetaLeadId)} aria-busy={savingMetaLeadId === lead.leadgenId}><Save size={14} />{savingMetaLeadId === lead.leadgenId ? "保存中..." : "保存并入库"}</button>
               </div>)}
             </div> : null}
           </section>

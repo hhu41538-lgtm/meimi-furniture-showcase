@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
+import { ensureMetaTables, importMetaLeads } from "../processing";
 
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
@@ -30,6 +31,7 @@ export async function GET(request: Request) {
   if (!url) return errorResponse("尚未配置云端数据库", 503, "DATABASE_NOT_CONFIGURED");
   try {
     const sql = neon<false, false>(url);
+    await ensureMetaTables(sql);
     const rows = await sql`SELECT leadgen_id, raw_payload FROM meimi_meta_leads WHERE status = 'needs_mapping' ORDER BY received_at ASC LIMIT 100`;
     const leads = (rows as Array<{ leadgen_id?: unknown; raw_payload?: unknown }>).map((row) => {
       const payload = row.raw_payload && typeof row.raw_payload === "object" ? row.raw_payload as { details?: unknown } : {};
@@ -59,18 +61,23 @@ export async function PATCH(request: Request) {
   const leadgenId = text(body.leadgenId);
   const country = text(body.country);
   const phone = text(body.phone);
-  if (!leadgenId || leadgenId.length > 200 || !country || country.length > 100 || !phone || phone.length > 100) {
+  if (!leadgenId || leadgenId.length > 200 || !country || country.length > 100 || !/\d/.test(phone) || phone.length > 100) {
     return errorResponse("请补充有效的国家和电话", 400, "MISSING_LEAD_FIELDS");
   }
   try {
     const sql = neon<false, false>(url);
-    const rows = await sql`SELECT raw_payload FROM meimi_meta_leads WHERE leadgen_id = ${leadgenId} LIMIT 1`;
+    await ensureMetaTables(sql);
+    const rows = await sql`SELECT raw_payload, status FROM meimi_meta_leads WHERE leadgen_id = ${leadgenId} LIMIT 1`;
     if (!rows.length) return errorResponse("找不到这条 Meta 线索", 404, "META_LEAD_NOT_FOUND");
+    if (rows[0].status !== "needs_mapping") return errorResponse("这条线索已处理，请刷新列表", 409, "META_LEAD_ALREADY_PROCESSED");
     const payload = rows[0].raw_payload && typeof rows[0].raw_payload === "object" ? rows[0].raw_payload as { details?: unknown } : {};
     const details = payload.details && typeof payload.details === "object" ? payload.details as Record<string, unknown> : {};
     const nextPayload = { ...payload, details: { ...details, country, phone } };
-    await sql`UPDATE meimi_meta_leads SET raw_payload = ${JSON.stringify(nextPayload)}::jsonb, status = 'details_ready', updated_at = NOW() WHERE leadgen_id = ${leadgenId}`;
-    return NextResponse.json({ ok: true });
+    const updated = await sql`UPDATE meimi_meta_leads SET raw_payload = ${JSON.stringify(nextPayload)}::jsonb, status = 'details_ready', updated_at = NOW()
+      WHERE leadgen_id = ${leadgenId} AND status = 'needs_mapping' RETURNING leadgen_id`;
+    if (!updated.length) return errorResponse("这条线索已处理，请刷新列表", 409, "META_LEAD_ALREADY_PROCESSED");
+    const result = await importMetaLeads(sql, [leadgenId]);
+    return NextResponse.json({ ok: true, ...result });
   } catch (error) {
     console.error("Meta pending lead update failed", error);
     return errorResponse("Meta 线索字段更新失败", 503, "META_PENDING_UPDATE_FAILED");

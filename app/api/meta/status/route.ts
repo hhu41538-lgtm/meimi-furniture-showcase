@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
+import { ensureMetaTables } from "../processing";
 
 export const dynamic = "force-dynamic";
 export const runtime = "edge";
@@ -30,23 +31,35 @@ export async function GET(request: Request) {
   let pending = 0;
   let imported = 0;
   let needsMapping = 0;
+  let readFailed = 0;
+  let duplicates = 0;
+  let databaseReachable = false;
   let latestReceivedAt: string | null = null;
   if (url) {
     try {
       const sql = neon<false, false>(url);
+      await ensureMetaTables(sql);
       const rows = await sql`SELECT status, COUNT(*)::int AS count FROM meimi_meta_leads GROUP BY status`;
       const latestRows = await sql`SELECT MAX(received_at)::text AS latest_received_at FROM meimi_meta_leads`;
       latestReceivedAt = (latestRows[0] as { latest_received_at?: unknown } | undefined)?.latest_received_at as string || null;
+      databaseReachable = true;
       for (const row of rows as Array<{ status?: unknown; count?: unknown }>) {
-        if (row.status === "imported" || row.status === "imported_duplicate") imported += Number(row.count) || 0;
+        if (row.status === "imported") imported += Number(row.count) || 0;
+        else if (row.status === "imported_duplicate") duplicates += Number(row.count) || 0;
         else {
           pending += Number(row.count) || 0;
           if (row.status === "needs_mapping") needsMapping += Number(row.count) || 0;
+          if (row.status === "read_failed") readFailed += Number(row.count) || 0;
         }
       }
     } catch {
-      // The webhook creates this table lazily; configuration status remains useful before first delivery.
+      databaseReachable = false;
     }
   }
-  return NextResponse.json({ ok: true, config, readyForWebhook: config.database && config.webhookVerifyToken, readyForRetrieval: config.database && config.pageAccessToken, pending, needsMapping, imported, latestReceivedAt });
+  return NextResponse.json({
+    ok: true, config, databaseReachable,
+    readyForWebhook: databaseReachable && config.webhookVerifyToken && config.appSecret && config.pageAccessToken,
+    readyForRetrieval: databaseReachable && config.pageAccessToken,
+    pending, needsMapping, readFailed, imported, duplicates, latestReceivedAt,
+  });
 }

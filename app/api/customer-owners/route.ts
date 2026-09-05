@@ -75,7 +75,9 @@ export async function POST(request: Request) {
     const identity = await authorize(sql, key);
     if (!identity) return errorResponse("销售账号验证失败，请重新登录", 401, "UNAUTHORIZED");
     if (body.action === "list") {
-      const rows = await sql`SELECT record FROM meimi_customer_owners ORDER BY updated_at DESC`;
+      const rows = identity.role === "admin"
+        ? await sql`SELECT record FROM meimi_customer_owners ORDER BY updated_at DESC`
+        : await sql`SELECT record FROM meimi_customer_owners WHERE record->>'ownerAccountId' = ${identity.id} ORDER BY updated_at DESC`;
       const records = rows.map((row) => row.record as Record<string, unknown>);
       return NextResponse.json({ ok: true, records: identity.role === "admin" ? records : records.filter((record) => record.ownerAccountId === identity.id) });
     }
@@ -122,10 +124,17 @@ export async function POST(request: Request) {
       }
       const existingRows = await sql`SELECT record FROM meimi_customer_owners WHERE owner_key = ${body.ownerKey} LIMIT 1`;
       const existingRecord = existingRows[0]?.record as Record<string, unknown> | undefined;
-      if (identity.role === "sales" && existingRecord?.ownerAccountId && existingRecord.ownerAccountId !== identity.id) {
-        return errorResponse(`该客户已被销售“${String(existingRecord.owner || "其他销售")}”录入`, 409, "OWNER_CONFLICT");
+      if (identity.role === "sales" && existingRecord && existingRecord.ownerAccountId !== identity.id) {
+        return errorResponse(existingRecord.ownerAccountId
+          ? `该客户已被销售“${String(existingRecord.owner || "其他销售")}"录入`
+          : "该客户待管理员分配，销售不能自行认领", 409, "OWNER_CONFLICT");
       }
-      await sql`INSERT INTO meimi_customer_owners (owner_key, record) VALUES (${body.ownerKey}, ${JSON.stringify(record)}::jsonb) ON CONFLICT (owner_key) DO UPDATE SET record = EXCLUDED.record, updated_at = NOW()`;
+      const updated = await sql`INSERT INTO meimi_customer_owners (owner_key, record)
+        VALUES (${body.ownerKey}, ${JSON.stringify(record)}::jsonb)
+        ON CONFLICT (owner_key) DO UPDATE SET record = EXCLUDED.record, updated_at = NOW()
+        WHERE ${identity.role === "admin"} OR meimi_customer_owners.record->>'ownerAccountId' = ${identity.role === "sales" ? identity.id : ""}
+        RETURNING owner_key`;
+      if (!updated.length) return errorResponse("客户归属已变更，请刷新客户池后重试", 409, "OWNER_CONFLICT");
       return NextResponse.json({ ok: true });
     }
     return errorResponse("不支持的客户归属操作", 400, "INVALID_ACTION");

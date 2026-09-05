@@ -13,6 +13,7 @@
     "audit:export": "node scripts/audit-catalogue-export.mjs",
     "audit:miniprogram": "node scripts/audit-miniprogram.mjs",
     "audit:security": "npm audit --omit=dev --audit-level=high",
+    "test:meta": "node scripts/test-meta-integration.mjs",
     "smoke:catalogue": "node scripts/smoke-catalogue.mjs",
     "check:catalogue": "npx tsc --noEmit && npm run lint && npm run audit:catalogue && npm run audit:admin && npm run audit:export && npm run audit:miniprogram && npm run audit:security && npm run smoke:catalogue",
     "build": "next build",
@@ -30,6 +31,7 @@
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

@@ -1,10 +1,11 @@
-import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
+import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
+import { ensureMetaTables, readMetaLeads, importMetaLeads } from "../processing";
 
 export const dynamic = "force-dynamic";
-export const runtime = "edge";
+export const runtime = "nodejs";
+export const maxDuration = 60;
 
-type SqlClient = NeonQueryFunction<false, false>;
 type MetaLeadEvent = {
   leadgenId: string;
   pageId: string;
@@ -54,7 +55,7 @@ function parseLeadEvents(value: unknown): MetaLeadEvent[] {
         adId: text(lead.ad_id),
         adsetId: text(lead.adset_id),
         campaignId: text(lead.campaign_id),
-        createdTime: text(lead.created_time),
+        createdTime: typeof lead.created_time === "number" ? String(lead.created_time) : text(lead.created_time),
         raw: { field: item.field, value: lead },
       });
     }
@@ -64,7 +65,7 @@ function parseLeadEvents(value: unknown): MetaLeadEvent[] {
 
 async function hasValidSignature(body: string, signature: string | null) {
   const secret = process.env.META_APP_SECRET?.trim();
-  if (!secret) return true;
+  if (!secret) return false;
   if (!signature?.startsWith("sha256=")) return false;
   const expectedKey = await crypto.subtle.importKey(
     "raw",
@@ -76,25 +77,10 @@ async function hasValidSignature(body: string, signature: string | null) {
   const digest = await crypto.subtle.sign("HMAC", expectedKey, new TextEncoder().encode(body));
   const expected = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
   const received = signature.slice("sha256=".length).toLowerCase();
-  return received.length === expected.length && received.split("").every((character, index) => character === expected[index]);
-}
-
-async function ensureTable(sql: SqlClient) {
-  await sql`
-    CREATE TABLE IF NOT EXISTS meimi_meta_leads (
-      leadgen_id TEXT PRIMARY KEY,
-      page_id TEXT NOT NULL,
-      form_id TEXT,
-      ad_id TEXT,
-      adset_id TEXT,
-      campaign_id TEXT,
-      created_time TEXT,
-      raw_payload JSONB NOT NULL,
-      status TEXT NOT NULL DEFAULT 'received',
-      received_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
+  if (received.length !== expected.length) return false;
+  let difference = 0;
+  for (let index = 0; index < expected.length; index += 1) difference |= received.charCodeAt(index) ^ expected.charCodeAt(index);
+  return difference === 0;
 }
 
 export async function GET(request: Request) {
@@ -109,6 +95,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  if (!process.env.META_APP_SECRET?.trim()) return errorResponse("尚未配置 Meta 应用签名密钥", 503, "META_APP_SECRET_NOT_CONFIGURED");
   const url = databaseUrl();
   if (!url) return errorResponse("尚未配置云端数据库", 503, "DATABASE_NOT_CONFIGURED");
   const body = await request.text();
@@ -121,15 +108,20 @@ export async function POST(request: Request) {
   if (!events.length) return NextResponse.json({ ok: true, accepted: 0 });
   try {
     const sql = neon<false, false>(url);
-    await ensureTable(sql);
+    await ensureMetaTables(sql);
     for (const event of events) {
       await sql`
         INSERT INTO meimi_meta_leads (leadgen_id, page_id, form_id, ad_id, adset_id, campaign_id, created_time, raw_payload)
         VALUES (${event.leadgenId}, ${event.pageId}, ${event.formId || null}, ${event.adId || null}, ${event.adsetId || null}, ${event.campaignId || null}, ${event.createdTime || null}, ${JSON.stringify(event.raw)}::jsonb)
-        ON CONFLICT (leadgen_id) DO UPDATE SET raw_payload = EXCLUDED.raw_payload, updated_at = NOW()
+        ON CONFLICT (leadgen_id) DO NOTHING
       `;
     }
-    return NextResponse.json({ ok: true, accepted: events.length });
+    const ids = [...new Set(events.map((event) => event.leadgenId))];
+    if (!process.env.META_PAGE_ACCESS_TOKEN?.trim()) return errorResponse("线索通知已保存，待配置主页授权后读取详情", 503, "META_TOKEN_NOT_CONFIGURED");
+    const read = await readMetaLeads(sql, ids);
+    const imported = await importMetaLeads(sql, ids);
+    if (read.remaining) return errorResponse("线索通知已保存，详情读取待重试", 503, "META_LEAD_RETRY_REQUIRED");
+    return NextResponse.json({ ok: true, accepted: events.length, imported: imported.importedCount, needsMapping: imported.missingFields });
   } catch (error) {
     console.error("Meta lead webhook failed", error);
     return errorResponse("Meta 线索已接收但云端写入失败", 503, "META_LEAD_STORAGE_FAILED");
