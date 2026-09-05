@@ -191,6 +191,15 @@ type CustomerTier = "A" | "B" | "C";
 type CustomerFollowStatus = "new" | "following" | "quoted" | "won" | "paused";
 type CustomerLeadSource = "manual" | "meta" | "website" | "referral" | "other";
 type MetaPendingLead = { leadgenId: string; name: string; country: string; phone: string; email: string; company: string };
+type MetaConfigState = {
+  database: boolean;
+  webhookVerifyToken: boolean;
+  appSecret: boolean;
+  pageAccessToken: boolean;
+  databaseReachable: boolean;
+  readyForWebhook: boolean;
+  readyForRetrieval: boolean;
+};
 
 type CustomerOwnerRecord = {
   id: string;
@@ -1490,6 +1499,7 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   const [metaWebhookCopied, setMetaWebhookCopied] = useState(false);
   const [isSyncingMetaLeads, setIsSyncingMetaLeads] = useState(false);
   const [metaConfigStatus, setMetaConfigStatus] = useState("");
+  const [metaConfig, setMetaConfig] = useState<MetaConfigState | null>(null);
   const [savingMetaLeadId, setSavingMetaLeadId] = useState("");
   const [isCheckingMetaConfig, setIsCheckingMetaConfig] = useState(false);
   const [metaPendingLeads, setMetaPendingLeads] = useState<MetaPendingLead[]>([]);
@@ -3249,8 +3259,17 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     setIsCheckingMetaConfig(true);
     try {
       const response = await fetch("/api/meta/status", { headers: { "x-meimi-admin-key": adminSyncKey }, cache: "no-store" });
-      const payload = await response.json().catch(() => ({})) as { message?: string; config?: Record<string, boolean>; databaseReachable?: boolean; pending?: number; needsMapping?: number; readFailed?: number; duplicates?: number; imported?: number; readyForWebhook?: boolean; latestReceivedAt?: string | null };
+      const payload = await response.json().catch(() => ({})) as { message?: string; config?: Record<string, boolean>; databaseReachable?: boolean; pending?: number; needsMapping?: number; readFailed?: number; duplicates?: number; imported?: number; readyForWebhook?: boolean; readyForRetrieval?: boolean; latestReceivedAt?: string | null };
       if (!response.ok || !payload.config) throw new Error(payload.message || "Meta 配置检查失败");
+      setMetaConfig({
+        database: Boolean(payload.config.database),
+        webhookVerifyToken: Boolean(payload.config.webhookVerifyToken),
+        appSecret: Boolean(payload.config.appSecret),
+        pageAccessToken: Boolean(payload.config.pageAccessToken),
+        databaseReachable: Boolean(payload.databaseReachable),
+        readyForWebhook: Boolean(payload.readyForWebhook),
+        readyForRetrieval: Boolean(payload.readyForRetrieval),
+      });
       const missing = Object.entries({
         数据库: payload.config.database,
         Webhook验证令牌: payload.config.webhookVerifyToken,
@@ -3825,6 +3844,32 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             </button>
             </div>
             <small className="meta-integration-result" role="status" aria-live="polite">{metaConfigStatus || "尚未检查接入状态"}</small>
+            <div className="meta-readiness-grid" aria-label="Meta 接入配置状态">
+              {[
+                ["云端数据库", metaConfig?.databaseReachable ?? false],
+                ["Webhook 验证令牌", metaConfig?.webhookVerifyToken ?? false],
+                ["App Secret", metaConfig?.appSecret ?? false],
+                ["Page Access Token", metaConfig?.pageAccessToken ?? false],
+              ].map(([label, ready]) => (
+                <div className={`meta-readiness-item${metaConfig ? (ready ? " is-ready" : " is-missing") : " is-unchecked"}`} key={label as string}>
+                  <span aria-hidden="true" />
+                  <strong>{label as string}</strong>
+                  <small>{metaConfig ? (ready ? "已配置" : "待配置") : "未检查"}</small>
+                </div>
+              ))}
+            </div>
+            <div className="meta-setup-guide">
+              <div>
+                <strong>接入顺序</strong>
+                <span>{metaConfig?.readyForWebhook ? "Meta 已具备自动接收条件，可发送测试线索" : "完成验证、令牌和页面订阅后，再发送测试线索"}</span>
+              </div>
+              <ol>
+                <li><span>01</span><a href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer">完成 Meta 开发者账号验证并创建应用</a></li>
+                <li><span>02</span><b>在 Vercel 配置 Webhook 令牌、App Secret 和 Page Access Token</b></li>
+                <li><span>03</span><b>在 Meta 应用订阅 Page 的 leadgen 事件</b></li>
+                <li><span>04</span><b>发送一条测试表单，再回到这里检查和分配</b></li>
+              </ol>
+            </div>
             <div className="meta-assignment-controls">
               <strong>管理员分配待处理线索{unassignedLeadCount ? ` · 待分配 ${unassignedLeadCount} 条` : " · 当前没有待分配线索"}</strong>
               <label>接收销售<select aria-label="选择接收待分配线索的销售" value={metaAssignmentSalesId} onChange={(event) => setMetaAssignmentSalesId(event.target.value)}>
