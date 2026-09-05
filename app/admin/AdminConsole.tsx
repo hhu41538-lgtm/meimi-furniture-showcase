@@ -3840,8 +3840,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               <div><strong>{visibleQuoteHistory.length}</strong><small>报价留档</small></div>
             </div>
             <div className="admin-system-actions" aria-label="管理员快捷操作">
-              <button type="button" onClick={() => void syncSharedWorkspaceState()} disabled={!isOnline || isRefreshingSharedWorkspace || !sharedSyncReady}>
-                <strong>{isRefreshingSharedWorkspace ? "同步中..." : "同步产品与报价"}</strong><small>发布最新价格和报价公式</small>
+              <button type="button" onClick={() => cloudSyncConflict ? refreshAfterSyncConflict() : void syncSharedWorkspaceState()} disabled={!isOnline || isRefreshingSharedWorkspace || !sharedSyncReady}>
+                <strong>{isRefreshingSharedWorkspace ? "处理中..." : cloudSyncConflict ? "解决同步冲突" : "同步产品与报价"}</strong><small>{cloudSyncConflict ? "先读取云端最新版本" : "发布最新价格和报价公式"}</small>
               </button>
               <button type="button" onClick={() => setAdminPanelView("leads")}>
                 <strong>处理 Meta 线索</strong><small>{metaUnassignedCount ? `有 ${metaUnassignedCount} 条待分配` : "查看接入和分配状态"}</small>
