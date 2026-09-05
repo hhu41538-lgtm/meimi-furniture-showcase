@@ -3833,8 +3833,8 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               </button>
             </div>
             <div className="meta-integration-actions">
-            <button type="button" className="meta-integration-sync" onClick={() => void syncMetaLeads()} disabled={!isOnline || isSyncingMetaLeads} aria-busy={isSyncingMetaLeads} title={!isOnline ? "联网后才能同步 Meta 线索" : "读取 Meta 线索并导入客户池"}>
-              <CloudUpload size={15} />{isSyncingMetaLeads ? "同步中..." : "重试待处理线索"}
+            <button type="button" className="meta-integration-sync" onClick={() => void syncMetaLeads()} disabled={!isOnline || isSyncingMetaLeads || Boolean(metaConfig && !metaConfig.readyForRetrieval)} aria-busy={isSyncingMetaLeads} title={!isOnline ? "联网后才能同步 Meta 线索" : metaConfig && !metaConfig.readyForRetrieval ? "先配置 Page Access Token，才能读取 Meta 线索" : "读取 Meta 线索并导入客户池"}>
+              <CloudUpload size={15} />{isSyncingMetaLeads ? "同步中..." : metaConfig && !metaConfig.readyForRetrieval ? "先配置读取权限" : "重试待处理线索"}
             </button>
             <button type="button" onClick={() => void checkMetaConfig()} disabled={!isOnline || isCheckingMetaConfig} aria-busy={isCheckingMetaConfig}>
               <Settings2 size={15} />{isCheckingMetaConfig ? "检查中..." : "检查接入状态"}
