@@ -1548,6 +1548,18 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
   }, []);
 
   useEffect(() => {
+    if (!adminUnlocked) return;
+    const savedView = localStorage.getItem(`meimi-admin-panel-${session.accountId}`);
+    if (savedView === "team" || savedView === "leads" || savedView === "catalogue" || savedView === "system") {
+      setAdminPanelView(savedView);
+    }
+  }, [adminUnlocked, session.accountId]);
+
+  useEffect(() => {
+    if (adminUnlocked) localStorage.setItem(`meimi-admin-panel-${session.accountId}`, adminPanelView);
+  }, [adminPanelView, adminUnlocked, session.accountId]);
+
+  useEffect(() => {
     if (storageReady) localStorage.setItem("meimi-admin-sidebar-collapsed", String(sidebarCollapsed));
   }, [sidebarCollapsed, storageReady]);
 
