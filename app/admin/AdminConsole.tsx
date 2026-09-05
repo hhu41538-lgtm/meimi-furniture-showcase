@@ -3834,6 +3834,20 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
               <div><strong>{entries.length}</strong><small>产品资料</small></div>
               <div><strong>{visibleQuoteHistory.length}</strong><small>报价留档</small></div>
             </div>
+            <div className="admin-system-actions" aria-label="管理员快捷操作">
+              <button type="button" onClick={() => void syncSharedWorkspaceState()} disabled={!isOnline || isRefreshingSharedWorkspace || !sharedSyncReady}>
+                <strong>{isRefreshingSharedWorkspace ? "同步中..." : "同步产品与报价"}</strong><small>发布最新价格和报价公式</small>
+              </button>
+              <button type="button" onClick={() => setAdminPanelView("leads")}>
+                <strong>处理 Meta 线索</strong><small>{metaUnassignedCount ? `有 ${metaUnassignedCount} 条待分配` : "查看接入和分配状态"}</small>
+              </button>
+              <button type="button" onClick={() => setAdminPanelView("team")}>
+                <strong>管理销售账号</strong><small>{salesAccounts.length} 个已注册账号</small>
+              </button>
+              <button type="button" onClick={() => { setQuoteWorkspaceView("archive"); openModule("quote"); }}>
+                <strong>查看报价留档</strong><small>{visibleQuoteHistory.length} 条历史报价</small>
+              </button>
+            </div>
             <p className="admin-system-note">管理员修改产品、价格和报价公式后，点击顶部“保存并同步”；销售端刷新云端目录后读取最新版本。Meta 授权配置在“广告线索”分区完成。</p>
           </section> : null}
         </>
