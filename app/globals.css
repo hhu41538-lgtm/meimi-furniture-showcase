@@ -550,7 +550,7 @@ body:has(.admin-shell) {
   padding-top: 10px;
 }
 
-.meta-assignment-summary > span {
+.meta-assignment-summary > button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -558,6 +558,15 @@ body:has(.admin-shell) {
   padding: 7px 9px;
   border: 1px solid var(--admin-line);
   background: #fff;
+  color: var(--admin-ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+.meta-assignment-summary > button:hover,
+.meta-assignment-summary > button.is-selected {
+  border-color: var(--admin-cobalt);
+  background: #eef4ff;
 }
 
 .meta-assignment-summary small {

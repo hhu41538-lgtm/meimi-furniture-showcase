@@ -3838,7 +3838,9 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             </div>
             <div className="meta-assignment-summary" aria-label="销售 Meta 线索数量">
               {salesAccounts.filter((account) => account.active).map((account) => (
-                <span key={account.id}><small>{account.name}</small><strong>{metaAssignedCountBySales[account.id] ?? 0}</strong></span>
+                <button key={account.id} type="button" className={metaAssignmentSalesId === account.id ? "is-selected" : ""} onClick={() => setMetaAssignmentSalesId(account.id)} aria-pressed={metaAssignmentSalesId === account.id}>
+                  <small>{account.name}</small><strong>{metaAssignedCountBySales[account.id] ?? 0}</strong>
+                </button>
               ))}
               {!salesAccounts.some((account) => account.active) ? <small>暂无可接收线索的销售账号</small> : null}
             </div>
