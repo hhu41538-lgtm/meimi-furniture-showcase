@@ -2249,6 +2249,11 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
     catalogue: "维护产品资料、统一价格和报价公式",
     system: "查看网络、同步、产品和报价留档状态",
   }[adminPanelView];
+  const adminNextAction = metaUnassignedCount
+    ? `分配 ${metaUnassignedCount} 条待处理线索`
+    : cloudSyncPending
+      ? "同步最新产品与报价"
+      : "检查销售账号和产品状态";
   const deliveryChecklist = [
     {
       label: "客户版报价",
@@ -3568,13 +3573,13 @@ export default function AdminConsole({ initialEntries, session, adminSyncKey, st
             <span>{isOnline
               ? (adminUnlocked ? "本地 + 云端" : "本地资料 + 云端目录")
               : "离线本地"}</span>
-          <strong>报价完成度 {quoteProgress}%</strong>
+          <strong>{adminUnlocked ? `管理员待办 ${metaUnassignedCount} 条线索` : `报价完成度 ${quoteProgress}%`}</strong>
         </div>
         <div className="sales-cockpit-head">
           <div>
-            <p className="eyebrow">今日工作台</p>
-            <h2>从这里开始今天的报价</h2>
-            <p className="sales-next-action">下一步：{nextSalesAction}</p>
+            <p className="eyebrow">{adminUnlocked ? "管理员工作台" : "今日工作台"}</p>
+            <h2>{adminUnlocked ? "先处理分配与同步" : "从这里开始今天的报价"}</h2>
+            <p className="sales-next-action">下一步：{adminUnlocked ? adminNextAction : nextSalesAction}</p>
           </div>
         </div>
         <div className="sales-cockpit-grid">
