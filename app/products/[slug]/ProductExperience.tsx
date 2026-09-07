@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Maximize2, X } from "lucide-react";
 import type { HydratedProduct } from "@/lib/products";
@@ -224,14 +225,14 @@ export default function ProductExperience({
                     aria-label={`Open ${label.toLowerCase()}`}
                     title={label}
                     onClick={(event) => openDetail(index % hotspotImages.length, event.currentTarget)}
-                    className="absolute flex h-9 w-9 items-center justify-center rounded-full border border-white bg-stone-900/80 text-base text-white shadow-md transition hover:scale-110"
+                    className="absolute flex h-9 w-9 items-center justify-center rounded-full border border-white bg-stone-900/80 text-base text-white shadow-md transition hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                     style={position}
                   >
                     +
                   </button>
                   );
                 })}
-                <button ref={imageTriggerRef} type="button" onClick={() => setImageExpanded(true)} aria-label="Expand product image" title="Expand product image" className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-stone-900 shadow-sm backdrop-blur transition hover:bg-white">
+                <button ref={imageTriggerRef} type="button" onClick={() => setImageExpanded(true)} aria-label="Expand product image" title="Expand product image" className="absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-stone-900 shadow-sm backdrop-blur transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
                   <Maximize2 size={17} strokeWidth={1.7} />
                 </button>
               </div>
@@ -263,9 +264,12 @@ export default function ProductExperience({
               <p className="mt-7 text-xs font-light leading-relaxed text-stone-400">
                 Preview selections are controlled catalogue combinations. Select Front to view a finish preview; final materials and dimensions are confirmed with the sales team.
               </p>
-              <a href={phoneHref} className="mt-7 inline-flex w-full items-center justify-center bg-[#6B2737] px-4 py-3 text-xs font-medium uppercase tracking-[0.12em] text-white transition-colors hover:bg-stone-900">
-                Call 15355787546
+              <a href={phoneHref} target="_blank" rel="noreferrer" aria-label={`Message Meimi&H on WhatsApp about ${product.name}`} className="mt-7 inline-flex w-full items-center justify-center bg-[#6B2737] px-4 py-3 text-xs font-medium uppercase tracking-[0.12em] text-white transition-colors hover:bg-stone-900">
+                WhatsApp +86 177 9604 5579
               </a>
+              <Link href="/contact" className="mt-3 inline-flex w-full items-center justify-center border border-stone-300 px-4 py-3 text-xs font-medium uppercase tracking-[0.12em] text-stone-700 transition-colors hover:border-stone-900 hover:text-stone-950">
+                View contact options
+              </Link>
             </aside>
           </div>
         </div>

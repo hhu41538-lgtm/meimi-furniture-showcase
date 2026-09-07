@@ -12,23 +12,45 @@ const SLIDE_DURATION = 6000;
 export default function HeroCarousel({ images }: HeroCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    if (images.length <= 1) return;
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotionPreference = () => setReducedMotion(mediaQuery.matches);
+    updateMotionPreference();
+    mediaQuery.addEventListener("change", updateMotionPreference);
+    return () => mediaQuery.removeEventListener("change", updateMotionPreference);
+  }, []);
+
+  useEffect(() => {
+    if (images.length <= 1 || paused || reducedMotion) return;
     const timer = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % images.length);
     }, SLIDE_DURATION);
     return () => clearInterval(timer);
-  }, [images.length]);
+  }, [images.length, paused, reducedMotion]);
 
   useEffect(() => {
+    if (reducedMotion) {
+      setZoomed(false);
+      return;
+    }
     setZoomed(false);
     const raf = requestAnimationFrame(() => setZoomed(true));
     return () => cancelAnimationFrame(raf);
-  }, [activeIndex]);
+  }, [activeIndex, reducedMotion]);
 
   return (
-    <div className="absolute inset-0">
+    <div
+      className="absolute inset-0"
+      role="region"
+      aria-label="Featured furniture carousel"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
+    >
       {images.map((src, index) => (
         <div
           key={src}
@@ -46,7 +68,7 @@ export default function HeroCarousel({ images }: HeroCarouselProps) {
           >
             <Image
               src={src}
-              alt="Featured furniture showcase"
+              alt={index === activeIndex ? "Featured Meimi&H furniture showcase" : ""}
               fill
               priority={index === 0}
               className="object-cover"
@@ -63,8 +85,9 @@ export default function HeroCarousel({ images }: HeroCarouselProps) {
               key={src}
               type="button"
               aria-label={`Show slide ${index + 1}`}
+              aria-current={index === activeIndex ? "true" : undefined}
               onClick={() => setActiveIndex(index)}
-              className={`h-1 rounded-full transition-all duration-300 ${
+              className={`h-1 rounded-full transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${
                 index === activeIndex
                   ? "w-8 bg-white"
                   : "w-1.5 bg-white/50 hover:bg-white/80"

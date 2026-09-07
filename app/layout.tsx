@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Jost } from "next/font/google";
 import Script from "next/script";
-import { Phone } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -126,9 +126,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </div>
           <Footer />
         </div>
-        <a href="tel:15355787546" aria-label="拨打美觅家居电话 15355787546" title="拨打 15355787546"
+        <a href="https://wa.me/8617796045579" target="_blank" rel="noreferrer" aria-label="在 WhatsApp 联系美觅家居 +86 177 9604 5579" title="WhatsApp +86 177 9604 5579"
           className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#6B2737] text-white shadow-lg shadow-stone-900/20 transition hover:scale-105">
-          <Phone className="h-7 w-7" strokeWidth={1.7} />
+          <MessageCircle className="h-7 w-7" strokeWidth={1.7} />
         </a>
         <Script src="/mp.js" strategy="afterInteractive" />
         <PwaRegistration />

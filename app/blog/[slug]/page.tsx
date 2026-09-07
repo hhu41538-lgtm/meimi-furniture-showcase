@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 import FadeIn from "@/components/ui/FadeIn";
 import { getPostSlugs, getPostBySlug } from "@/lib/blog";
 
-const PHONE_NUMBER = "15355787546";
+const PHONE_NUMBER = "8617796045579";
 
 export function generateStaticParams() {
   return getPostSlugs().map((slug) => ({ slug }));
@@ -175,10 +175,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <span>&rarr;</span>
               </Link>
               <a
-                href={`tel:${PHONE_NUMBER}`}
+                href={`https://wa.me/${PHONE_NUMBER}`}
+                target="_blank"
+                rel="noreferrer"
                 className="inline-flex items-center gap-2 border-b border-stone-300 pb-1 text-sm font-medium tracking-[0.12em] text-stone-600 transition-colors duration-300 hover:border-stone-900 hover:text-stone-900"
               >
-                CALL MEIMI&H
+                WHATSAPP MEIMI&H
                 <span>&rarr;</span>
               </a>
             </div>

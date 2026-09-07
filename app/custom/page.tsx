@@ -13,10 +13,17 @@ export const metadata: Metadata = {
     description:
       "Bespoke furniture made to order in our Foshan atelier — factory-direct, shipped worldwide.",
     type: "website",
+    images: [{ url: "/images/explore by space/Vivian sofa/New Arrivals.jpg" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Custom Furniture Manufacturer | Meimi&H",
+    description: "Bespoke furniture made to order in our Foshan atelier — factory-direct, shipped worldwide.",
+    images: ["/images/explore by space/Vivian sofa/New Arrivals.jpg"],
   },
 };
 
-const PHONE = "tel:15355787546";
+const PHONE = "https://wa.me/8617796045579";
 
 const HERO_IMAGE = encodeURI("/images/explore by space/Vivian sofa/New Arrivals.jpg");
 
@@ -168,13 +175,24 @@ export default function CustomPage() {
             From a single custom sofa to a whole-home interior — designed with you,
             handcrafted in our atelier, and shipped worldwide.
           </p>
-          <a
-            href={PHONE}
-            className="mt-10 inline-flex items-center gap-2 bg-[#6B2737] px-8 py-3.5 text-sm font-medium tracking-[0.12em] text-white transition-colors duration-300 hover:bg-white hover:text-stone-900"
-          >
-            START YOUR PROJECT
-            <span>&rarr;</span>
-          </a>
+          <div className="mt-10 flex flex-wrap justify-center gap-4">
+            <a
+              href={PHONE}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 bg-[#6B2737] px-8 py-3.5 text-sm font-medium tracking-[0.12em] text-white transition-colors duration-300 hover:bg-white hover:text-stone-900"
+            >
+              START YOUR PROJECT
+              <span>&rarr;</span>
+            </a>
+            <Link
+              href="/case-showcase"
+              className="inline-flex items-center gap-2 border border-white/60 px-8 py-3.5 text-sm font-medium tracking-[0.12em] text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-stone-900"
+            >
+              VIEW CASE SHOWCASE
+              <span>&rarr;</span>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -396,13 +414,24 @@ export default function CustomPage() {
           Share your space and references — we&apos;ll come back with ideas, materials and a
           factory-direct quote.
         </p>
-        <a
-          href={PHONE}
-          className="mt-8 inline-flex items-center gap-2 bg-[#6B2737] px-8 py-3.5 text-sm font-medium tracking-[0.12em] text-white transition-colors duration-300 hover:bg-stone-900"
-        >
-          CALL TO DISCUSS YOUR PROJECT
-          <span>&rarr;</span>
-        </a>
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <a
+            href={PHONE}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 bg-[#6B2737] px-8 py-3.5 text-sm font-medium tracking-[0.12em] text-white transition-colors duration-300 hover:bg-stone-900"
+          >
+            CALL TO DISCUSS YOUR PROJECT
+            <span>&rarr;</span>
+          </a>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 border border-stone-300 px-8 py-3.5 text-sm font-medium tracking-[0.12em] text-stone-700 transition-colors duration-300 hover:border-stone-900 hover:text-stone-950"
+          >
+            VIEW CONTACT OPTIONS
+            <span>&rarr;</span>
+          </Link>
+        </div>
       </section>
     </main>
   );

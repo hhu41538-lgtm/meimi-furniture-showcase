@@ -1,12 +1,32 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getFolderImagePaths, getRepresentativeImage } from "@/lib/imageAssets";
 import { getProductsByCategory } from "@/lib/products";
+import { siteConfig } from "@/lib/seo-config";
 import HeroCarousel from "./HeroCarousel";
 import FadeIn from "@/components/ui/FadeIn";
 import HeroTitle from "@/components/ui/HeroTitle";
 import ParallaxImage from "@/components/ui/ParallaxImage";
 import AnimatedCounter from "@/components/ui/AnimatedCounter";
+
+export const metadata: Metadata = {
+  title: "Premium Furniture from Foshan",
+  description: "Meimi&H creates refined, made-to-order furniture and custom interiors from Foshan, China — sofas, dining tables, bedrooms and complete spaces.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Premium Furniture from Foshan | Meimi&H",
+    description: "Refined, made-to-order furniture and custom interiors from the Meimi&H Foshan atelier.",
+    type: "website",
+    images: [{ url: "/images/Hero/hero4.jpg" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Premium Furniture from Foshan | Meimi&H",
+    description: "Refined, made-to-order furniture and custom interiors from the Meimi&H Foshan atelier.",
+    images: ["/images/Hero/hero4.jpg"],
+  },
+};
 
 const FALLBACK = "/images/Other/fallback.jpg";
 
@@ -15,16 +35,19 @@ const categories = [
     title: "Living Room",
     description: "Sofas, lounge chairs, coffee tables",
     folder: "Living Room",
+    href: "/products#sofas",
   },
   {
     title: "Dining & Bedroom",
     description: "Dining tables, chairs, beds, nightstands",
     folder: "Dining",
+    href: "/products#dining-tables",
   },
   {
     title: "Custom Interiors",
     description: "Wardrobes, cabinetry, wall panels, doors",
     folder: "Custom Interiors",
+    href: "/custom",
   },
 ];
 
@@ -37,9 +60,17 @@ export default function Home() {
     image: getRepresentativeImage(category.folder, FALLBACK),
   }));
   const newArrivals = getProductsByCategory("sofa");
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Meimi&H",
+    url: siteConfig.url,
+    description: siteConfig.description,
+  };
 
   return (
     <main className="bg-[#FAF9F6] text-stone-800">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       {/* HERO */}
       <section className="relative isolate overflow-hidden">
         <HeroCarousel images={heroSlides} />
@@ -51,14 +82,14 @@ export default function Home() {
           <p className="hero-rise mt-8 max-w-lg text-base font-light leading-relaxed tracking-wide text-white/80" style={{ animationDelay: "1.1s" }}>
             Bespoke furniture, made to order in our Foshan atelier.
           </p>
-          <a
-            href="/app"
+          <Link
+            href="/products"
             className="hero-rise group mt-12 inline-flex items-center gap-2 border-b border-white/50 pb-1 text-sm font-medium tracking-[0.15em] text-white transition-colors duration-300 hover:border-white"
             style={{ animationDelay: "1.3s" }}
           >
-            OPEN CATALOGUE APP
+            EXPLORE COLLECTIONS
             <span className="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -78,13 +109,13 @@ export default function Home() {
                 Foshan atelier &mdash; where twenty years of craft meet a quieter,
                 more considered idea of luxury.
               </p>
-              <a
+              <Link
                 href="/about"
                 className="group mt-10 inline-flex items-center gap-2 text-sm font-medium tracking-[0.12em] text-[#6B2737] transition-colors duration-300 hover:text-stone-900"
               >
                 OUR STORY
                 <span className="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
-              </a>
+              </Link>
             </div>
           </FadeIn>
           <FadeIn delay={150}>
@@ -123,7 +154,7 @@ export default function Home() {
             {categoryCards.map((category, index) => (
               <FadeIn key={category.title} delay={index * 120}>
                 <Link
-                  href="/products"
+                  href={category.href}
                   className="group relative block aspect-[3/4] overflow-hidden rounded-sm"
                 >
                   <Image
@@ -137,7 +168,7 @@ export default function Home() {
                     <h3 className="text-xl font-light tracking-tight text-white transition-transform duration-500 [transition-timing-function:var(--ease-lux)] group-hover:-translate-y-1">
                       {category.title}
                     </h3>
-                    <p className="mt-1.5 max-w-[16rem] translate-y-1 text-sm font-light leading-relaxed text-white/0 transition-all duration-500 group-hover:translate-y-0 group-hover:text-white/75">
+                    <p className="mt-1.5 max-w-[16rem] text-sm font-light leading-relaxed text-white/75 transition-all duration-500 sm:translate-y-1 sm:text-white/0 sm:group-hover:translate-y-0 sm:group-hover:text-white/75">
                       {category.description}
                     </p>
                     <span className="mt-3 block h-px w-8 bg-white/60 transition-all duration-500 [transition-timing-function:var(--ease-lux)] group-hover:w-16" />

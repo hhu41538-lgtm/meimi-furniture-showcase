@@ -1,92 +1,94 @@
 import type { Metadata } from "next";
-import { getFolderImagePaths } from "@/lib/imageAssets";
-import { getProductsByCategory } from "@/lib/products";
+import { studioItems } from "@/lib/catalogueStudio";
+import { getProducts } from "@/lib/products";
 import ProductsClient from "./ProductsClient";
+import { siteConfig } from "@/lib/seo-config";
 
 export const metadata: Metadata = {
   title: "Products",
   description:
-    "Explore Meimi&H collections — ready-made living, dining and bedroom furniture, custom interiors, and our signature handmade mattresses. Factory-direct from Foshan.",
+    "Explore verified Meimi&H furniture collections — sofas, lounge chairs, dining tables, coffee tables, beds, cabinets, outdoor furniture and handmade mattresses. Factory-direct from Foshan.",
   alternates: { canonical: "/products" },
+  openGraph: {
+    title: "Products | Meimi&H",
+    description: "Explore verified Meimi&H furniture collections, made to order in Foshan.",
+    type: "website",
+    images: [{ url: "/images/catalogue-app/bamboo-sofa-construction-v1.webp" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Products | Meimi&H",
+    description: "Explore verified Meimi&H furniture collections, made to order in Foshan.",
+    images: ["/images/catalogue-app/bamboo-sofa-construction-v1.webp"],
+  },
 };
 
-const FALLBACK = "/images/Other/fallback.jpg";
-
-const customCategories = [
-  {
-    id: "wall-panels",
-    title: "Wall Panels, Doors & TV Cabinets",
-    description:
-      "Textured wall panels, statement doors and integrated TV cabinetry, crafted as a continuous surface for living and reception spaces.",
-    image: "",
-  },
-  {
-    id: "kitchen",
-    title: "Kitchen Cabinetry",
-    description:
-      "Turnkey kitchen systems combining precise millwork, stone worktops and integrated appliances for modern cooking and service areas.",
-    image: "",
-  },
-  {
-    id: "wardrobes",
-    title: "Wardrobes",
-    description:
-      "Full-height wardrobe and dressing systems tailored to bedrooms and walk-in closets, with configurable interiors.",
-    image: "",
-  },
-];
-
-const otherSpacesCategory = {
-  id: "other-spaces",
-  title: "Other Spaces",
-  description:
-    "Ready-made furniture for tea rooms, home offices, entryways and other areas of the home. New collections are being added to this range.",
-  image: "",
+type CatalogueCard = {
+  id: string;
+  name: string;
+  imageSrc: string;
+  href: string;
+  detail: string;
+  code?: string;
 };
 
-const mattressCategory = {
-  id: "mattress",
-  title: "Handmade Mattress",
-  description:
-    "Hand-tufted, hand-stitched mattresses built layer by layer in our own workshop — a signature craft of the Meimi&H factory.",
-  image: "",
+const productCard = (product: ReturnType<typeof getProducts>[number]): CatalogueCard => ({
+  id: product.slug,
+  name: product.name,
+  imageSrc: product.mainImage,
+  href: `/products/${product.slug}`,
+  detail: product.tagline,
+  code: product.productCode,
+});
+
+const studioCard = (slug: string): CatalogueCard => {
+  const item = studioItems.find((candidate) => candidate.slug === slug);
+  if (!item) throw new Error(`Missing verified studio item: ${slug}`);
+  return { id: item.slug, name: item.name, imageSrc: item.image, href: `/products/studio/${item.slug}`, detail: item.tagline };
 };
 
 export default function ProductsPage() {
-  const productsWithImages = [
-    ...getProductsByCategory("sofa").map((product) => ({ slug: product.slug, name: product.name, category: "Living Room", imageSrc: product.mainImage || FALLBACK })),
-    ...getProductsByCategory("dining").map((product) => ({ slug: product.slug, name: product.name, category: "Dining", imageSrc: product.mainImage || FALLBACK })),
-    ...getProductsByCategory("outdoor").map((product) => ({ slug: product.slug, name: product.name, category: "Outdoor", imageSrc: product.mainImage || FALLBACK })),
-  ];
-
-  const customImages = getFolderImagePaths("Custom Interiors");
-  const customWithImages = customCategories.map((cat, i) => ({
-    ...cat,
-    imageSrc:
-      cat.image || (customImages.length > 0 ? customImages[i % customImages.length] : FALLBACK),
-  }));
-
-  const otherImages = getFolderImagePaths("Other");
-  const otherSpacesWithImage = {
-    ...otherSpacesCategory,
-    imageSrc:
-      otherSpacesCategory.image ||
-      (otherImages.length > 0 ? otherImages[0] : FALLBACK),
+  const products = getProducts();
+  const bySlug = (slug: string) => {
+    const product = products.find((candidate) => candidate.slug === slug);
+    if (!product) throw new Error(`Missing verified product: ${slug}`);
+    return productCard(product);
   };
 
-  const mattressImages = getFolderImagePaths("Handmade mattress");
-  const mattressWithImage = {
-    ...mattressCategory,
-    imageSrc:
-      mattressCategory.image || (mattressImages.length > 0 ? mattressImages[0] : FALLBACK),
+  const collections = [
+    { id: "sofas", title: "Sofas", description: "Made-to-order seating for living rooms, lounges and hospitality projects.", products: products.filter((product) => product.category === "sofa").map(productCard) },
+    { id: "lounge-chairs", title: "Lounge Chairs", description: "Verified showroom selections for reading corners, lounges and conversation areas.", products: [
+      { id: "lillian-lounge-chair", name: "Lillian Lounge Chair", imageSrc: "/images/showroom-products/lounge-chairs/lillian-lounge-chair.webp", href: "/products/showroom/lillian-lounge-chair", detail: "Showroom piece · specification available on request" },
+      { id: "lounge-chair-collection", name: "Lounge Chair Collection", imageSrc: "/images/showroom-products/lounge-chairs/lounge-chair-collection.webp", href: "/products/showroom/lounge-chair-collection", detail: "Showroom selection · individual models confirmed at enquiry" },
+    ] },
+    { id: "dining-tables", title: "Dining Tables", description: "Dining tables selected for material character, generous gathering and tailored scale.", products: [
+      ...products.filter((product) => product.category === "dining" && product.slug !== "square-coffee-table").map(productCard), studioCard("travertine-dining-table"), studioCard("jason-dining-table"), studioCard("maxim-petal-dining-table"),
+    ] },
+    { id: "coffee-tables", title: "Coffee Tables", description: "Low tables designed to complete a seating composition without competing with it.", products: [bySlug("square-coffee-table")] },
+    { id: "beds-mattresses", title: "Beds & Mattresses", description: "Upholstered beds and handmade mattresses for a complete sleep specification.", products: [studioCard("riviere-bed"), studioCard("stina-upholstered-bed"), ...products.filter((product) => product.category === "mattress").map(productCard)] },
+    { id: "cabinets", title: "Cabinets & Storage", description: "Freestanding storage and display pieces with finish and internal layout tailored to use.", products: [studioCard("airplane-cabinet"), studioCard("palawan-bar-cabinet")] },
+    { id: "outdoor", title: "Outdoor Furniture", description: "Weather-ready seating and dining pieces for terraces, pool decks and garden rooms.", products: products.filter((product) => product.category === "outdoor").map(productCard) },
+  ];
+
+  const productList = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Meimi&H Verified Furniture Collection",
+    url: `${siteConfig.url}/products`,
+    numberOfItems: collections.reduce((total, collection) => total + collection.products.length, 0),
+    itemListElement: collections.flatMap((collection) => collection.products).map((product, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: product.name,
+      url: `${siteConfig.url}${product.href}`,
+      image: `${siteConfig.url}${product.imageSrc}`,
+    })),
   };
 
   return (
-    <ProductsClient
-      products={productsWithImages}
-      customCategories={customWithImages}
-      otherSpaces={otherSpacesWithImage}
-      mattress={mattressWithImage}
-    />
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productList) }} />
+      <ProductsClient collections={collections} />
+    </>
   );
 }

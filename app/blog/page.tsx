@@ -9,6 +9,18 @@ export const metadata: Metadata = {
   description:
     "Guides and insights on custom furniture, bespoke interiors and factory-direct manufacturing from Meimi&H, a Foshan-based atelier serving clients worldwide.",
   alternates: { canonical: "/blog" },
+  openGraph: {
+    title: "Journal | Meimi&H",
+    description: "Guides and insights on custom furniture, bespoke interiors and factory-direct manufacturing from Foshan.",
+    type: "website",
+    images: [{ url: "/images/explore by space/Bessel sofa/New Arrivals.jpg" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Journal | Meimi&H",
+    description: "Guides and insights on custom furniture, bespoke interiors and factory-direct manufacturing from Foshan.",
+    images: ["/images/explore by space/Bessel sofa/New Arrivals.jpg"],
+  },
 };
 
 function formatDate(iso: string) {
@@ -79,6 +91,18 @@ export default function BlogPage() {
             </FadeIn>
           ))}
         </div>
+      </section>
+
+      <section className="border-t border-stone-200/70 bg-white/60 px-6 py-20 text-center sm:px-8 lg:px-10">
+        <FadeIn>
+          <p className="text-xs font-medium uppercase tracking-[0.4em] text-stone-400">Ready to make it real?</p>
+          <h2 className="mt-4 text-2xl font-extralight tracking-tight text-stone-900 sm:text-3xl">Take the next step for your space.</h2>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link href="/products" className="inline-flex min-h-11 items-center gap-2 bg-[#6B2737] px-6 text-sm font-medium text-white transition-colors hover:bg-stone-900">Explore products <span aria-hidden="true">→</span></Link>
+            <Link href="/case-showcase" className="inline-flex min-h-11 items-center gap-2 border border-stone-300 px-6 text-sm font-medium text-stone-700 transition-colors hover:border-stone-900 hover:text-stone-950">View case showcase <span aria-hidden="true">→</span></Link>
+            <Link href="/contact" className="inline-flex min-h-11 items-center gap-2 border-b border-[#6B2737] px-1 text-sm font-medium text-[#6B2737] transition-colors hover:border-stone-900 hover:text-stone-900">Contact us <span aria-hidden="true">→</span></Link>
+          </div>
+        </FadeIn>
       </section>
     </main>
   );

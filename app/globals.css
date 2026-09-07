@@ -695,6 +695,23 @@ body:has(.admin-shell) {
   color: #17345f;
 }
 
+.meta-assignment-limit {
+  flex-basis: 100%;
+  color: #667085;
+  font-size: 11px;
+}
+
+.meta-assignment-preview {
+  flex-basis: 100%;
+  color: #667085;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.meta-assignment-preview.is-ready {
+  color: #365526;
+}
+
 .meta-assignment-controls label {
   display: grid;
   gap: 6px;
@@ -719,6 +736,42 @@ body:has(.admin-shell) {
 
 .meta-assignment-controls input {
   width: 82px;
+}
+
+.meta-assignment-quick-picks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+}
+
+.meta-assignment-quick-picks span {
+  color: #667085;
+  font-size: 11px;
+}
+
+.meta-assignment-quick-picks button {
+  min-height: 32px;
+  border: 1px solid #cbd8e8;
+  background: #fff;
+  color: #17345f;
+  padding: 0 8px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.meta-assignment-quick-picks button:hover,
+.meta-assignment-quick-picks button.is-selected {
+  border-color: var(--admin-cobalt);
+  background: #eef4ff;
+  color: var(--admin-cobalt-deep);
+}
+
+.meta-assignment-quick-picks button:focus-visible {
+  outline: 2px solid #e4a11b;
+  outline-offset: 2px;
 }
 
 .meta-assignment-summary {
@@ -766,6 +819,23 @@ body:has(.admin-shell) {
   margin-top: 14px;
 }
 
+.meta-pending-list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  color: #17345f;
+}
+
+.meta-pending-list-head strong {
+  font-size: 12px;
+}
+
+.meta-pending-list-head span {
+  color: #667085;
+  font-size: 11px;
+}
+
 .meta-pending-row {
   display: grid;
   grid-template-columns: minmax(150px, 1fr) minmax(110px, .7fr) minmax(130px, .8fr) auto;
@@ -788,6 +858,48 @@ body:has(.admin-shell) {
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.meta-pending-list-toggle {
+  min-height: 38px;
+  border: 1px solid #cbd8e8;
+  background: #fff;
+  color: #17345f;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.meta-pending-list-toggle:hover {
+  border-color: var(--admin-cobalt);
+  background: #eef4ff;
+}
+
+.meta-pending-empty {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 14px;
+  border: 1px dashed #c7d7c1;
+  background: #fbfdf8;
+  padding: 12px;
+  color: #557241;
+}
+
+.meta-pending-empty > div {
+  display: grid;
+  gap: 3px;
+}
+
+.meta-pending-empty strong {
+  color: #365526;
+  font-size: 12px;
+}
+
+.meta-pending-empty small {
+  color: #687662;
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 @media (max-width: 720px) {
@@ -1803,7 +1915,8 @@ body:has(.admin-shell) {
   font-size: 13px;
 }
 
-.customer-owner-search-clear {
+.customer-owner-search-clear,
+.quote-history-search-clear {
   display: grid;
   place-items: center;
   flex: 0 0 26px;
@@ -1815,9 +1928,16 @@ body:has(.admin-shell) {
   color: #77736d !important;
 }
 
-.customer-owner-search-clear:not(:disabled):hover {
+.customer-owner-search-clear:not(:disabled):hover,
+.quote-history-search-clear:not(:disabled):hover {
   background: #eeeae3 !important;
   color: #171717 !important;
+}
+
+.customer-owner-search-clear:disabled,
+.quote-history-search-clear:disabled {
+  cursor: default;
+  opacity: .35;
 }
 
 .customer-tier-summary {
@@ -2709,6 +2829,11 @@ body:has(.admin-shell) {
   font: inherit;
   font-size: 12px;
   cursor: pointer;
+}
+
+.quote-history-actions button:disabled {
+  cursor: not-allowed;
+  opacity: .5;
 }
 
 .quote-history-list {
@@ -6524,6 +6649,25 @@ body:has(.admin-shell) {
   color: var(--admin-muted);
   font-size: 12px;
   text-align: center;
+}
+
+.quote-archive-load-more {
+  width: 100%;
+  min-height: 38px;
+  margin-top: 10px;
+  border: 1px solid var(--admin-line);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--admin-cobalt);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.quote-archive-load-more:hover {
+  border-color: var(--admin-cobalt);
+  background: #f7faff;
 }
 
 /* Customer-facing copy and export are deliberately the final block in the quote sheet. */

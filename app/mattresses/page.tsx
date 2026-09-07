@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import FadeIn from "@/components/ui/FadeIn";
 import { getProductsByCategory } from "@/lib/products";
 
-const PHONE = "tel:15355787546";
+const PHONE = "https://wa.me/8617796045579";
 const HERO = "/images/Mattress Collection/01-hero.jpg";
 
 export const metadata: Metadata = {
@@ -18,6 +18,12 @@ export const metadata: Metadata = {
       "Softly tailored classics and clean contemporary profiles — handmade mattresses, made to order in our Foshan workshop.",
     type: "website",
     images: [{ url: encodeURI(HERO) }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Mattress Collection | Meimi&H",
+    description: "Handmade mattresses, made to order in our Foshan workshop.",
+    images: [encodeURI(HERO)],
   },
 };
 
@@ -129,9 +135,11 @@ export default function MattressesPage() {
           </p>
           <a
             href={enquiryHref}
+            target="_blank"
+            rel="noreferrer"
             className="mt-8 inline-flex items-center gap-2 bg-[#6B2737] px-7 py-3.5 text-sm font-medium tracking-[0.12em] text-white transition-colors duration-300 hover:bg-stone-900"
           >
-            CALL 15355787546
+            WHATSAPP +86 177 9604 5579
             <span>&rarr;</span>
           </a>
         </FadeIn>

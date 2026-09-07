@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+const currentYear = new Date().getFullYear();
+
 const socialLinks = [
   { label: "TikTok", href: "https://www.tiktok.com/@meimi_furniture" },
   { label: "Instagram", href: "https://www.instagram.com/meimi_furniture_us" },
@@ -32,10 +34,12 @@ export default function Footer() {
             ))}
           </div>
           <a
-            href="tel:15355787546"
+            href="https://wa.me/8617796045579"
+            target="_blank"
+            rel="noreferrer"
             className="font-medium text-stone-700 transition-colors duration-300 hover:text-[#6B2737]"
           >
-            Call 15355787546
+            WhatsApp +86 177 9604 5579
           </a>
           <Link
             href="/privacy"
@@ -44,7 +48,7 @@ export default function Footer() {
             Privacy Policy
           </Link>
           <p className="text-xs uppercase tracking-[0.24em] text-stone-500">
-            &copy; 2025 Meimi&H. All rights reserved.
+            &copy; {currentYear} Meimi&H. All rights reserved.
           </p>
         </div>
       </div>

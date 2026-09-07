@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Phone } from "lucide-react";
+import { ArrowLeft, MessageCircle } from "lucide-react";
 
 export default function NotFound() {
   return (
@@ -16,8 +16,8 @@ export default function NotFound() {
           <Link href="/app" className="inline-flex min-h-12 items-center gap-2 border border-stone-300 px-5 text-xs font-medium text-stone-700">
             打开产品图册
           </Link>
-          <a href="tel:15355787546" className="inline-flex min-h-12 items-center gap-2 border border-[#6B2737] px-5 text-xs font-medium text-[#6B2737]">
-            <Phone size={16} strokeWidth={1.7} /> 15355787546
+          <a href="https://wa.me/8617796045579" target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center gap-2 border border-[#6B2737] px-5 text-xs font-medium text-[#6B2737]">
+            <MessageCircle size={16} strokeWidth={1.7} /> WhatsApp +86 177 9604 5579
           </a>
         </div>
       </section>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { getFolderImagePaths } from "@/lib/imageAssets";
+import { siteConfig } from "@/lib/seo-config";
 import FadeIn from "@/components/ui/FadeIn";
 
 export const metadata: Metadata = {
@@ -8,6 +10,18 @@ export const metadata: Metadata = {
   description:
     "Meimi&H is a premium furniture atelier in Foshan, China — 20+ years of craftsmanship meeting a refined global aesthetic. The art of refined living.",
   alternates: { canonical: "/about" },
+  openGraph: {
+    title: "About Meimi&H | Foshan Furniture Atelier",
+    description: "Discover the craftsmanship and refined global aesthetic behind Meimi&H furniture.",
+    type: "website",
+    images: [{ url: "/images/Hero/hero4.jpg" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About Meimi&H | Foshan Furniture Atelier",
+    description: "Discover the craftsmanship and refined global aesthetic behind Meimi&H furniture.",
+    images: ["/images/Hero/hero4.jpg"],
+  },
 };
 
 const FALLBACK = "/images/Other/fallback.jpg";
@@ -38,9 +52,23 @@ export default function AboutPage() {
   const atelierImage = pick(0);
   const craftImage = pick(1);
   const showroomImage = pick(2);
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Meimi&H",
+    url: siteConfig.url,
+    description: "Premium furniture atelier and custom interior manufacturer in Foshan, China.",
+    sameAs: [
+      "https://www.tiktok.com/@meimi_furniture",
+      "https://www.instagram.com/meimi_furniture_us",
+      "https://www.facebook.com/profile.php?id=61589995301371",
+    ],
+    address: { "@type": "PostalAddress", addressLocality: "Foshan", addressRegion: "Guangdong", addressCountry: "CN" },
+  };
 
   return (
     <main className="bg-[#FAF9F6] text-stone-800">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
       {/* HEADER */}
       <section className="px-6 pt-32 sm:px-8 lg:px-10 lg:pt-40">
         <FadeIn>
@@ -167,6 +195,18 @@ export default function AboutPage() {
               Meimi&amp;H
             </footer>
           </blockquote>
+        </FadeIn>
+      </section>
+
+      <section className="border-t border-stone-200/70 px-6 py-20 text-center sm:px-8 lg:px-10">
+        <FadeIn>
+          <p className="text-xs font-medium uppercase tracking-[0.4em] text-stone-400">Continue exploring</p>
+          <h2 className="mt-4 text-2xl font-extralight tracking-tight text-stone-900 sm:text-3xl">Find the right direction for your space.</h2>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link href="/products" className="inline-flex min-h-11 items-center gap-2 bg-[#6B2737] px-6 text-sm font-medium text-white transition-colors hover:bg-stone-900">Explore products <span aria-hidden="true">→</span></Link>
+            <Link href="/case-showcase" className="inline-flex min-h-11 items-center gap-2 border border-stone-300 px-6 text-sm font-medium text-stone-700 transition-colors hover:border-stone-900 hover:text-stone-950">View case showcase <span aria-hidden="true">→</span></Link>
+            <Link href="/contact" className="inline-flex min-h-11 items-center gap-2 border-b border-[#6B2737] px-1 text-sm font-medium text-[#6B2737] transition-colors hover:border-stone-900 hover:text-stone-900">Contact us <span aria-hidden="true">→</span></Link>
+          </div>
         </FadeIn>
       </section>
     </main>

@@ -7,7 +7,7 @@ import { useState } from "react";
 type SubItem = { label: string; href: string };
 type MenuColumn = { title: string; items: SubItem[] };
 
-const productsMenu: MenuColumn[] = [
+const legacyProductsMenu: MenuColumn[] = [
   {
     title: "Ready-Made Collections",
     items: [
@@ -34,14 +34,46 @@ const productsMenu: MenuColumn[] = [
   },
 ];
 
+const publicProductsMenu: MenuColumn[] = [
+  {
+    title: "Collections",
+    items: [
+      { label: "Sofas", href: "/products#sofas" },
+      { label: "Lounge Chairs", href: "/products#lounge-chairs" },
+      { label: "Dining Tables", href: "/products#dining-tables" },
+      { label: "Coffee Tables", href: "/products#coffee-tables" },
+    ],
+  },
+  {
+    title: "Bedroom & Storage",
+    items: [
+      { label: "Beds & Mattresses", href: "/products#beds-mattresses" },
+      { label: "Cabinets & Storage", href: "/products#cabinets" },
+    ],
+  },
+  {
+    title: "More collections",
+    items: [
+      { label: "Outdoor Furniture", href: "/products#outdoor" },
+      { label: "Handmade Mattress Collection", href: "/mattresses" },
+      { label: "Luxury Series", href: "/products/luxury-series" },
+    ],
+  },
+];
+
 const otherNavItems = [
   { label: "Home", href: "/" },
   { label: "Custom Furniture", href: "/custom" },
   { label: "Case Showcase", href: "/case-showcase" },
+  { label: "Blog", href: "/blog" },
+  { label: "About us", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export default function Header() {
   const pathname = usePathname();
+  // Keep the internal catalogue's existing navigation isolated from the public site.
+  const productsMenu = pathname.startsWith("/app") ? legacyProductsMenu : publicProductsMenu;
   const [megaOpen, setMegaOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
@@ -65,7 +97,7 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-7 text-sm font-medium text-stone-700 lg:flex">
-          <Link href="/" className={navLinkClass("/")}>
+          <Link href="/" aria-current={pathname === "/" ? "page" : undefined} className={navLinkClass("/")}>
             Home
           </Link>
 
@@ -76,14 +108,22 @@ export default function Header() {
           >
             <Link
               href="/products"
+              aria-haspopup="true"
+              aria-expanded={megaOpen}
+              aria-controls="public-products-mega-menu"
+              aria-current={pathname.startsWith("/products") ? "page" : undefined}
               className={`inline-flex items-center gap-1 ${navLinkClass("/products", false)}`}
+              onFocus={() => setMegaOpen(true)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") setMegaOpen(false);
+              }}
             >
               Products
               <span aria-hidden className="text-xs">{"\u25BE"}</span>
             </Link>
 
             {megaOpen && (
-              <div className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-4">
+              <div id="public-products-mega-menu" className="absolute left-1/2 top-full z-50 -translate-x-1/2 pt-4">
                 <div className="w-[720px] overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-lg">
                   <div className="grid grid-cols-3 gap-8 p-8">
                     {productsMenu.map((col) => (
@@ -129,18 +169,25 @@ export default function Header() {
             )}
           </div>
 
-          <Link href="/custom" className={navLinkClass("/custom")}>
+          <Link href="/custom" aria-current={pathname.startsWith("/custom") ? "page" : undefined} className={navLinkClass("/custom")}>
             Custom Furniture
           </Link>
-          <Link href="/case-showcase" className={navLinkClass("/case-showcase")}>
+          <Link href="/case-showcase" aria-current={pathname.startsWith("/case-showcase") ? "page" : undefined} className={navLinkClass("/case-showcase")}>
             Case Showcase
           </Link>
+          {otherNavItems.slice(3).map((item) => (
+            <Link key={item.href} href={item.href} aria-current={pathname.startsWith(item.href) ? "page" : undefined} className={navLinkClass(item.href)}>
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
         {/* Mobile hamburger */}
         <button
           type="button"
           aria-label="Toggle menu"
+          aria-expanded={mobileOpen}
+          aria-controls="public-mobile-navigation"
           className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-stone-300 text-stone-700 lg:hidden"
           onClick={() => setMobileOpen((v) => !v)}
         >
@@ -150,12 +197,13 @@ export default function Header() {
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="border-t border-stone-200 bg-[#FAF9F6] lg:hidden">
+        <div id="public-mobile-navigation" className="border-t border-stone-200 bg-[#FAF9F6] lg:hidden">
           <div className="mx-auto max-w-7xl px-6 py-4 sm:px-8">
             <ul className="space-y-1 text-sm font-medium text-stone-800">
               <li>
-                <Link
+            <Link
                   href="/"
+                  aria-current={pathname === "/" ? "page" : undefined}
                   className={`block rounded px-3 py-3 hover:bg-stone-100 ${
                     pathname === "/" ? "bg-stone-100 text-[#6B2737]" : ""
                   }`}
@@ -167,6 +215,8 @@ export default function Header() {
               <li>
                 <button
                   type="button"
+                  aria-expanded={mobileProductsOpen}
+                  aria-controls="public-mobile-products-menu"
                   className="flex w-full items-center justify-between rounded px-3 py-3 text-left hover:bg-stone-100"
                   onClick={() => setMobileProductsOpen((v) => !v)}
                 >
@@ -176,7 +226,18 @@ export default function Header() {
                   </span>
                 </button>
                 {mobileProductsOpen && (
-                  <div className="mt-1 space-y-4 rounded-lg bg-white px-4 py-4">
+                  <div id="public-mobile-products-menu" className="mt-1 space-y-4 rounded-lg bg-white px-4 py-4">
+                    <Link
+                      href="/products"
+                      className="flex items-center justify-between border-b border-stone-200 pb-3 text-sm font-semibold text-[#6B2737]"
+                      onClick={() => {
+                        setMobileOpen(false);
+                        setMobileProductsOpen(false);
+                      }}
+                    >
+                      <span>View all products</span>
+                      <span aria-hidden="true">&rarr;</span>
+                    </Link>
                     {productsMenu.map((col) => (
                       <div key={col.title}>
                         <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
@@ -209,8 +270,9 @@ export default function Header() {
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      aria-current={pathname.startsWith(item.href) ? "page" : undefined}
                       className={`block rounded px-3 py-3 hover:bg-stone-100 ${
-                        pathname === item.href ? "bg-stone-100 text-[#6B2737]" : ""
+                        pathname.startsWith(item.href) ? "bg-stone-100 text-[#6B2737]" : ""
                       }`}
                       onClick={() => setMobileOpen(false)}
                     >

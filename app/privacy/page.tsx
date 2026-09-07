@@ -5,11 +5,11 @@ export default function PrivacyPage() {
         <p className="text-sm font-semibold uppercase tracking-[0.3em] text-stone-500">Legal</p>
         <h1 className="mt-3 text-4xl font-semibold text-stone-900">Privacy Policy</h1>
         <span className="mt-4 block h-0.5 w-16 bg-[#6B2737]" />
-        <p className="mt-4 text-sm text-stone-500">Last updated: July 2025</p>
+        <p className="mt-4 text-sm text-stone-500">Last updated: September 2026</p>
         <div className="mt-10 space-y-8 text-base leading-8 text-stone-700">
           <section>
             <h2 className="text-xl font-semibold text-stone-900">1. Who We Are</h2>
-            <p className="mt-3">This website is operated by <strong>Meimi&amp;H</strong>, a premium furniture manufacturer based in Shunde District, Longjiang Town, Foshan, Guangdong, China. Contact us by phone: <a href="tel:15355787546" className="text-[#6B2737] hover:underline">15355787546</a>.</p>
+            <p className="mt-3">This website is operated by <strong>Meimi&amp;H</strong>, a premium furniture manufacturer based in Shunde District, Longjiang Town, Foshan, Guangdong, China. Contact us on WhatsApp: <a href="https://wa.me/8617796045579" target="_blank" rel="noreferrer" className="text-[#6B2737] hover:underline">+86 177 9604 5579</a>.</p>
           </section>
           <section>
             <h2 className="text-xl font-semibold text-stone-900">2. Information We Collect</h2>
@@ -40,7 +40,7 @@ export default function PrivacyPage() {
           </section>
           <section>
             <h2 className="text-xl font-semibold text-stone-900">8. Contact Us</h2>
-            <p className="mt-3"><strong>Meimi&amp;H</strong><br />Shunde District, Longjiang Town, Foshan, Guangdong, China<br />Phone: <a href="tel:15355787546" className="text-[#6B2737] hover:underline">15355787546</a></p>
+            <p className="mt-3"><strong>Meimi&amp;H</strong><br />Shunde District, Longjiang Town, Foshan, Guangdong, China<br />WhatsApp: <a href="https://wa.me/8617796045579" target="_blank" rel="noreferrer" className="text-[#6B2737] hover:underline">+86 177 9604 5579</a></p>
           </section>
         </div>
       </div>

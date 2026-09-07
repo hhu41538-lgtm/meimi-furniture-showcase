@@ -1,14 +1,27 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import FadeIn from "@/components/ui/FadeIn";
 
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Get in touch with Meimi&H — premium furniture handcrafted in Foshan, China. Call us on 15355787546, we respond within 24 hours.",
+    "Get in touch with Meimi&H — premium furniture handcrafted in Foshan, China. Message us on WhatsApp at +86 177 9604 5579, we respond within 24 hours.",
   alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "Contact Meimi&H | WhatsApp Furniture Enquiries",
+    description: "Message Meimi&H on WhatsApp about premium furniture and custom interiors from Foshan.",
+    type: "website",
+    images: [{ url: "/images/Hero/hero4.jpg" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact Meimi&H | WhatsApp Furniture Enquiries",
+    description: "Message Meimi&H on WhatsApp about premium furniture and custom interiors from Foshan.",
+    images: ["/images/Hero/hero4.jpg"],
+  },
 };
 
-const PHONE = "tel:15355787546";
+const PHONE = "https://wa.me/8617796045579";
 
 const socialLinks = [
   { platform: "TikTok", href: "https://www.tiktok.com/@meimi_furniture", handle: "@meimi_furniture" },
@@ -35,9 +48,11 @@ export default function ContactPage() {
             </p>
             <a
               href={PHONE}
+              target="_blank"
+              rel="noreferrer"
               className="mt-10 inline-flex items-center gap-2 bg-[#6B2737] px-8 py-3.5 text-sm font-medium tracking-[0.12em] text-white transition-colors duration-300 hover:bg-stone-900"
             >
-              CALL 15355787546
+              WHATSAPP +86 177 9604 5579
               <span>&rarr;</span>
             </a>
           </div>
@@ -62,9 +77,11 @@ export default function ContactPage() {
               </p>
               <a
                 href={PHONE}
+                target="_blank"
+                rel="noreferrer"
                 className="group mt-8 inline-flex items-center gap-2 text-sm font-medium tracking-[0.12em] text-[#6B2737] transition-colors duration-300 hover:text-stone-900"
               >
-                15355787546
+                +86 177 9604 5579
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   &rarr;
                 </span>
@@ -107,11 +124,18 @@ export default function ContactPage() {
         </h2>
         <a
           href={PHONE}
+          target="_blank"
+          rel="noreferrer"
           className="mt-8 inline-flex items-center gap-2 border-b border-[#6B2737] pb-1 text-sm font-medium tracking-[0.12em] text-[#6B2737] transition-colors duration-300 hover:border-stone-900 hover:text-stone-900"
         >
           START A CONVERSATION
           <span>&rarr;</span>
         </a>
+        <div className="mt-10 flex flex-wrap justify-center gap-4 text-sm">
+          <Link href="/products" className="inline-flex min-h-10 items-center border border-stone-300 px-5 text-stone-700 transition-colors hover:border-stone-900 hover:text-stone-950">Explore products <span className="ml-2" aria-hidden="true">→</span></Link>
+          <Link href="/case-showcase" className="inline-flex min-h-10 items-center border border-stone-300 px-5 text-stone-700 transition-colors hover:border-stone-900 hover:text-stone-950">View case showcase <span className="ml-2" aria-hidden="true">→</span></Link>
+          <Link href="/custom" className="inline-flex min-h-10 items-center border border-stone-300 px-5 text-stone-700 transition-colors hover:border-stone-900 hover:text-stone-950">Custom furniture <span className="ml-2" aria-hidden="true">→</span></Link>
+        </div>
       </section>
     </main>
   );
