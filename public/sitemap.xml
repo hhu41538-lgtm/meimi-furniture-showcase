@@ -1,82 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url> <loc>https://www.meimifurniture.com/</loc> <lastmod>2026-07-06</lastmod> <changefreq>monthly</changefreq> <priority>1.0</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/custom</loc> <lastmod>2026-07-06</lastmod> <changefreq>monthly</changefreq> <priority>0.9</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/blog</loc> <lastmod>2026-07-06</lastmod> <changefreq>weekly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/blog/how-to-buy-custom-furniture-from-china</loc> <lastmod>2026-07-06</lastmod> <changefreq>monthly</changefreq> <priority>0.6</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/blog/handmade-mattress-guide</loc> <lastmod>2026-07-28</lastmod> <changefreq>monthly</changefreq> <priority>0.6</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/blog/why-foshan-furniture-capital</loc> <lastmod>2026-07-24</lastmod> <changefreq>monthly</changefreq> <priority>0.6</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/blog/interior-designer-guide-custom-furniture-china</loc> <lastmod>2026-07-20</lastmod> <changefreq>monthly</changefreq> <priority>0.6</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/about</loc> <lastmod>2026-07-04</lastmod> <changefreq>monthly</changefreq> <priority>0.8</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/case-showcase</loc> <lastmod>2026-07-04</lastmod> <changefreq>monthly</changefreq> <priority>0.8</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/contact</loc> <lastmod>2026-07-04</lastmod> <changefreq>monthly</changefreq> <priority>0.8</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products</loc> <lastmod>2026-07-04</lastmod> <changefreq>monthly</changefreq> <priority>0.8</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app</loc> <lastmod>2026-08-24</lastmod> <changefreq>weekly</changefreq> <priority>0.8</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/custom-curve-sofa</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/beijing-residence-interior</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/dark-tonal-residence</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/modern-french-kitchen</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/soft-minimal-study</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/warm-contemporary-living</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/riviere-bed</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/elizabeth-mattress</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/isabel-mattress</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/travertine-dining-table</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/jason-dining-table</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/maxim-petal-dining-table</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/airplane-cabinet</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/palawan-bar-cabinet</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/stina-upholstered-bed</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/terrace-dining-setting</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/studio/outdoor-modular-lounge</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/bamboo-sofa</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/bessel-sofa</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/brera-sofa</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/coupe-sofa</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/rogers-sofa</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/vincent-sofa</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/vivian-sofa</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/baxter-drop-dining-table</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/hourglass-dining-table</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/walnut-long-dining-table</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/square-coffee-table</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/woven-garden-lounge</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/modular-terrace-lounge</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/poolside-daybed</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/terrace-conversation-set</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/elizabeth</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/isabel</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/margaret</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/sophia</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/louise</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/ms-233b</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/ms-3d</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/experts-choice-125</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/app/products/stina</loc> <lastmod>2026-08-25</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/mattresses</loc> <lastmod>2026-07-27</lastmod> <changefreq>monthly</changefreq> <priority>0.8</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/bamboo-sofa</loc> <lastmod>2026-07-04</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/bessel-sofa</loc> <lastmod>2026-07-04</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/brera-sofa</loc> <lastmod>2026-07-04</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/coupe-sofa</loc> <lastmod>2026-07-04</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/rogers-sofa</loc> <lastmod>2026-07-04</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/vincent-sofa</loc> <lastmod>2026-07-04</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/vivian-sofa</loc> <lastmod>2026-07-04</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/baxter-drop-dining-table</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/hourglass-dining-table</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/walnut-long-dining-table</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/square-coffee-table</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/woven-garden-lounge</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/modular-terrace-lounge</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/poolside-daybed</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/terrace-conversation-set</loc> <lastmod>2026-08-24</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/elizabeth</loc> <lastmod>2026-07-27</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/isabel</loc> <lastmod>2026-07-27</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/margaret</loc> <lastmod>2026-07-27</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/sophia</loc> <lastmod>2026-07-27</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/louise</loc> <lastmod>2026-07-27</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/ms-233b</loc> <lastmod>2026-07-27</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/ms-3d</loc> <lastmod>2026-07-27</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/experts-choice-125</loc> <lastmod>2026-07-27</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/products/stina</loc> <lastmod>2026-07-27</lastmod> <changefreq>monthly</changefreq> <priority>0.7</priority> </url>
-  <url> <loc>https://www.meimifurniture.com/privacy</loc> <lastmod>2026-07-04</lastmod> <changefreq>yearly</changefreq> <priority>0.3</priority> </url>
+  <url><loc>https://www.meimifurniture.com/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.meimifurniture.com/products</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.meimifurniture.com/products/luxury-series</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.meimifurniture.com/mattresses</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.meimifurniture.com/custom</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.meimifurniture.com/case-showcase</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.meimifurniture.com/about</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.meimifurniture.com/contact</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.meimifurniture.com/blog</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.meimifurniture.com/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://www.meimifurniture.com/products/showroom/lillian-lounge-chair</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.meimifurniture.com/products/showroom/lounge-chair-collection</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.meimifurniture.com/case-showcase/beijing-qingcui-garden</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.meimifurniture.com/case-showcase/bao-neng-taikoo-hui</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.meimifurniture.com/case-showcase/nanjing-jiangwan-city</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.meimifurniture.com/case-showcase/shenzhen-lan-jiangshan</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.meimifurniture.com/case-showcase/shuixie-huadu</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.meimifurniture.com/case-showcase/taiyuan-vanke-jade-garden</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.meimifurniture.com/case-showcase/tianjian-tianjiao</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.meimifurniture.com/blog/how-to-buy-custom-furniture-from-china</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.meimifurniture.com/blog/handmade-mattress-guide</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.meimifurniture.com/blog/why-foshan-furniture-capital</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.meimifurniture.com/blog/interior-designer-guide-custom-furniture-china</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.meimifurniture.com/products/bamboo-sofa</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/bessel-sofa</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/brera-sofa</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/coupe-sofa</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/rogers-sofa</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/vincent-sofa</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/vivian-sofa</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/baxter-drop-dining-table</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/hourglass-dining-table</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/walnut-long-dining-table</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/square-coffee-table</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/woven-garden-lounge</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/modular-terrace-lounge</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/poolside-daybed</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/terrace-conversation-set</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/elizabeth</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/isabel</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/margaret</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/sophia</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/louise</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/ms-233b</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/ms-3d</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/experts-choice-125</loc></url>
+  <url><loc>https://www.meimifurniture.com/products/stina</loc></url>
 </urlset>
