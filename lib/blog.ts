@@ -458,6 +458,154 @@ const posts: Post[] = [
       },
     ],
   },
+  {
+    slug: "how-to-plan-a-whole-home-furniture-project",
+    title: "How to Plan a Whole-Home Furniture Project with a Custom Atelier",
+    description:
+      "Planning furniture for an entire home? Learn how to set a clear brief, coordinate rooms, choose materials and manage a custom furniture project from first idea to delivery.",
+    date: "2026-09-07",
+    readingTime: "6 min read",
+    excerpt:
+      "A whole-home furniture project feels easier when every decision is connected. This practical framework helps you move from a moodboard to a coherent, made-to-order interior.",
+    heroImage: "/images/catalogue-app/beijing-residence-interior.jpg",
+    keywords: [
+      "whole home furniture project",
+      "custom furniture for entire home",
+      "bespoke interior furniture planning",
+      "custom furniture atelier",
+      "made to order furniture China",
+    ],
+    body: [
+      {
+        type: "p",
+        text: "Furnishing one room is a series of choices. Furnishing an entire home is a system. The sofa, dining table, bed and cabinetry need to work together in scale, colour and character, while each room still feels purposeful. That is why a whole-home project benefits from a clear process before any piece enters production.",
+      },
+      {
+        type: "p",
+        text: "Working with a custom atelier gives you more freedom than buying from a fixed collection, but it also makes the brief more important. The following framework keeps the creative possibilities open while giving the project a practical structure.",
+      },
+      { type: "h2", text: "Begin with the Home, Not the Shopping List" },
+      {
+        type: "p",
+        text: "Start by mapping how the home is used. Note the rooms, the people who use them, the way guests move through the space and any moments that need special attention. An open living area may need a generous sectional and a quieter reading chair; a compact bedroom may need integrated storage and a bed with carefully considered proportions.",
+      },
+      {
+        type: "ul",
+        items: [
+          "**Room schedule** — list every room, its purpose and the pieces required.",
+          "**Key dimensions** — record walls, doors, windows, circulation routes and lift or stair access.",
+          "**Reference direction** — collect images that show the mood, materials and level of detail you want.",
+          "**Practical requirements** — include storage, family use, pets, hospitality and maintenance needs.",
+        ],
+      },
+      { type: "h2", text: "Create One Material Story" },
+      {
+        type: "p",
+        text: "A coherent home does not need every room to match. It needs a few materials and tones that return throughout the scheme. You might carry a warm walnut tone from the dining room into a cabinet, repeat a textured neutral fabric in the living room and bedroom, then use stone or metal details as a quiet connecting note.",
+      },
+      {
+        type: "p",
+        text: "Ask your atelier to build a material schedule rather than approving each piece in isolation. Physical samples are especially valuable for upholstery, timber, stone and metal finishes because screens cannot show texture, sheen or grain accurately.",
+      },
+      { type: "h2", text: "Resolve Scale Before Surface" },
+      {
+        type: "p",
+        text: "Beautiful materials cannot rescue the wrong proportions. Confirm the footprint of every major piece against the plan, then check the relationships between them: sofa depth and coffee-table position, dining-table length and circulation, bed height and bedside storage. A good custom maker can adjust dimensions by centimetre so the furniture belongs to the room rather than simply fitting inside it.",
+      },
+      { type: "h2", text: "Use Milestones to Keep Decisions Clear" },
+      {
+        type: "ul",
+        items: [
+          "**Brief and budget.** Agree the rooms, quantities, target materials and the level of customisation.",
+          "**Design development.** Review drawings, dimensions and finish options as one coordinated package.",
+          "**Sample approval.** Confirm fabrics, leathers, timber, stone and metal before production begins.",
+          "**Production review.** Keep one decision log and request progress images for considered pieces.",
+          "**Delivery planning.** Coordinate packing, freight, access and installation with the site schedule.",
+        ],
+      },
+      { type: "h2", text: "Plan for the Final Ten Percent" },
+      {
+        type: "p",
+        text: "The last details often determine whether an interior feels finished: the clearance around a cabinet door, the alignment of seams, the height of a bedside table and the way a stone edge meets a timber frame. Build review time into the programme and keep the final specification in writing. For a made-to-order project, a realistic production period is around two months, followed by shipping time to your destination.",
+      },
+      {
+        type: "p",
+        text: "Meimi&H works with private clients and designers on coordinated furniture packages, from a single room to a complete residence. Our Foshan atelier can take a project from references and plans to finished, export-packed pieces made for your home.",
+      },
+    ],
+  },
+  {
+    slug: "best-outdoor-furniture-materials-humid-climates",
+    title: "Choosing Outdoor Furniture Materials for Humid Climates",
+    description:
+      "Coastal and tropical spaces need more than weather-resistant styling. Learn how to choose outdoor furniture materials, finishes and construction details that stay comfortable and beautiful in humid climates.",
+    date: "2026-09-07",
+    readingTime: "5 min read",
+    excerpt:
+      "Outdoor furniture has to work with the climate. Here is how to compare frames, fabrics, finishes and drainage when you are furnishing a terrace, garden or poolside space.",
+    heroImage: "/images/catalogue-app/outdoor-collection-hero.jpg",
+    keywords: [
+      "outdoor furniture humid climate",
+      "best outdoor furniture materials",
+      "custom outdoor furniture",
+      "tropical terrace furniture",
+      "poolside furniture manufacturer",
+    ],
+    body: [
+      {
+        type: "p",
+        text: "Outdoor furniture in a humid climate is exposed to more than rain. Warm air, salt, strong sunlight and repeated drying all affect the frame, finish, upholstery and hardware. The right specification balances durability with the comfort and visual softness you want from an outdoor room.",
+      },
+      {
+        type: "p",
+        text: "The most reliable approach is to choose the construction and materials as a complete system. A weather-resistant fabric cannot compensate for standing water in a frame, and a beautiful timber finish will not last if the piece is left without the care it needs.",
+      },
+      { type: "h2", text: "Start with Exposure" },
+      {
+        type: "p",
+        text: "Describe the site before choosing a material. Is the furniture fully exposed, under a roof, beside a pool or close to the sea? How quickly does the area dry after rain? Does the space receive direct afternoon sun? These answers determine whether you need maximum UV resistance, fast drainage, salt-resistant hardware or a finish that can be refreshed seasonally.",
+      },
+      { type: "h2", text: "Compare the Main Frame Options" },
+      {
+        type: "ul",
+        items: [
+          "**Powder-coated metal** offers a clean, precise look and strong structural performance. Specify a suitable coating system and stainless or corrosion-resistant hardware for coastal locations.",
+          "**Teak and other stable hardwoods** bring warmth and age gracefully. They still need correct detailing, ventilation and a maintenance plan, especially where water can collect.",
+          "**Synthetic woven materials** are light and relaxed, making them useful for lounge settings. Ask about UV stability, edge finishing and how the weave is secured to the frame.",
+          "**Mixed-material construction** can create a more residential feel, but every junction should allow drainage and avoid trapping moisture between materials.",
+        ],
+      },
+      { type: "h2", text: "Upholstery Is a Construction Decision" },
+      {
+        type: "p",
+        text: "Choose outdoor fabrics for their performance as well as their colour. Look for solution-dyed fibres, strong lightfastness and a weave that feels comfortable against the skin. Seat cushions should use quick-dry construction where possible, with drainage through the cover and foam rather than a sealed base that holds water.",
+      },
+      {
+        type: "p",
+        text: "Cushion shape matters too. A slight pitch helps water run off, while removable covers make cleaning and seasonal storage easier. Always ask how the fabric should be cleaned and whether replacement covers can be made later.",
+      },
+      { type: "h2", text: "Design for Air and Drainage" },
+      {
+        type: "p",
+        text: "Good outdoor furniture lets air move through it. Raised bases, open slats and considered gaps help surfaces dry; concealed drainage paths prevent water pooling inside frames. Avoid placing a solid panel directly on a wet terrace unless the design includes a clear way for water to escape.",
+      },
+      { type: "h2", text: "Ask These Questions Before Ordering" },
+      {
+        type: "ul",
+        items: [
+          "Which coating, timber treatment or protective finish is specified for this climate?",
+          "Are the fasteners and internal fixings suitable for humidity or salt air?",
+          "How does water leave the frame and cushions after heavy rain?",
+          "What care is required, and which parts can be replaced or refinished?",
+          "Can the maker provide material samples and construction details before production?",
+        ],
+      },
+      {
+        type: "p",
+        text: "A terrace, garden or poolside space should feel as considered as the rooms inside. Meimi&H develops made-to-order outdoor lounges, dining sets and daybeds with the dimensions, materials and finish suited to each project. Share your site conditions and references with our team, and we can recommend a practical specification before you commit.",
+      },
+    ],
+  },
 ];
 
 export function getPosts(): Post[] {
