@@ -19,7 +19,7 @@ export function generateMetadata({ params }: { params: Promise<{ slug: string }>
     return {
       title: product.name,
       description: product.description,
-      alternates: { canonical: `/products/showroom/${product.slug}` },
+      alternates: { canonical: `/products/showroom/${product.slug}/` },
       openGraph: {
         title: `${product.name} | Meimi&H`,
         description: product.description,

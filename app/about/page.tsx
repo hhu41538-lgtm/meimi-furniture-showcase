@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "About us",
   description:
     "Meimi&H is a premium furniture atelier in Foshan, China — 20+ years of craftsmanship meeting a refined global aesthetic. The art of refined living.",
-  alternates: { canonical: "/about" },
+  alternates: { canonical: "/about/" },
   openGraph: {
     title: "About Meimi&H | Foshan Furniture Atelier",
     description: "Discover the craftsmanship and refined global aesthetic behind Meimi&H furniture.",

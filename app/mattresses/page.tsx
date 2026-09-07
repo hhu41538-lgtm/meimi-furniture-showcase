@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: "Mattress Collection",
   description:
     "The Meimi&H mattress collection — hand-tufted, hand-stitched mattresses built layer by layer in our own workshop. Elizabeth, Isabel, Margaret, Stina and the Contemporary Edit. Factory-direct from Foshan.",
-  alternates: { canonical: "/mattresses" },
+  alternates: { canonical: "/mattresses/" },
   openGraph: {
     title: "Mattress Collection | Meimi&H",
     description:

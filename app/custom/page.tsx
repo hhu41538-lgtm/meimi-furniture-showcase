@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Custom Furniture Manufacturer | Bespoke, Made to Order",
   description:
     "Bespoke furniture made to order in our Foshan atelier. Two decades of craftsmanship, factory-direct: custom sofas, dining, bedroom, wardrobes, cabinetry and whole-home interiors, shipped worldwide.",
-  alternates: { canonical: "/custom" },
+  alternates: { canonical: "/custom/" },
   openGraph: {
     title: "Custom Furniture Manufacturer | Bespoke, Made to Order | Meimi&H",
     description:

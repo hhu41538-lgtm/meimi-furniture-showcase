@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Journal",
   description:
     "Guides and insights on custom furniture, bespoke interiors and factory-direct manufacturing from Meimi&H, a Foshan-based atelier serving clients worldwide.",
-  alternates: { canonical: "/blog" },
+  alternates: { canonical: "/blog/" },
   openGraph: {
     title: "Journal | Meimi&H",
     description: "Guides and insights on custom furniture, bespoke interiors and factory-direct manufacturing from Foshan.",

@@ -29,7 +29,7 @@ export function generateMetadata({
     return {
       title,
       description,
-      alternates: { canonical: `/products/${product.slug}` },
+      alternates: { canonical: `/products/${product.slug}/` },
       openGraph: {
         title: ogTitle,
         description,

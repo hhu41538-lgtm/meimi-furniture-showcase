@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: "Products",
   description:
     "Explore verified Meimi&H furniture collections — sofas, lounge chairs, dining tables, coffee tables, beds, cabinets, outdoor furniture and handmade mattresses. Factory-direct from Foshan.",
-  alternates: { canonical: "/products" },
+  alternates: { canonical: "/products/" },
   openGraph: {
     title: "Products | Meimi&H",
     description: "Explore verified Meimi&H furniture collections, made to order in Foshan.",

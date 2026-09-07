@@ -20,7 +20,7 @@ export function generateMetadata({ params }: { params: Promise<{ slug: string }>
     return {
       title,
       description: item.description,
-      alternates: { canonical: `/case-showcase/${item.id}` },
+      alternates: { canonical: `/case-showcase/${item.id}/` },
       openGraph: { title, description: item.description, type: "website", images: [{ url: image }] },
       twitter: { card: "summary_large_image", title, description: item.description, images: [image] },
     };

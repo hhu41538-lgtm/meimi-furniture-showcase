@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Contact",
   description:
     "Get in touch with Meimi&H — premium furniture handcrafted in Foshan, China. Message us on WhatsApp at +86 177 9604 5579, we respond within 24 hours.",
-  alternates: { canonical: "/contact" },
+  alternates: { canonical: "/contact/" },
   openGraph: {
     title: "Contact Meimi&H | WhatsApp Furniture Enquiries",
     description: "Message Meimi&H on WhatsApp about premium furniture and custom interiors from Foshan.",

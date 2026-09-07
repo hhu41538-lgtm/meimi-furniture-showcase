@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "Case Showcase",
   description:
     "Explore Meimi&H custom furniture and interior projects across China, from tailored kitchens and cabinetry to complete residential spaces.",
-  alternates: { canonical: "/case-showcase" },
+  alternates: { canonical: "/case-showcase/" },
   openGraph: {
     title: "Case Showcase | Meimi&H",
     description: "Explore Meimi&H custom furniture and interior projects across China.",

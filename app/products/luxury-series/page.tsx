@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Luxury Series | Meimi&H",
   description:
     "Explore verified pieces from the Meimi&H Luxury Series, including sculptural dining tables and upholstered bedroom furniture made to order in Foshan.",
-  alternates: { canonical: "/products/luxury-series" },
+  alternates: { canonical: "/products/luxury-series/" },
   openGraph: {
     title: "Luxury Series | Meimi&H",
     description: "Verified dining and bedroom pieces from the Meimi&H Luxury Series, made to order in Foshan.",
